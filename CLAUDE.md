@@ -105,6 +105,27 @@ Dùng `localStorage` với key `pti_raw_v1` (JSON dữ liệu) và `pti_filename
 - Màu brand: `#1565C0` (xanh PTI)
 - Font: `Be Vietnam Pro`
 
+## Quy ước ngưỡng ngày tồn (QUAN TRỌNG)
+
+| Bucket | Điều kiện | Ghi chú |
+|--------|-----------|---------|
+| 1–30 ngày | `n >= 1 && n <= 30` | |
+| 31–45 ngày | `n > 30 && n <= 45` | |
+| 46–89 ngày | `n > 45 && n < 90` | |
+| ≥ 90 ngày | `n >= 90` | Ngưỡng cảnh báo — dùng `>=90` KHÔNG phải `>90` |
+
+- `qua90`: `parseTon(...) >= 90` (dùng nhất quán toàn bộ file)
+- `g45_90`: `n > 45 && n < 90` (không bao gồm 90)
+- `g90 / b4`: `n >= 90` (bao gồm đúng 90 ngày)
+- Hàm `gdvKey(r)` phải dùng khi lấy mã GĐV thay vì `r['GĐV thụ lý']` trực tiếp
+
+## Hàm helper dùng chung
+
+- `parseDate(v)` — hàm global duy nhất parse ngày (Excel serial, Date, string). Không tạo bản sao cục bộ trong các hàm khác.
+- `gdvKey(r)` — lấy mã GĐV từ `r['GĐV thụ lý'] || r['Mã GĐV']`
+- `parseTon(v)` — parse số ngày tồn, trả về `null` nếu `n <= 0`
+- `parseMoney(v)` — parse số tiền, trả về `0` nếu không hợp lệ
+
 ## Tab Báo cáo XO — Nội dung mới
 
 ### BC1 — Thống kê Doanh thu SC các Gara/Showroom (PS năm hiện tại)
