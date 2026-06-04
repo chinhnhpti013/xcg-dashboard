@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Báo cáo Tồn đọng PTI SOS — Quảng Ninh</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#111827;--dark:#1f2937;--gray:#6b7280;--lgray:#f3f4f6;
+  --blue:#1565C0;--blue2:#1976D2;--blue-bg:#dbeafe;
+  --red:#dc2626;--red-bg:#fee2e2;
+  --amber:#d97706;--amber-bg:#fef3c7;
+  --green:#059669;--green-bg:#d1fae5;
+  --orange:#ea580c;
+}
+body{font-family:'Be Vietnam Pro',sans-serif;background:#e5e7eb;color:var(--black);min-height:100vh;padding:20px}
+
+/* ── UPLOAD OVERLAY ── */
+#upload-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;z-index:999;
+}
+.upload-box{
+  background:#fff;border-radius:16px;padding:40px 48px;text-align:center;
+  max-width:480px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,.3);
+}
+.upload-box h2{font-size:1.3rem;font-weight:800;color:var(--blue);margin-bottom:8px}
+.upload-box p{font-size:.85rem;color:var(--gray);margin-bottom:24px;line-height:1.6}
+.btn-up{
+  display:inline-flex;align-items:center;gap:8px;background:var(--blue);color:#fff;
+  border:none;padding:12px 32px;border-radius:8px;font-size:.9rem;font-weight:700;
+  cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;margin-bottom:12px;
+}
+.btn-restore-small{
+  display:block;margin:0 auto;background:none;border:1px solid #ccc;color:var(--gray);
+  padding:8px 20px;border-radius:6px;font-size:.8rem;cursor:pointer;
+  font-family:'Be Vietnam Pro',sans-serif;
+}
+#file-inp{display:none}
+
+/* ── INFOGRAPHIC WRAPPER ── */
+#infographic{display:none;max-width:1260px;margin:0 auto}
+
+/* ── TOOLBAR ── */
+.toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;flex-wrap:wrap;gap:8px;
+}
+.toolbar-left{font-size:.78rem;color:#6b7280}
+.btn-sm{
+  background:#fff;border:1px solid #d1d5db;color:var(--dark);
+  padding:6px 14px;border-radius:6px;font-size:.78rem;font-weight:600;
+  cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;
+}
+.btn-sm:hover{background:var(--lgray)}
+.btn-sm.blue{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* ── INFOGRAPHIC CARD ── */
+.info-card{
+  background:#fff;border-radius:12px;
+  box-shadow:0 4px 24px rgba(0,0,0,.08);
+  overflow:hidden;
+}
+
+/* ── HEADER ── */
+.info-header{
+  padding:20px 28px 16px;border-bottom:1px solid #e5e7eb;
+}
+.info-header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.info-title{font-size:1.35rem;font-weight:900;color:var(--black);line-height:1.25;letter-spacing:-.01em}
+.info-title span{color:var(--blue)}
+.info-date{
+  background:var(--black);color:#fff;padding:5px 14px;border-radius:6px;
+  font-size:.75rem;font-weight:700;white-space:nowrap;letter-spacing:.03em;
+}
+.info-subtitle{font-size:.8rem;color:var(--gray);margin-top:6px;line-height:1.5;max-width:680px}
+.info-org{font-size:.72rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+
+/* ── BODY GRID ── */
+.info-body{display:grid;grid-template-columns:1fr 1fr;border-top:3px solid var(--black)}
+.info-panel{padding:22px 26px}
+.info-panel+.info-panel{border-left:1px solid #e5e7eb}
+.info-panel-title{
+  font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--black);border-bottom:2px solid var(--black);padding-bottom:6px;margin-bottom:16px;
+}
+
+/* KPI blocks */
+.kpi-block{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+.kpi-num{
+  font-size:2.6rem;font-weight:900;line-height:1;letter-spacing:-.03em;
+  color:#fff;background:var(--blue);padding:8px 14px;border-radius:8px;
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.kpi-num.red{background:var(--red)}
+.kpi-num.green{background:var(--green)}
+.kpi-pct{
+  font-size:2.8rem;font-weight:900;line-height:1;letter-spacing:-.03em;color:var(--blue);
+}
+.kpi-pct.red{color:var(--red)}
+.kpi-meta{flex:1}
+.kpi-label{font-size:.9rem;font-weight:800;color:var(--black);line-height:1.25}
+.kpi-desc{font-size:.73rem;color:var(--gray);margin-top:4px;line-height:1.4}
+
+/* NV bars */
+.nv-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.nv-label{font-size:.78rem;font-weight:700;width:80px;color:var(--dark);flex-shrink:0}
+.nv-bar-wrap{flex:1;background:#f3f4f6;border-radius:4px;height:20px;overflow:hidden}
+.nv-bar{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px}
+.nv-bar span{font-size:.68rem;font-weight:700;color:#fff;white-space:nowrap}
+.nv-val{font-size:.78rem;font-weight:700;color:var(--dark);width:90px;flex-shrink:0;text-align:right}
+
+/* Tồn >45 highlight */
+.highlight-pct{
+  display:flex;align-items:center;gap:16px;
+  background:var(--red-bg);border-left:4px solid var(--red);
+  border-radius:6px;padding:10px 14px;margin-top:14px;
+}
+.hl-num{font-size:2.2rem;font-weight:900;color:var(--red)}
+.hl-text{font-size:.78rem;color:var(--dark);line-height:1.4;font-weight:600}
+
+/* ── BOTTOM GRID ── */
+.info-bottom{display:grid;grid-template-columns:1fr 1fr;border-top:3px solid var(--black)}
+.info-bottom .info-panel+.info-panel{border-left:1px solid #e5e7eb}
+
+/* Hot spots */
+.hotspot-hero{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px}
+.hotspot-count{
+  font-size:2rem;font-weight:900;color:var(--red);line-height:1;
+  border-right:3px solid var(--red);padding-right:14px;margin-right:4px;
+}
+.hotspot-label{font-size:.88rem;font-weight:800;color:var(--black);line-height:1.25}
+.hotspot-desc{font-size:.72rem;color:var(--gray);margin-top:6px;line-height:1.45}
+.hotspot-note{
+  font-size:.72rem;color:var(--dark);line-height:1.45;
+  background:#fff7ed;border-left:3px solid var(--orange);
+  padding:8px 10px;border-radius:4px;margin-bottom:14px;
+}
+.hotspot-note b{color:var(--orange)}
+
+/* Hotspot table */
+table.hs{width:100%;border-collapse:collapse;font-size:.76rem}
+table.hs th{
+  background:var(--dark);color:#fff;padding:7px 10px;text-align:left;
+  font-size:.67rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+}
+table.hs td{padding:7px 10px;border-bottom:1px solid #f3f4f6;vertical-align:middle}
+table.hs tr:last-child td{border-bottom:none}
+table.hs tr:nth-child(even) td{background:#fafafa}
+.pct-cell{font-weight:800;color:var(--red)}
+.pct-cell.amber{color:var(--amber)}
+
+/* Comparison */
+.cmp-row{display:flex;align-items:stretch;gap:0;margin-bottom:14px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden}
+.cmp-side{flex:1;padding:10px 14px}
+.cmp-side.left{background:var(--blue);color:#fff}
+.cmp-side.right{background:#f8fafc;color:var(--dark)}
+.cmp-side.orange{background:var(--orange);color:#fff}
+.cmp-side.green2{background:var(--green);color:#fff}
+.cmp-name{font-size:.72rem;font-weight:700;opacity:.85;text-transform:uppercase;letter-spacing:.05em}
+.cmp-hs{font-size:1.2rem;font-weight:900;line-height:1.1;margin-top:2px}
+.cmp-hs small{font-size:.65rem;font-weight:500;opacity:.8}
+.cmp-vs{
+  display:flex;align-items:center;justify-content:center;
+  background:#f3f4f6;color:var(--gray);font-size:.7rem;font-weight:800;
+  padding:0 8px;flex-shrink:0;
+}
+.cmp-note{font-size:.72rem;color:var(--gray);margin-top:10px;line-height:1.45}
+
+/* Địa bàn comparison bars */
+.db-row{margin-bottom:12px}
+.db-row-top{display:flex;justify-content:space-between;margin-bottom:3px}
+.db-name{font-size:.78rem;font-weight:700;color:var(--dark)}
+.db-badge{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.db-badge.cap3{background:var(--red-bg);color:var(--red)}
+.db-badge.cap2{background:var(--amber-bg);color:var(--amber)}
+.db-badge.cap1{background:var(--green-bg);color:var(--green)}
+.db-bar-wrap{background:#f3f4f6;border-radius:4px;height:14px;overflow:hidden}
+.db-bar{height:100%;border-radius:4px;transition:width .5s}
+.db-bar.cap3{background:var(--red)}
+.db-bar.cap2{background:var(--amber)}
+.db-bar.cap1{background:var(--green)}
+.db-meta{font-size:.68rem;color:var(--gray);margin-top:2px}
+
+/* Footer */
+.info-footer{
+  border-top:1px solid #e5e7eb;padding:10px 28px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;
+  font-size:.68rem;color:var(--gray);
+}
+.info-footer b{color:var(--dark)}
+
+@media print{
+  body{background:#fff;padding:0}
+  .toolbar{display:none}
+  .info-card{box-shadow:none;border:1px solid #ddd}
+  #upload-overlay{display:none!important}
+  #infographic{display:block!important}
+}
+</style>
+</head>
+<body>
+
+<!-- UPLOAD OVERLAY -->
+<div id="upload-overlay">
+  <div class="upload-box">
+    <h2>PTI SOS · Quảng Ninh</h2>
+    <p>Tải file <b>Dulieu.xlsx</b> để xem infographic báo cáo tồn đọng.<br/>Hoặc khôi phục phiên làm việc đã lưu.</p>
+    <input type="file" id="file-inp" accept=".xlsx,.xls"/>
+    <button class="btn-up" onclick="document.getElementById('file-inp').click()">📂 Chọn file Dulieu.xlsx</button><br/>
+    <button class="btn-restore-small" id="btn-restore-ls" style="display:none" onclick="restoreLS()">🔄 Khôi phục phiên trước</button>
+  </div>
+</div>
+
+<!-- INFOGRAPHIC -->
+<div id="infographic">
+  <div class="toolbar">
+    <span class="toolbar-left" id="tb-filename"></span>
+    <div style="display:flex;gap:8px">
+      <button class="btn-sm" onclick="window.print()">🖨️ In / Xuất PDF</button>
+      <button class="btn-sm" onclick="location.href='index.html'">← Dashboard</button>
+      <button class="btn-sm" onclick="reloadFile()">📂 Tải file khác</button>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <!-- HEADER -->
+    <div class="info-header">
+      <div class="info-org">PTISOS · Văn phòng Miền Bắc · Phòng Khu vực Quảng Ninh</div>
+      <div class="info-header-top">
+        <div>
+          <div class="info-title">BÁO CÁO TIẾN ĐỘ GIẢI QUYẾT HỒ SƠ TỒN ĐỌNG PTI SOS <span id="hdr-date"></span></div>
+          <div class="info-subtitle">Tổng hợp và phân tích tình hình giải quyết hồ sơ tồn đọng tại <b>Khu vực Quảng Ninh</b>, nhấn mạnh các địa bàn đang ở mức cảnh báo cao để lãnh đạo có phương án điều chỉnh.</div>
+        </div>
+        <div class="info-date" id="hdr-date2"></div>
+      </div>
+    </div>
+
+    <!-- BODY: 2 cột trên -->
+    <div class="info-body">
+      <!-- Cột trái: Tổng quan -->
+      <div class="info-panel">
+        <div class="info-panel-title">Tổng quan Khu vực Quảng Ninh</div>
+        <div class="kpi-block">
+          <div class="kpi-num" id="kpi-cgq">—</div>
+          <div class="kpi-meta">
+            <div class="kpi-label">Hồ sơ cần<br/>giải quyết</div>
+            <div class="kpi-desc" id="kpi-cgq-desc">—</div>
+          </div>
+        </div>
+        <div class="kpi-block">
+          <div class="kpi-pct" id="kpi-tyle">—</div>
+          <div class="kpi-meta">
+            <div class="kpi-label">Tỷ lệ giải quyết<br/>thành công</div>
+            <div class="kpi-desc" id="kpi-tyle-desc">—</div>
+          </div>
+        </div>
+        <div class="kpi-block">
+          <div class="kpi-num red" id="kpi-ton">—</div>
+          <div class="kpi-meta">
+            <div class="kpi-label">Hồ sơ<br/>đang tồn đọng</div>
+            <div class="kpi-desc" id="kpi-ton-desc">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cột phải: Phân tích NV & thời gian tồn -->
+      <div class="info-panel">
+        <div class="info-panel-title">Phân tích Nghiệp vụ &amp; Thời gian tồn</div>
+        <div style="font-size:.78rem;font-weight:700;color:var(--dark);margin-bottom:10px" id="nv-title">Phân bổ hồ sơ tồn theo nghiệp vụ</div>
+        <div id="nv-bars"></div>
+        <div class="highlight-pct">
+          <div class="hl-num" id="hl-pct">—</div>
+          <div class="hl-text">Hồ sơ tồn trên 45 ngày<br/><span id="hl-desc" style="font-weight:400;font-size:.72rem"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BODY: 2 cột dưới -->
+    <div class="info-bottom">
+      <!-- Cột trái: Điểm nóng -->
+      <div class="info-panel">
+        <div class="info-panel-title">Điểm nóng cần tập trung (Cảnh báo Cấp độ 3)</div>
+        <div class="hotspot-hero">
+          <div>
+            <div id="hs-count" style="font-size:2.2rem;font-weight:900;color:var(--red);line-height:1">—</div>
+            <div style="font-size:.65rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.06em">Địa bàn</div>
+          </div>
+          <div style="border-left:3px solid #e5e7eb;padding-left:14px">
+            <div style="font-size:.9rem;font-weight:800;color:var(--black)">ở mức Cảnh báo<br/>Cấp độ 3</div>
+            <div class="hotspot-desc">Địa bàn có tỷ lệ hồ sơ tồn so với<br/>năng lực giải quyết hàng tháng ở mức rất cao,<br/>cần sự can thiệp trực tiếp từ lãnh đạo phụ trách.</div>
+          </div>
+        </div>
+        <div id="hs-note" class="hotspot-note"></div>
+        <table class="hs">
+          <thead>
+            <tr>
+              <th>Địa bàn</th>
+              <th>Tỷ lệ Tồn / Giải quyết tháng</th>
+              <th>GĐV phụ trách</th>
+            </tr>
+          </thead>
+          <tbody id="hs-rows"></tbody>
+        </table>
+      </div>
+
+      <!-- Cột phải: So sánh địa bàn -->
+      <div class="info-panel">
+        <div class="info-panel-title">So sánh Hiệu suất các Địa bàn</div>
+        <div id="cmp-section"></div>
+        <div class="cmp-note" id="cmp-note"></div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="info-footer">
+      <span><b>PTISOS</b> · Văn phòng Miền Bắc · Phòng Khu vực Quảng Ninh &nbsp;|&nbsp; Dữ liệu xử lý offline trong trình duyệt</span>
+      <span>🟢 Cấp độ 1: &lt;80% &nbsp; 🟡 Cấp độ 2: 80–130% &nbsp; 🔴 Cấp độ 3: &gt;130%</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CẤU HÌNH ĐỊA BÀN ──────────────────────────────────────────────────────
+const DIABAN_MAP={
+  'Móng Cái':   ['VIETNT05'],
+  'Cẩm Phả':   ['SONTT'],
+  'Đông Triều': ['HUONGNV'],
+  'Hạ Long':    ['TUNGHX','DUYNT','TUYENLM','CHINH05']
+};
+const GDV_NAMES={
+  TUNGHX:'Hoàng X. Tùng',TUYENLM:'L. Minh Tuyến',
+  CHINH05:'N. Hồng Chinh',DUYNT:'N. Thế Duy',
+  VIETNT05:'N. Tiến Việt',HUONGNV:'N. Văn Hướng',
+  SONTT:'Trần T. Sơn'
+};
+const LS_KEY='pti_raw_v1', LS_FILE='pti_filename';
+let RAW=[];
+
+// ── SESSION RESTORE ────────────────────────────────────────────────────────
+(function(){
+  const saved=localStorage.getItem(LS_KEY);
+  if(saved){
+    const btn=document.getElementById('btn-restore-ls');
+    const fname=localStorage.getItem(LS_FILE)||'Dulieu.xlsx';
+    btn.textContent='🔄 Khôi phục: '+fname;
+    btn.style.display='block';
+    // Auto-restore nếu có
+    restoreLS();
+  }
+})();
+
+function restoreLS(){
+  try{
+    const saved=localStorage.getItem(LS_KEY);
+    if(!saved)return;
+    RAW=JSON.parse(saved);
+    const fname=localStorage.getItem(LS_FILE)||'Dulieu.xlsx';
+    document.getElementById('tb-filename').textContent='📁 '+fname;
+    render();
+    document.getElementById('upload-overlay').style.display='none';
+    document.getElementById('infographic').style.display='block';
+  }catch(e){console.error(e);}
+}
+
+function reloadFile(){document.getElementById('upload-overlay').style.display='flex';}
+
+document.getElementById('file-inp').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const wb=XLSX.read(new Uint8Array(ev.target.result),{type:'array'});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    RAW=XLSX.utils.sheet_to_json(ws,{defval:''});
+    try{localStorage.setItem(LS_KEY,JSON.stringify(RAW));localStorage.setItem(LS_FILE,f.name);}catch(e){}
+    document.getElementById('tb-filename').textContent='📁 '+f.name;
+    render();
+    document.getElementById('upload-overlay').style.display='none';
+    document.getElementById('infographic').style.display='block';
+  };
+  reader.readAsArrayBuffer(f);
+});
+
+// ── HELPERS ────────────────────────────────────────────────────────────────
+function parseTon(v){const n=parseFloat(String(v).replace(/,/g,''));return n>0?n:null}
+function isResolved(r){const t=String(r['Trạng thái hồ sơ']||'');return t==='Đã thanh toán'||t==='Đã hủy'}
+function gdvKey(r){return String(r['GĐV thụ lý']||r['Mã GĐV']||'').trim()}
+function fmtN(v){return new Intl.NumberFormat('vi-VN').format(Math.round(v))}
+function parseDate(v){
+  if(!v)return null;
+  if(v instanceof Date)return v;
+  if(typeof v==='number')return new Date((v-25569)*86400000);
+  const s=String(v),p=s.split(/[\/\-\.]/);
+  if(p.length===3){
+    const y=p[2].length===4?+p[2]:+p[0];
+    const m=+p[1];
+    const d=p[2].length===4?+p[0]:+p[2];
+    return new Date(y,m-1,d);
+  }
+  return null;
+}
+
+// ── TÍNH TOÁN ĐỊA BÀN ──────────────────────────────────────────────────────
+function computeDiabanStats(){
+  const now=new Date();
+  const curYear=now.getFullYear();
+  const curMonth=now.getMonth()+1;
+  const prevYearEnd=new Date(curYear-1,11,31);
+  const curYearStart=new Date(curYear,0,1);
+
+  const result={};
+  Object.entries(DIABAN_MAP).forEach(([db,gdvs])=>{
+    const rows=RAW.filter(r=>gdvs.includes(gdvKey(r)));
+    const resolved=rows.filter(isResolved);
+    const tonRows=rows.filter(r=>parseTon(r['Số ngày tồn'])!==null);
+    const g30=tonRows.filter(r=>parseTon(r['Số ngày tồn'])<=30);
+    const g30_45=tonRows.filter(r=>{const n=parseTon(r['Số ngày tồn']);return n>30&&n<=45});
+    const g45_90=tonRows.filter(r=>{const n=parseTon(r['Số ngày tồn']);return n>45&&n<=90});
+    const g90=tonRows.filter(r=>parseTon(r['Số ngày tồn'])>90);
+    const tnds=tonRows.filter(r=>String(r['Mã nghiệp vụ']||'').startsWith('XO.1'));
+    const vcx=tonRows.filter(r=>String(r['Mã nghiệp vụ']||'').startsWith('XO.4'));
+    const tonNT=rows.filter(r=>{const d=parseDate(r['Ngày mở HSBT']);return d&&d<=prevYearEnd});
+    const hsps=rows.filter(r=>{const d=parseDate(r['Ngày mở HSBT']);return d&&d>=curYearStart});
+    const tongCanGQ=tonNT.length+hsps.length;
+    const tongTon=tonRows.length;
+    const hspsTB=curMonth>0?hsps.length/curMonth:0;
+    const tyQ=hspsTB>0?Math.round(tongTon/hspsTB*10000)/100:0;
+    const wl=tyQ>130?3:tyQ>=80?2:1;
+    result[db]={
+      db,gdvs,total:rows.length,resolved:resolved.length,tongTon,
+      tonNT:tonNT.length,hsps:hsps.length,tongCanGQ,
+      g30:g30.length,g30_45:g30_45.length,g45_90:g45_90.length,g90:g90.length,
+      tnds:tnds.length,vcx:vcx.length,
+      qua45:g45_90.length+g90.length,
+      hspsTB:Math.round(hspsTB*100)/100,tyQ,wl,
+      tyGQ:tongCanGQ>0?Math.round(resolved.length/tongCanGQ*1000)/10:0
+    };
+  });
+  return {result,curYear,curMonth,prevYear:curYear-1};
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────────────
+function render(){
+  const now=new Date();
+  const dateStr='(Dữ liệu đến '+now.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'})+')';
+  document.getElementById('hdr-date').textContent=dateStr;
+  document.getElementById('hdr-date2').textContent='Tháng '+now.toLocaleDateString('vi-VN',{month:'2-digit',year:'numeric'});
+
+  const {result,curYear,curMonth,prevYear}=computeDiabanStats();
+  const dbs=Object.values(result);
+
+  // ── TỔNG QUAN ──
+  const totCGQ=dbs.reduce((a,d)=>a+d.tongCanGQ,0);
+  const totGQ=dbs.reduce((a,d)=>a+d.resolved,0);
+  const totTon=dbs.reduce((a,d)=>a+d.tongTon,0);
+  const totHsps=dbs.reduce((a,d)=>a+d.hsps,0);
+  const tyGQ=totCGQ>0?(totGQ/totCGQ*100).toFixed(1):0;
+
+  document.getElementById('kpi-cgq').textContent=fmtN(totCGQ);
+  document.getElementById('kpi-cgq-desc').textContent=
+    'Tổng khối lượng HS phát sinh và tồn từ năm '+prevYear+' chuyển sang tính đến '+
+    now.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'})+' tại Khu vực Quảng Ninh.';
+  document.getElementById('kpi-tyle').textContent=tyGQ+'%';
+  document.getElementById('kpi-tyle-desc').textContent=
+    'Đã giải quyết được '+fmtN(totGQ)+' hồ sơ trên tổng số '+fmtN(totCGQ)+' HS cần xử lý.';
+  document.getElementById('kpi-ton').textContent=fmtN(totTon);
+  document.getElementById('kpi-ton-desc').textContent=
+    'Trong đó '+fmtN(dbs.reduce((a,d)=>a+d.qua45,0))+' HS tồn trên 45 ngày cần xử lý ưu tiên.';
+
+  // ── NGHIỆP VỤ ──
+  const totVCX=dbs.reduce((a,d)=>a+d.vcx,0);
+  const totTNDS=dbs.reduce((a,d)=>a+d.tnds,0);
+  const maxNV=Math.max(totVCX,totTNDS)||1;
+  document.getElementById('nv-title').textContent=
+    totVCX>totTNDS?'Nghiệp vụ VCX chiếm tỷ trọng tồn cao nhất':'Phân bổ hồ sơ tồn theo nghiệp vụ';
+  document.getElementById('nv-bars').innerHTML=`
+    <div class="nv-row">
+      <div class="nv-label">VCX</div>
+      <div class="nv-bar-wrap"><div class="nv-bar" style="width:${Math.round(totVCX/maxNV*100)}%;background:#1565C0">
+        <span>${fmtN(totVCX)} HS</span></div></div>
+      <div class="nv-val">${fmtN(totVCX)} HS</div>
+    </div>
+    <div class="nv-row">
+      <div class="nv-label">TNDS</div>
+      <div class="nv-bar-wrap"><div class="nv-bar" style="width:${Math.round(totTNDS/maxNV*100)}%;background:#374151">
+        <span>${fmtN(totTNDS)} HS</span></div></div>
+      <div class="nv-val">${fmtN(totTNDS)} HS</div>
+    </div>
+    ${totVCX>totTNDS?`<div style="font-size:.72rem;color:#6b7280;margin-top:4px">Gấp ${(totVCX/Math.max(totTNDS,1)).toFixed(1)} lần so với nghiệp vụ TNDS.</div>`:''}
+  `;
+  const totQua45=dbs.reduce((a,d)=>a+d.qua45,0);
+  const pctQua45=totTon>0?Math.round(totQua45/totTon*100):0;
+  document.getElementById('hl-pct').textContent=pctQua45+'%';
+  document.getElementById('hl-desc').textContent=
+    'Đây là nhóm HS cần ưu tiên xử lý gấp để tránh quá hạn kéo dài, tập trung chủ yếu ở '+
+    dbs.filter(d=>d.qua45>0).map(d=>d.db).join(', ')+'.';
+
+  // ── ĐIỂM NÓNG ──
+  const cap3=dbs.filter(d=>d.wl===3).sort((a,b)=>b.tyQ-a.tyQ);
+  const cap2=dbs.filter(d=>d.wl===2).sort((a,b)=>b.tyQ-a.tyQ);
+  const allHot=[...cap3,...cap2];
+  document.getElementById('hs-count').textContent=cap3.length||'0';
+
+  // Tìm địa bàn tệ nhất
+  const worst=dbs.reduce((a,b)=>b.tyQ>a.tyQ?b:a,dbs[0]);
+  document.getElementById('hs-note').innerHTML=worst&&worst.wl>=2?
+    `<b>Địa bàn ${worst.db}: Tỷ lệ tồn ${worst.tyQ.toFixed(0)}%</b><br/>
+    Là địa bàn có chỉ số hồ sơ tồn so với trung bình tháng cao nhất khu vực, cần theo dõi sát.`:'';
+
+  // Bảng tất cả địa bàn (sắp xếp theo tyQ giảm dần)
+  const sortedAll=[...dbs].sort((a,b)=>b.tyQ-a.tyQ);
+  document.getElementById('hs-rows').innerHTML=sortedAll.map(d=>{
+    const cls=d.wl===3?'pct-cell':d.wl===2?'pct-cell amber':'';
+    const gdvNames=d.gdvs.map(g=>GDV_NAMES[g]||g).join(', ');
+    const icon=d.wl===3?'🔴':d.wl===2?'🟡':'🟢';
+    return`<tr>
+      <td><b>${d.db}</b></td>
+      <td class="${cls}">${icon} ${d.tyQ.toFixed(0)}%</td>
+      <td style="font-size:.69rem;color:#374151">${gdvNames}</td>
+    </tr>`;
+  }).join('');
+
+  // ── SO SÁNH ĐỊA BÀN ──
+  const maxTyQ=Math.max(...dbs.map(d=>d.tyQ),130);
+  const cmpHTML=sortedAll.map(d=>{
+    const cls=d.wl===3?'cap3':d.wl===2?'cap2':'cap1';
+    const bdg=d.wl===3?'🔴 Cấp độ 3':d.wl===2?'🟡 Cấp độ 2':'🟢 Cấp độ 1';
+    const w=Math.min(Math.round(d.tyQ/maxTyQ*100),100);
+    return`<div class="db-row">
+      <div class="db-row-top">
+        <span class="db-name">${d.db} <span style="font-size:.68rem;font-weight:400;color:#6b7280">(${fmtN(d.tongTon)} HS tồn)</span></span>
+        <span class="db-badge ${cls}">${bdg}</span>
+      </div>
+      <div class="db-bar-wrap"><div class="db-bar ${cls}" style="width:${w}%"></div></div>
+      <div class="db-meta">Tỷ lệ tồn/PS tháng: <b>${d.tyQ.toFixed(1)}%</b> &nbsp;·&nbsp; Đã GQ: <b>${d.tyGQ}%</b> &nbsp;·&nbsp; HSPS TB/tháng: <b>${d.hspsTB.toFixed(1)}</b></div>
+    </div>`;
+  }).join('');
+
+  // So sánh cặp tốt nhất - tệ nhất
+  const best=dbs.reduce((a,b)=>b.tyGQ>a.tyGQ?b:a,dbs[0]);
+  let noteHTML='';
+  if(worst&&best&&worst.db!==best.db){
+    noteHTML=`<b>${worst.db}</b> đang có tỷ lệ tồn/PS tháng cao nhất (<b>${worst.tyQ.toFixed(0)}%</b> — ${worst.wl===3?'🔴 Cấp độ 3':'🟡 Cấp độ 2'}). `;
+    noteHTML+=`<b>${best.db}</b> có tỷ lệ giải quyết tốt nhất (<b>${best.tyGQ}%</b>).`;
+  }
+
+  // Thêm ghi chú địa bàn ổn định
+  const stable=dbs.filter(d=>d.wl===1);
+  if(stable.length>0){
+    noteHTML+=`<br/>${stable.map(d=>`<b>${d.db}</b> (GĐV: ${d.gdvs.map(g=>GDV_NAMES[g]||g).join(', ')}): Tỷ lệ tồn/GQ ${d.tyQ.toFixed(0)}% (🟢 Cấp độ 1)`).join('<br/>')}`;
+  }
+
+  document.getElementById('cmp-section').innerHTML=cmpHTML;
+  document.getElementById('cmp-note').innerHTML=noteHTML;
+}
+</script>
+</body>
+</html>

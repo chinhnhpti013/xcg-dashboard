@@ -1,0 +1,5 @@
+﻿input/
+*.xlsx
+*.xls
+.claude/
+docs/*.docx
