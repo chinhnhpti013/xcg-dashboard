@@ -48,7 +48,7 @@ bao-cao-tuan/
 | 📊 **Tổng quan** | KPI tổng hợp (tổng HS, đã GQ, đang tồn, quá hạn, tổng BT) + biểu đồ theo GĐV và phân bổ tồn |
 | 👤 **Theo GĐV** | Bảng tổng hợp hồ sơ tồn theo từng Giám định viên — định dạng Excel, 4 hàng header, 18 cột, kẻ ô đầy đủ |
 | ⏳ **Phân tích tồn** | Aging bucket (0–30 · 30–45 · 45–90 · >90 ngày) + biểu đồ theo GĐV |
-| 📋 **Báo cáo XO** | BC1: Tiếp nhận/Giải quyết/Tồn · BC2: Tổng hợp tồn NV XO (kẻ ô, header 4 cấp) |
+| 📋 **Báo cáo XO** | BC1: Top 10 Gara/Showroom doanh thu sửa chữa năm hiện tại · BC2: Danh sách chi tiết HS tồn ≥90 ngày |
 | ⚠️ **Cảnh báo** | Danh sách hồ sơ tồn >90 ngày + GĐV vượt ngưỡng cảnh báo |
 | 🗺️ **Infographic** | Báo cáo tổng hợp dạng infographic theo địa bàn (Móng Cái · Cẩm Phả · Đông Triều · Hạ Long) |
 

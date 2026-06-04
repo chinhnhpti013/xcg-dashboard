@@ -64,7 +64,7 @@ Cột quan trọng:
 | Tổng quan | `tab-overview` | KPI tổng hợp + biểu đồ |
 | Theo GĐV | `tab-gdv` | Bảng tổng hợp hồ sơ tồn theo GĐV — kiểu Excel, 4 hàng header |
 | Phân tích tồn | `tab-aging` | Aging bucket + biểu đồ |
-| Báo cáo XO | `tab-baocao` | BC1 Tiếp nhận/GQ/Tồn + BC2 Tổng hợp tồn (kẻ ô đầy đủ) |
+| Báo cáo XO | `tab-baocao` | BC1 Top 10 Gara/Showroom doanh thu SC + BC2 Danh sách HS tồn ≥90 ngày |
 | Cảnh báo | `tab-warnings` | HS tồn >90 ngày + GĐV nguy hiểm |
 | Infographic | `tab-infographic` | Báo cáo tổng hợp dạng infographic theo địa bàn |
 
@@ -85,6 +85,10 @@ Infographic tính toán theo địa bàn (không phải GĐV):
 - Bảng điểm nóng (địa bàn Cấp độ 3, tỷ lệ tồn/PS tháng)
 - So sánh hiệu suất 4 địa bàn qua thanh bar
 
+**Công thức tỷ lệ đã giải quyết (tyGQ):**
+`tyGQ = Math.round(resolved / tongCanGQ * 1000) / 10` → kết quả là % (vd: 75.6%)
+⚠️ Lưu ý: phải nhân 1000 rồi chia 10 (không phải nhân 10 chia 10) để ra đúng đơn vị %.
+
 ## Lưu phiên làm việc
 
 Dùng `localStorage` với key `pti_raw_v1` (JSON dữ liệu) và `pti_filename`.
@@ -101,25 +105,36 @@ Dùng `localStorage` với key `pti_raw_v1` (JSON dữ liệu) và `pti_filename
 - Màu brand: `#1565C0` (xanh PTI)
 - Font: `Be Vietnam Pro`
 
-## Báo cáo 1 — Thống kê HS Tiếp nhận, Giải quyết và Tồn (XO)
+## Tab Báo cáo XO — Nội dung mới
 
-Cột | Logic
-----|------
-Đã giải quyết | `Trạng thái` ∈ {Đã thanh toán, Đã hủy}
-Đang giải quyết | `Số ngày tồn` > 0
-Tỷ lệ tồn | Đang GQ / (Đã GQ + Đang GQ)
-Tồn ≤ 45 ngày | `0 < Số ngày tồn ≤ 45`
-Tồn > 45 ngày | `Số ngày tồn > 45`
-Tỷ lệ tồn >45 | Tồn >45 / Đang GQ
+### BC1 — Thống kê Doanh thu SC các Gara/Showroom (PS năm hiện tại)
 
-## Báo cáo 2 — Tổng hợp Hồ sơ Tồn (NV XO)
+Tham chiếu Query: `select P, Count(AX), sum(AX), sum(BC) Where Y >= date 'năm-01-01' group by P order by sum(AX) DESC limit 10`
 
-Cột | Logic
-----|------
-Tồn năm trước | `Ngày mở HSBT` ≤ 31/12/năm trước
-HSPS kỳ báo cáo | `Ngày mở HSBT` ≥ 01/01/năm hiện tại
-Tổn theo NV — TNDS | `Mã nghiệp vụ` bắt đầu `XO.1` và đang tồn
-Tồn theo NV — VCX | `Mã nghiệp vụ` bắt đầu `XO.4` và đang tồn
-Hs tồn/PS TB tháng | Tổng tồn / (HSPS / tháng hiện tại)
+| Cột | Nguồn | Logic |
+|-----|-------|-------|
+| Tên Gara/SH | Cột P = `Tên garage` | Group by |
+| Số vụ phát sinh | Cột AX = `Tiền ước/duyệt BT` | Count |
+| Tiền SC ước BT | Cột AX = `Tiền ước/duyệt BT` | Sum |
+| Tiền SC đã BT | Cột BC = `Tiền BT đã trả cho GR` | Sum |
 
-**Ngưỡng cảnh báo**: <80% → Cấp 1 🟢 | 80–130% → Cấp 2 🟡 | >130% → Cấp 3 🔴
+Điều kiện lọc: `Ngày mở HSBT` (cột Y) ≥ 01/01/năm hiện tại · Sắp xếp giảm dần theo tổng tiền ước BT · Giới hạn Top 10
+
+### BC2 — Danh sách chi tiết HS tồn ≥ 90 ngày
+
+Tham chiếu Query: `Select C, D, E, N, P, AN, AP, AX, BH, BI WHERE BI>=90 Order by BI DESC`
+
+| Cột Excel | Tên cột | Ghi chú |
+|-----------|---------|---------|
+| C (col 3) | GĐV thụ lý | |
+| D (col 4) | Số HSBT | |
+| E (col 5) | Biển số xe | |
+| N (col 14) | Mã nghiệp vụ | |
+| P (col 16) | Tên garage | |
+| AN (col 40) | Mã check | |
+| AP (col 42) | Mã validate | |
+| AX (col 50) | Tiền ước/duyệt BT | |
+| BH (col 60) | Trạng thái hồ sơ | |
+| BI (col 61) | Số ngày tồn | Điều kiện ≥ 90 |
+
+Tô màu: 🔴 ≥ 180 ngày · 🟡 120–179 ngày · Sắp xếp ngày tồn giảm dần

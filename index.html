@@ -909,202 +909,145 @@ function renderAging(s){
   },10);
 }
 
-// TAB 4: BÁO CÁO XO (Báo cáo 1 + Báo cáo 2)
+// TAB 4: BÁO CÁO XO
 function renderBaoCao(s){
   const el=document.getElementById('tab-baocao');
+  const curYear=new Date().getFullYear();
+  const curYearStart=new Date(curYear,0,1);
 
-  // ── Báo cáo 1 ──
-  const rows1=s.gdvStats.map((g,i)=>{
-    const total=g.resolved+g.ton;
-    const tyLe=total>0?Math.round(g.ton/total*1000)/10:0;
-    const tyLe45=g.ton>0?Math.round(g.qua45/g.ton*1000)/10:0;
+  // ── Báo cáo 1: Top 10 Gara/Showroom ──
+  // Ánh xạ: P=Tên garage, AX=Tiền ước/duyệt BT, BC=Tiền BT đã trả cho GR, Y=Ngày mở HSBT
+  const garaMap={};
+  RAW.forEach(r=>{
+    const ngay=parseDateBC(r['Ngày mở HSBT']);
+    if(!ngay||ngay<curYearStart)return;
+    const tenGR=String(r['Tên garage']||'').trim();
+    if(!tenGR)return;
+    if(!garaMap[tenGR])garaMap[tenGR]={ten:tenGR,soVu:0,tienUoc:0,tienDaTra:0};
+    garaMap[tenGR].soVu++;
+    garaMap[tenGR].tienUoc+=parseMoney(r['Tiền ước/duyệt BT']);
+    garaMap[tenGR].tienDaTra+=parseMoney(r['Tiền BT đã trả cho GR']);
+  });
+  const top10=Object.values(garaMap)
+    .sort((a,b)=>b.tienUoc-a.tienUoc)
+    .slice(0,10);
+  const totG_soVu=top10.reduce((a,g)=>a+g.soVu,0);
+  const totG_uc=top10.reduce((a,g)=>a+g.tienUoc,0);
+  const totG_da=top10.reduce((a,g)=>a+g.tienDaTra,0);
+  const rows1=top10.map((g,i)=>`<tr>
+    <td style="text-align:center">${i+1}</td>
+    <td class="left">${g.ten}</td>
+    <td style="text-align:center">${fmtN(g.soVu)}</td>
+    <td style="text-align:right;font-family:'JetBrains Mono',monospace">${fmtMBC(g.tienUoc)}</td>
+    <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:var(--green)">${fmtMBC(g.tienDaTra)}</td>
+  </tr>`).join('');
+
+  // ── Báo cáo 2: Hồ sơ tồn >= 90 ngày ──
+  // Ánh xạ: C=GĐV thụ lý, D=Số HSBT, E=Biển số xe, N=Mã nghiệp vụ, P=Tên garage,
+  //          AN=Mã check, AP=Mã validate, AX=Tiền ước/duyệt BT, BH=Trạng thái hồ sơ, BI=Số ngày tồn
+  const ton90=RAW
+    .filter(r=>{const n=parseFloat(String(r['Số ngày tồn']||'').replace(/,/g,''));return n>=90;})
+    .sort((a,b)=>parseFloat(String(b['Số ngày tồn']||'').replace(/,/g,''))-parseFloat(String(a['Số ngày tồn']||'').replace(/,/g,'')));
+  const rows2=ton90.map((r,i)=>{
+    const ngayTon=parseFloat(String(r['Số ngày tồn']||'').replace(/,/g,''));
+    const cls=ngayTon>=180?'hl-red':ngayTon>=120?'hl-amber':'';
     return`<tr>
-      <td>${i+1}</td>
-      <td style="text-align:left"><span class="mono">${g.code}</span> <span style="font-size:.72rem;color:var(--text3)">${g.name}</span></td>
-      <td>${g.resolved}</td>
-      <td>${g.ton}</td>
-      <td style="color:${tyLe>50?'var(--red)':tyLe>30?'var(--amber)':'inherit'}">${fmtPct(tyLe)}</td>
-      <td style="color:var(--green)">${g.duoi45}</td>
-      <td style="color:${g.qua45?'var(--red)':'var(--green)'}">${g.qua45}</td>
-      <td style="color:${tyLe45>30?'var(--red)':tyLe45>15?'var(--amber)':'inherit'}">${fmtPct(tyLe45)}</td>
+      <td style="text-align:center;color:var(--text2);font-size:.72rem">${i+1}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.74rem">${r['GĐV thụ lý']||''}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.74rem;max-width:160px;overflow:hidden;text-overflow:ellipsis" title="${r['Số HSBT']||''}">${String(r['Số HSBT']||'').substring(0,24)}</td>
+      <td style="font-weight:700">${r['Biển số xe']||''}</td>
+      <td style="font-size:.72rem">${r['Mã nghiệp vụ']||''}</td>
+      <td style="font-size:.74rem;max-width:140px;overflow:hidden;text-overflow:ellipsis" title="${r['Tên garage']||''}">${String(r['Tên garage']||'').substring(0,20)}</td>
+      <td style="font-size:.7rem;color:var(--text2)">${r['Mã check']||''}</td>
+      <td style="font-size:.7rem;color:var(--text2)">${r['Mã validate']||''}</td>
+      <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:.74rem">${fmtMBC(parseMoney(r['Tiền ước/duyệt BT']))}</td>
+      <td style="font-size:.74rem">${r['Trạng thái hồ sơ']||''}</td>
+      <td class="${cls}" style="text-align:center;font-weight:700">${fmtN(ngayTon)}</td>
     </tr>`;
   }).join('');
-  const tot1_gq=s.gdvStats.reduce((a,g)=>a+g.resolved,0);
-  const tot1_ton=s.gdvStats.reduce((a,g)=>a+g.ton,0);
-  const tot1_d45=s.gdvStats.reduce((a,g)=>a+g.duoi45,0);
-  const tot1_q45=s.gdvStats.reduce((a,g)=>a+g.qua45,0);
-  const tot1_t=tot1_gq+tot1_ton;
-
-  // ── Báo cáo 2 ──
-  const curYear2=new Date().getFullYear();
-  const prevYear2=curYear2-1;
-  const rows2=s.gdvStats.map((g,i)=>{
-    const hspsTB=s.curMonth>0?Math.round(g.hsps/s.curMonth*100)/100:0;
-    const tyO=g.tongCanGQ>0?Math.round(g.tongTon/g.tongCanGQ*10000)/100:0;
-    const qua45tt=g.g45_90+g.qua90;
-    const tyP=g.tongTon>0?Math.round(qua45tt/g.tongTon*10000)/100:0;
-    const tyQ=hspsTB>0?Math.round(g.tongTon/hspsTB*10000)/100:0;
-    const rowCls=g.wl===3?'row-warn3':g.wl===2?'row-warn2':'';
-    const clsW=g.wl===3?'warn-3':g.wl===2?'warn-2':'warn-1';
-    const clsQ=tyQ>130?'hl-red':tyQ>=80?'hl-amber':'hl-green';
-    const clsP=tyP>30?'hl-red':tyP>15?'hl-amber':'';
-    const wIcon=g.wl===3?'🔴':g.wl===2?'🟡':'🟢';
-    return`<tr class="${rowCls}">
-      <td>${i+1}</td>
-      <td class="left"><b style="font-family:'JetBrains Mono',monospace">${g.code}</b><br/><span style="font-size:.67rem;color:#64748b">${g.name}</span></td>
-      <td>${g.tonNamTruoc}</td>
-      <td>${g.hsps}</td>
-      <td><b>${g.tongCanGQ}</b></td>
-      <td class="hl-green">${g.daGQ}</td>
-      <td class="hl-green">${g.g30}</td>
-      <td style="color:#d97706">${g.g30_45}</td>
-      <td style="color:#ea580c">${g.g45_90}</td>
-      <td class="${g.qua90?'hl-red':''}">${g.qua90}</td>
-      <td>${g.tnds_ton}</td>
-      <td>${g.vcx_ton}</td>
-      <td><b>${g.tongTon}</b></td>
-      <td>${hspsTB.toFixed(1)}</td>
-      <td class="pct ${tyO>30?'hl-amber':''}">${tyO.toFixed(2)}%</td>
-      <td class="pct ${clsP}">${tyP.toFixed(2)}%</td>
-      <td class="pct ${clsQ}">${tyQ.toFixed(2)}%</td>
-      <td class="${clsW}">${wIcon} ${g.wlabel}</td>
-    </tr>`;
-  }).join('');
-  const tot2_ntr=s.gdvStats.reduce((a,g)=>a+g.tonNamTruoc,0);
-  const tot2_ps=s.gdvStats.reduce((a,g)=>a+g.hsps,0);
-  const tot2_cgq=s.gdvStats.reduce((a,g)=>a+g.tongCanGQ,0);
-  const tot2_dgq=s.gdvStats.reduce((a,g)=>a+g.daGQ,0);
-  const tot2_ton=s.gdvStats.reduce((a,g)=>a+g.tongTon,0);
-  const tot2_tnds=s.gdvStats.reduce((a,g)=>a+g.tnds_ton,0);
-  const tot2_vcx=s.gdvStats.reduce((a,g)=>a+g.vcx_ton,0);
-  const tot2_g30=s.gdvStats.reduce((a,g)=>a+g.g30,0);
-  const tot2_g3045=s.gdvStats.reduce((a,g)=>a+g.g30_45,0);
-  const tot2_g4590=s.gdvStats.reduce((a,g)=>a+g.g45_90,0);
-  const tot2_g90=s.gdvStats.reduce((a,g)=>a+g.qua90,0);
-  const tot2_hspsTB=s.curMonth>0?Math.round(tot2_ps/s.curMonth*100)/100:0;
-  const tot2_tyO=tot2_cgq>0?Math.round(tot2_ton/tot2_cgq*10000)/100:0;
-  const tot2_qua45=tot2_g4590+tot2_g90;
-  const tot2_tyP=tot2_ton>0?Math.round(tot2_qua45/tot2_ton*10000)/100:0;
-  const tot2_tyQ=tot2_hspsTB>0?Math.round(tot2_ton/tot2_hspsTB*10000)/100:0;
 
   el.innerHTML=`
-    <div class="report-section">
-      <div class="report-title">1. Thống kê Hồ sơ Tiếp nhận, Giải quyết và Tồn (XO)</div>
-      <div class="table-card" style="padding:14px 16px">
-        <table class="report">
+    <div class="gdv-report-wrap" style="margin-bottom:20px">
+      <div class="gdv-report-header">
+        <div class="org">PTISOS · Văn phòng Miền Bắc · Phòng Khu vực Quảng Ninh</div>
+        <div class="title">1. THỐNG KÊ DOANH THU SỬA CHỮA CÁC GARA, SHOWROOM — PS NĂM ${curYear}</div>
+        <div class="period">Top 10 Gara/Showroom có số tiền sửa chữa phát sinh lớn nhất năm ${curYear}</div>
+      </div>
+      <div class="gdv-table-outer">
+        <table class="gdv" style="min-width:700px">
           <thead>
             <tr>
-              <th rowspan="2">Stt</th>
-              <th rowspan="2">Mã GĐV</th>
-              <th rowspan="2">Đã giải quyết<br/>(cả tồn năm trước)</th>
-              <th rowspan="2">Đang giải quyết<br/>(đang tồn)</th>
-              <th rowspan="2">Tỷ lệ HS tồn<br/>/ ∑ HS nhận</th>
-              <th colspan="3" class="subh">Chi tiết hồ sơ tồn</th>
-            </tr>
-            <tr>
-              <th class="subh">1. Tồn ≤45 ngày</th>
-              <th class="subh">2. Tồn >45 ngày</th>
-              <th class="subh">3. Tỷ lệ tồn >45 / ∑ tồn</th>
+              <th style="width:44px">Stt</th>
+              <th class="lv2" style="min-width:220px;text-align:left">Tên Gara / Showroom</th>
+              <th class="lv2" style="width:120px">Số vụ phát sinh<br/>năm ${curYear}</th>
+              <th class="lv2" style="width:180px">Số tiền SC phát sinh<br/>năm ${curYear} ước BT</th>
+              <th class="lv2" style="width:180px">Số tiền SC phát sinh<br/>năm ${curYear} đã BT</th>
             </tr>
           </thead>
-          <tbody>${rows1}</tbody>
+          <tbody>${rows1||'<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text2)">Không có dữ liệu Tên garage trong file</td></tr>'}</tbody>
           <tfoot>
             <tr>
-              <td colspan="2">Tổng cộng</td>
-              <td>${tot1_gq}</td>
-              <td>${tot1_ton}</td>
-              <td>${fmtPct(pct(tot1_ton,tot1_t))}</td>
-              <td>${tot1_d45}</td>
-              <td>${tot1_q45}</td>
-              <td>${fmtPct(pct(tot1_q45,tot1_ton))}</td>
+              <td colspan="2" class="left"><b>Tổng cộng (Top 10)</b></td>
+              <td style="text-align:center"><b>${fmtN(totG_soVu)}</b></td>
+              <td style="text-align:right;font-family:'JetBrains Mono',monospace"><b>${fmtMBC(totG_uc)}</b></td>
+              <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:var(--green)"><b>${fmtMBC(totG_da)}</b></td>
             </tr>
           </tfoot>
         </table>
-        <p style="margin-top:8px;font-size:.72rem;color:var(--text3);font-style:italic">* Tỷ lệ = Đang giải quyết / (Đã giải quyết + Đang giải quyết)</p>
       </div>
-      <div class="chart-row">
-        <div class="chart-card"><h3>Đã giải quyết vs Đang tồn theo GĐV</h3><div class="chart-wrap"><canvas id="chart-bc1-bar"></canvas></div></div>
-        <div class="chart-card"><h3>Cơ cấu hồ sơ tồn (trong/quá hạn 45 ngày)</h3><div class="chart-wrap"><canvas id="chart-bc1-donut"></canvas></div></div>
+      <div class="gdv-report-footer">
+        Lọc: HS có Ngày mở HSBT từ 01/01/${curYear} &nbsp;·&nbsp; Sắp xếp: Tiền ước BT giảm dần &nbsp;·&nbsp; Tổng Gara có phát sinh: <b>${Object.keys(garaMap).length}</b>
       </div>
     </div>
 
-    <div class="report-section">
-      <div class="report-title">2. Tổng hợp Hồ sơ Tồn (NV XO) — Kỳ báo cáo tháng ${s.curMonth}/${curYear2}</div>
-      <div class="gdv-report-wrap" style="border-radius:var(--radius-sm)">
-        <div class="gdv-table-outer">
-          <table class="gdv" style="min-width:1100px">
-            <thead>
-              <tr>
-                <th rowspan="4">Stt</th>
-                <th rowspan="4" style="min-width:120px">Mã GĐV</th>
-                <th colspan="3" class="lv2">Tổng số HSBT cần giải quyết</th>
-                <th rowspan="4" class="lv2">Đã giải quyết<br/>${curYear2}</th>
-                <th colspan="7" class="lv2">Tồn chưa giải quyết</th>
-                <th rowspan="4" class="lv2">HSPS TB<br/>tháng ${curYear2}</th>
-                <th colspan="3" class="lv2">Tỷ lệ %</th>
-                <th rowspan="4" class="lv2">Cảnh báo</th>
-              </tr>
-              <tr>
-                <th rowspan="3" class="lv2">Tồn ${prevYear2}<br/>chuyển sang</th>
-                <th rowspan="3" class="lv2">HSPS ${curYear2}</th>
-                <th rowspan="3" class="lv2">Tổng số HS<br/>cần GQ</th>
-                <th colspan="4" class="lv3">Tồn theo ngày PSHS</th>
-                <th colspan="2" class="lv3">Tồn theo NV</th>
-                <th rowspan="3" class="lv2">Tổng số</th>
-                <th rowspan="3" class="lv3">Hs tồn /<br/>Tổng HS cần GQ</th>
-                <th rowspan="3" class="lv3">Tồn &gt;45 ngày /<br/>Tổng tồn</th>
-                <th rowspan="3" class="lv3">Hs tồn /<br/>Hs PS TB tháng</th>
-              </tr>
-              <tr>
-                <th rowspan="2" class="lv3">Từ 0 – 30<br/>ngày</th>
-                <th rowspan="2" class="lv3">Từ 30 – 45<br/>ngày</th>
-                <th rowspan="2" class="lv3">45 ≤ Tồn<br/>&lt; 90 ngày</th>
-                <th rowspan="2" class="lv3">Tồn &gt; 90<br/>ngày</th>
-                <th rowspan="2" class="lv3">TNDS</th>
-                <th rowspan="2" class="lv3">VCX</th>
-              </tr>
-              <tr></tr>
-            </thead>
-            <tbody>${rows2}</tbody>
-            <tfoot>
-              <tr>
-                <td colspan="2" class="left"><b>Tổng cộng</b></td>
-                <td><b>${tot2_ntr}</b></td>
-                <td><b>${tot2_ps}</b></td>
-                <td><b>${tot2_cgq}</b></td>
-                <td class="hl-green"><b>${tot2_dgq}</b></td>
-                <td><b>${tot2_g30}</b></td>
-                <td><b>${tot2_g3045}</b></td>
-                <td><b>${tot2_g4590}</b></td>
-                <td class="${tot2_g90?'hl-red':''}"><b>${tot2_g90}</b></td>
-                <td><b>${tot2_tnds}</b></td>
-                <td><b>${tot2_vcx}</b></td>
-                <td><b>${tot2_ton}</b></td>
-                <td>${tot2_hspsTB.toFixed(1)}</td>
-                <td class="pct">${tot2_tyO.toFixed(2)}%</td>
-                <td class="pct">${tot2_tyP.toFixed(2)}%</td>
-                <td class="pct ${tot2_tyQ>130?'hl-red':tot2_tyQ>=80?'hl-amber':'hl-green'}">${tot2_tyQ.toFixed(2)}%</td>
-                <td>—</td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-        <div class="gdv-report-footer">
-          🟢 <b>Cấp độ 1</b>: &lt;80% &nbsp;&nbsp; 🟡 <b>Cấp độ 2</b>: 80%–130% &nbsp;&nbsp; 🔴 <b>Cấp độ 3</b>: &gt;130%
-          &nbsp;·&nbsp; HSPS TB tháng = HSPS ${curYear2} ÷ số tháng hiện tại
-        </div>
+    <div class="gdv-report-wrap">
+      <div class="gdv-report-header">
+        <div class="org">PTISOS · Văn phòng Miền Bắc · Phòng Khu vực Quảng Ninh</div>
+        <div class="title">2. DANH SÁCH CHI TIẾT HỒ SƠ TỒN TRÊN 90 NGÀY</div>
+        <div class="period">Sắp xếp theo số ngày tồn giảm dần &nbsp;·&nbsp; Tổng: <b>${ton90.length} hồ sơ</b></div>
+      </div>
+      <div class="gdv-table-outer">
+        <table class="gdv" style="min-width:1000px">
+          <thead>
+            <tr>
+              <th style="width:36px">#</th>
+              <th class="lv2" style="width:90px">GĐV thụ lý</th>
+              <th class="lv2" style="min-width:160px">Số HSBT</th>
+              <th class="lv2" style="width:100px">Biển số xe</th>
+              <th class="lv2" style="width:90px">Mã NV</th>
+              <th class="lv2" style="min-width:140px">Tên Gara</th>
+              <th class="lv2" style="width:90px">Mã check</th>
+              <th class="lv2" style="width:100px">Mã validate</th>
+              <th class="lv2" style="width:140px">Tiền ước/duyệt BT</th>
+              <th class="lv2" style="width:110px">Trạng thái HS</th>
+              <th class="lv3" style="width:80px">Số ngày<br/>tồn</th>
+            </tr>
+          </thead>
+          <tbody>${rows2||'<tr><td colspan="11" style="text-align:center;padding:20px;color:var(--green);font-weight:700">✅ Không có hồ sơ nào tồn trên 90 ngày!</td></tr>'}</tbody>
+        </table>
+      </div>
+      <div class="gdv-report-footer">
+        Điều kiện: Số ngày tồn ≥ 90 &nbsp;·&nbsp;
+        <span style="color:var(--red);font-weight:700">■</span> ≥ 180 ngày &nbsp;
+        <span style="color:var(--amber);font-weight:700">■</span> 120–179 ngày
       </div>
     </div>
   `;
-  setTimeout(()=>{
-    buildBar('chart-bc1-bar',s.gdvStats.map(g=>g.code),[
-      {label:'Đã giải quyết',data:s.gdvStats.map(g=>g.resolved),backgroundColor:'#6ee7b7'},
-      {label:'Đang tồn',data:s.gdvStats.map(g=>g.ton),backgroundColor:'#fcd34d'}
-    ]);
-    buildDonut('chart-bc1-donut',
-      ['Tồn ≤45 ngày','Tồn >45 ngày'],
-      [s.duoi45,s.qua45],['#6ee7b7','#f87171']);
-  },10);
+}
+
+function parseDateBC(v){
+  if(!v)return null;
+  if(v instanceof Date)return v;
+  if(typeof v==='number')return new Date((v-25569)*86400000);
+  const p=String(v).split(/[\/\-\.]/);
+  if(p.length===3){const y=p[2].length===4?+p[2]:+p[0];const m=+p[1];const d=p[2].length===4?+p[0]:+p[2];return new Date(y,m-1,d);}
+  return null;
+}
+function fmtMBC(v){
+  if(!v||isNaN(v))return'—';
+  if(v>=1e9)return(v/1e9).toFixed(3)+' tỷ';
+  if(v>=1e6)return(v/1e6).toFixed(1)+' tr';
+  return new Intl.NumberFormat('vi-VN').format(Math.round(v));
 }
 
 // TAB 5: CẢNH BÁO
@@ -1207,7 +1150,7 @@ function computeDiabanStats(){
       g45_90:g45_90.length,g90:g90.length,qua45:g45_90.length+g90.length,
       tnds:tnds.length,vcx:vcx.length,
       hspsTB:Math.round(hspsTB*100)/100,tyQ,wl,
-      tyGQ:tongCanGQ>0?Math.round(resolvedR.length/tongCanGQ*10)/10:0};
+      tyGQ:tongCanGQ>0?Math.round(resolvedR.length/tongCanGQ*1000)/10:0};
   });
   return{result,curYear,curMonth,prevYear:curYear-1};
 }
