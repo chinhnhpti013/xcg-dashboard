@@ -174,6 +174,7 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
 .chart-card h3{font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:14px;
   padding-bottom:10px;border-bottom:2px solid var(--claude-light)}
 .chart-wrap{position:relative;height:260px;width:100%}
+.chart-wrap-pie{position:relative;height:340px;width:100%}
 
 /* TABLE */
 .table-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
@@ -684,7 +685,7 @@ function renderOverview(s){
     </div>
     <div class="chart-row">
       <div class="chart-card"><h3>Tiếp nhận · Đã giải quyết · Đang xử lý theo GĐV</h3><div class="chart-wrap"><canvas id="chart-bar-main"></canvas></div></div>
-      <div class="chart-card"><h3>Phân bổ hồ sơ tồn theo thời gian</h3><div class="chart-wrap"><canvas id="chart-donut-age"></canvas></div></div>
+      <div class="chart-card"><h3>Phân bổ hồ sơ tồn theo thời gian</h3><div class="chart-wrap-pie"><canvas id="chart-donut-age"></canvas></div></div>
     </div>
   `;
   setTimeout(()=>{
@@ -839,7 +840,7 @@ function renderGdv(s){
     </div>
 
     <div class="chart-row">
-      <div class="chart-card"><h3>Tổng hồ sơ cần giải quyết theo GĐV</h3><div class="chart-wrap"><canvas id="chart-donut-gdv"></canvas></div></div>
+      <div class="chart-card"><h3>Tổng hồ sơ cần giải quyết theo GĐV</h3><div class="chart-wrap-pie"><canvas id="chart-donut-gdv"></canvas></div></div>
       <div class="chart-card"><h3>Tỷ lệ Hs tồn / Hs PS TB tháng — ngưỡng cảnh báo</h3><div class="chart-wrap"><canvas id="chart-gdv-tyle"></canvas></div></div>
     </div>
     <div class="chart-row">
@@ -894,7 +895,7 @@ function renderAging(s){
     </div>
     <div class="chart-row">
       <div class="chart-card"><h3>Phân phối tồn theo khoảng ngày</h3><div class="chart-wrap"><canvas id="chart-bar-age"></canvas></div></div>
-      <div class="chart-card"><h3>Tỷ lệ trong hạn vs quá hạn</h3><div class="chart-wrap"><canvas id="chart-donut-age2"></canvas></div></div>
+      <div class="chart-card"><h3>Tỷ lệ trong hạn vs quá hạn</h3><div class="chart-wrap-pie"><canvas id="chart-donut-age2"></canvas></div></div>
     </div>
     <div class="table-card">
       <h3>Chi tiết tồn theo từng GĐV</h3>
@@ -1414,21 +1415,21 @@ function buildDonut(id,labels,data,colors){
   function ra(h,a){const[r,g,b]=h2r(h);return`rgba(${r},${g},${b},${a})`;}
 
   function render(prog){
-    const W=parent.clientWidth||300,H=parent.clientHeight||220;
+    const W=parent.clientWidth||400,H=parent.clientHeight||340;
     if(canvas.width!==W)canvas.width=W;
     if(canvas.height!==H)canvas.height=H;
     const ctx=canvas.getContext('2d');
     ctx.clearRect(0,0,W,H);
     const tot=data.reduce((a,b)=>a+b,0);if(!tot)return;
 
-    // Layout
-    const LW=Math.min(122,W*0.30);
-    const cW=W-LW;
-    const cx=cW*0.50, cy=H*0.42;
-    const R=Math.min(cW*0.37,H*0.36);
-    const ky=0.30;       // góc nhìn thấp — gần nằm ngang như ảnh mẫu
-    const D=R*0.55;      // rất dày — đặc trưng của ảnh
-    const EX=R*0.065;    // explode nhẹ mỗi segment
+    // Layout: chart dùng toàn bộ chiều ngang, legend nằm dưới
+    const LEG_H=46;             // chiều cao vùng legend dưới
+    const chartH=H-LEG_H;
+    const cx=W*0.50, cy=chartH*0.42;
+    const R=Math.min(W*0.38,chartH*0.44); // tận dụng tối đa không gian
+    const ky=0.30;       // góc nhìn thấp — nằm ngang
+    const D=R*0.55;      // rất dày
+    const EX=R*0.065;
     const N=data.length;
     const GAP=Math.max(0.04,0.05*Math.PI*2/N);
     const totalSw=Math.PI*2-GAP*N;
@@ -1583,27 +1584,36 @@ function buildDonut(id,labels,data,colors){
       ctx.restore();
     }
 
-    // Legend bên phải
-    ctx.save();
-    const lx=W-LW+6;
-    const rowH=Math.min(36,Math.floor((H-12)/N));
-    let ly=Math.max(6,(H-rowH*N)/2);
-    data.forEach((v2,i)=>{
-      const pct2=Math.round(v2/tot*100);
-      ctx.fillStyle=colors[i%colors.length];
-      ctx.beginPath();ctx.arc(lx+5,ly+6,5,0,Math.PI*2);ctx.fill();
-      ctx.fillStyle='#1e293b';
-      ctx.font=`600 10px "Be Vietnam Pro",sans-serif`;
-      ctx.textAlign='left';ctx.textBaseline='top';
-      let lbl=labels[i];
-      if(ctx.measureText(lbl).width>LW-22)lbl=lbl.slice(0,8)+'…';
-      ctx.fillText(lbl,lx+14,ly);
-      ctx.fillStyle='#64748b';
-      ctx.font=`9.5px "Be Vietnam Pro",sans-serif`;
-      ctx.fillText(`${pct2}%  (${v2})`,lx+14,ly+13);
-      ly+=rowH;
-    });
-    ctx.restore();
+    // Legend nằm ngang dưới chart
+    if(prog>0.5){
+      ctx.save();
+      const cols=Math.min(N,4);
+      const itemW=W/cols;
+      const legY=H-LEG_H+6;
+      ctx.font=`600 10.5px "Be Vietnam Pro",sans-serif`;
+      data.forEach((v2,i)=>{
+        const pct2=Math.round(v2/tot*100);
+        const col=i%cols, row=Math.floor(i/cols);
+        const ix=col*itemW+10, iy=legY+row*21;
+        // Chấm màu
+        ctx.fillStyle=colors[i%colors.length];
+        ctx.beginPath();ctx.arc(ix+5,iy+5,5,0,Math.PI*2);ctx.fill();
+        // Label
+        ctx.fillStyle='#1e293b';
+        ctx.textAlign='left';ctx.textBaseline='top';
+        let lbl=labels[i];
+        const maxW=itemW-36;
+        while(lbl.length>4&&ctx.measureText(lbl).width>maxW)lbl=lbl.slice(0,-1);
+        if(lbl!==labels[i])lbl+='…';
+        ctx.fillText(`${lbl} · ${pct2}%`,ix+14,iy);
+        // Giá trị
+        ctx.fillStyle='#64748b';
+        ctx.font=`9px "Be Vietnam Pro",sans-serif`;
+        ctx.fillText(`(${v2} HS)`,ix+14,iy+12);
+        ctx.font=`600 10.5px "Be Vietnam Pro",sans-serif`;
+      });
+      ctx.restore();
+    }
   }
 
   function ease(t){const c=1.70;return t<1?1+c*(Math.pow(t-1,3))+(c-0.6)*(Math.pow(t-1,2)):1;}
