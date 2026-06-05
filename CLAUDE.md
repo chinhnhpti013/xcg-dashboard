@@ -96,14 +96,58 @@ Dùng `localStorage` với key `pti_raw_v1` (JSON dữ liệu) và `pti_filename
 - Khi mở lại trang → nút "🔄 Khôi phục" xuất hiện, tự restore
 - "↩ Tải file khác" → xoá cache, quay về upload
 
-## Quy tắc khi Claude chỉnh sửa index.html
+## Thiết kế UI hiện tại (quan trọng — không thay đổi tuỳ tiện)
+
+### Màu sắc & nền
+
+| Thành phần | Giá trị |
+|------------|---------|
+| Nền trang | `linear-gradient(150deg, #dce8f5 → #ede7f8 → #f8e9e0 → #fafaf0)`, `background-attachment: fixed` |
+| Chart card | `#FAFAF5` (trắng kem), `box-shadow: 0 4px 24px rgba(0,0,0,.08)` |
+| Info card (Infographic) | `#fff`, `box-shadow: 0 4px 20px rgba(0,0,0,.06)` |
+| CSS variable `--claude` | `#DA7756` (Claude Orange — dùng làm accent) |
+| CSS variable `--claude-light` | `#FDF1EE` |
+
+### Tab — 3D Press Button
+
+Mỗi tab có màu gradient riêng, hiệu ứng nổi/nhấn kiểu nút 3D vật lý:
+
+| Tab | Màu gradient |
+|-----|-------------|
+| 📊 Tổng quan | `#60a5fa → #1d4ed8` (xanh dương) |
+| 👤 Theo GĐV | `#34d399 → #047857` (xanh lá) |
+| ⏳ Phân tích tồn | `#fbbf24 → #b45309` (vàng) |
+| 📋 Báo cáo XO | `#c084fc → #6d28d9` (tím) |
+| ⚠️ Cảnh báo | `#f87171 → #b91c1c` (đỏ) |
+| 🗺️ Infographic | `#22d3ee → #0e7490` (cyan) |
+
+- Trạng thái mặc định: `transform: translateY(-3px)`, `box-shadow: 0 6px 0 rgba(0,0,0,0.22)`
+- Hover: `translateY(-5px)`, shadow `8px`
+- Active/nhấn: `translateY(+2px)`, shadow `2px`
+
+### Biểu đồ — Chart.js 4
+
+**Bar chart (cột trụ 3D):**
+- `cylinderPlugin`: vẽ ellipse đỉnh (radial gradient trắng sáng) + ellipse đáy (bóng tối) → hình trụ 3D
+- Gradient cột: `GRAD_PALETTE` 7 màu (indigo/emerald/amber/red/violet/cyan/orange), đậm ở đáy → sáng ở đỉnh
+- `borderRadius: {topLeft:0, topRight:0, bottomLeft:5, bottomRight:5}`
+- Animation: `easeOutQuart`, 1000ms
+
+**Donut chart (vòng tròn 3D):**
+- CSS transform trực tiếp trên canvas: `perspective(480px) rotateX(24deg) scaleY(0.86)`
+- Hover chuột: `rotateX(12deg)` — ngẩng lên
+- `shadow3DPlugin`: đổ bóng canvas
+- Animation: `easeOutBack`, 1100ms, `animateScale: true`
+
+### Quy tắc khi Claude chỉnh sửa index.html
 
 - Không thay đổi cấu trúc upload → loading → dashboard
 - Không thay đổi hàm `computeStats()` trừ khi thêm trường mới
 - Khi thêm tab mới: thêm cả button, div container, case switchTab, hàm render, và gọi trong renderAll()
 - Tiêu đề thống nhất: **PTISOS - Văn phòng Miền Bắc - Phòng Khu vực Quảng Ninh**
-- Màu brand: `#1565C0` (xanh PTI)
-- Font: `Be Vietnam Pro`
+- Màu brand PTI: `#1565C0` · Font: `Be Vietnam Pro`
+- **Không** thay đổi `cylinderPlugin`, `shadow3DPlugin`, `GRAD_PALETTE` trừ khi người dùng yêu cầu
+- Khi thêm chart bar mới → dùng `buildBar()`, chart donut mới → dùng `buildDonut()`
 
 ## Quy ước ngưỡng ngày tồn (QUAN TRỌNG)
 
