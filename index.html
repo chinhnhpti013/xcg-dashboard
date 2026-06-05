@@ -1402,228 +1402,256 @@ function buildBar(id,labels,datasets,extraDatasets){
   });
 }
 
-// 3D Isometric Pie — pure Canvas 2D, solid segments, label trên mặt
-// 3D Neon Glossy Pie — thick extrusion, diagonal gloss streak, neon rim glow
+/* ─────────────────────────────────────────────────────────────────────────
+   3D PIE CHART — Canvas 2D thuần, góc isometric, dày, gloss, neon glow
+   ───────────────────────────────────────────────────────────────────────── */
 function buildDonut(id,labels,data,colors){
-  const canvas=document.getElementById(id);if(!canvas)return;
-  canvas.style.transform='';canvas.style.transition='';
-  const parent=canvas.parentElement;
+  const canvas=document.getElementById(id);
+  if(!canvas)return;
+  canvas.style.transform='';
+  canvas.style.transition='';
+  const wrap=canvas.parentElement;
   let raf=null;
 
-  function h2r(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
-  function sh(h,f){const[r,g,b]=h2r(h);return`rgb(${~~Math.min(r*f,255)},${~~Math.min(g*f,255)},${~~Math.min(b*f,255)})`;}
-  function ra(h,a){const[r,g,b]=h2r(h);return`rgba(${r},${g},${b},${a})`;}
+  /* ── helpers màu ── */
+  function rgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
+  function dk(h,f){const[r,g,b]=rgb(h);return`rgb(${~~Math.min(r*f,255)},${~~Math.min(g*f,255)},${~~Math.min(b*f,255)})`;}
+  function al(h,a){const[r,g,b]=rgb(h);return`rgba(${r},${g},${b},${a})`;}
 
-  function render(prog){
-    const W=parent.clientWidth||400,H=parent.clientHeight||340;
-    if(canvas.width!==W)canvas.width=W;
-    if(canvas.height!==H)canvas.height=H;
+  function draw(prog){
+    /* kích thước canvas theo container */
+    const W=wrap.clientWidth||400;
+    const H=wrap.clientHeight||340;
+    if(canvas.width!==W||canvas.height!==H){canvas.width=W;canvas.height=H;}
     const ctx=canvas.getContext('2d');
     ctx.clearRect(0,0,W,H);
-    const tot=data.reduce((a,b)=>a+b,0);if(!tot)return;
 
-    // Layout: chart dùng toàn bộ chiều ngang, legend nằm dưới
-    const LEG_H=46;             // chiều cao vùng legend dưới
-    const chartH=H-LEG_H;
-    const cx=W*0.50, cy=chartH*0.42;
-    const R=Math.min(W*0.38,chartH*0.44); // tận dụng tối đa không gian
-    const ky=0.30;       // góc nhìn thấp — nằm ngang
-    const D=R*0.55;      // rất dày
-    const EX=R*0.065;
-    const N=data.length;
-    const GAP=Math.max(0.04,0.05*Math.PI*2/N);
+    const tot=data.reduce((s,v)=>s+v,0);
+    if(!tot)return;
+
+    /* ── tham số hình học ── */
+    const LH=50;                          // legend height ở đáy
+    const cH=H-LH;
+    const cx=W/2, cy=cH*0.44;
+    const R =Math.min(W*0.37,cH*0.44);   // bán kính — lớn nhất có thể
+    const KY=0.30;                         // nén Y (góc isometric ~17°)
+    const DP=R*0.52;                       // độ dày — rất dày
+    const N =data.length;
+    const GAP=0.040;                       // khe giữa các mảnh (rad)
+
+    /* ── tính góc từng mảnh ── */
     const totalSw=Math.PI*2-GAP*N;
-
-    // Build segments
+    const maxA=-Math.PI/2+prog*Math.PI*2; // animation sweep limit
     const segs=[];
-    const maxA=-Math.PI/2+prog*Math.PI*2;
     let ang=-Math.PI/2;
     data.forEach((v,i)=>{
-      const fullSw=(v/tot)*totalSw;
+      const sw=(v/tot)*totalSw;
       const a1=ang+GAP/2;
-      const a2=Math.min(ang+fullSw-GAP/2,maxA);
-      if(a2>a1+0.001){
-        const mid=(a1+a2)/2;
-        const ex=cx+EX*Math.cos(mid), ey=cy+EX*Math.sin(mid)*ky;
-        segs.push({a1,a2,mid,c:colors[i%colors.length],label:labels[i],v,pct:Math.round(v/tot*100),ex,ey});
+      const a2=Math.min(ang+sw-GAP/2, maxA);
+      if(a2>a1+0.002){
+        segs.push({a1,a2,mid:(a1+a2)/2,
+          c:colors[i%colors.length],
+          label:labels[i], v,
+          pct:Math.round(v/tot*100)});
       }
-      ang+=fullSw+GAP;
+      ang+=sw+GAP;
     });
 
-    const pt=(a,r2,ecx,ecy,dy=0)=>[ecx+r2*Math.cos(a), ecy+r2*Math.sin(a)*ky+dy];
+    /* ── helpers vẽ path ── */
+    // điểm trên ellipse isometric
+    const ep=(a,r,dy=0)=>({x:cx+r*Math.cos(a), y:cy+r*Math.sin(a)*KY+dy});
 
-    function pathSide(a1,a2,ecx,ecy){
+    // path: mặt trên (hình quạt)
+    function pTop(a1,a2){
       ctx.beginPath();
-      ctx.moveTo(...pt(a1,R,ecx,ecy,0));
-      ctx.ellipse(ecx,ecy,R,R*ky,0,a1,a2,false);
-      ctx.lineTo(...pt(a2,R,ecx,ecy,D));
-      ctx.ellipse(ecx,ecy+D,R,R*ky,0,a2,a1,true);
+      ctx.moveTo(cx,cy);
+      ctx.lineTo(ep(a1,R).x, ep(a1,R).y);
+      ctx.ellipse(cx,cy,R,R*KY,0,a1,a2,false);
       ctx.closePath();
     }
-    function pathTop(a1,a2,ecx,ecy){
+    // path: tường bên ngoài (extruded)
+    function pSide(a1,a2){
+      const t1=ep(a1,R,0), t2=ep(a2,R,0);
+      const b1=ep(a1,R,DP), b2=ep(a2,R,DP);
       ctx.beginPath();
-      ctx.moveTo(ecx,ecy);
-      ctx.lineTo(...pt(a1,R,ecx,ecy,0));
-      ctx.ellipse(ecx,ecy,R,R*ky,0,a1,a2,false);
+      ctx.moveTo(t1.x,t1.y);
+      ctx.ellipse(cx,cy,R,R*KY,0,a1,a2,false);
+      ctx.lineTo(b2.x,b2.y);
+      ctx.ellipse(cx,cy+DP,R,R*KY,0,a2,a1,true);
       ctx.closePath();
     }
-    function pathBot(a1,a2,ecx,ecy){
+    // path: mặt đáy
+    function pBot(a1,a2){
       ctx.beginPath();
-      ctx.moveTo(ecx,ecy+D);
-      ctx.lineTo(...pt(a1,R,ecx,ecy,D));
-      ctx.ellipse(ecx,ecy+D,R,R*ky,0,a1,a2,false);
+      ctx.moveTo(cx,cy+DP);
+      ctx.lineTo(ep(a1,R,DP).x, ep(a1,R,DP).y);
+      ctx.ellipse(cx,cy+DP,R,R*KY,0,a1,a2,false);
       ctx.closePath();
     }
 
-    // Bóng đổ phía dưới
-    ctx.save();
-    ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=28;ctx.shadowOffsetY=6;
-    const sg=ctx.createRadialGradient(cx,cy+D+6,R*0.1,cx,cy+D+6,R*1.22);
-    sg.addColorStop(0,'rgba(0,0,0,0.40)');sg.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=sg;
-    ctx.beginPath();ctx.ellipse(cx,cy+D+6,R*1.24,R*1.24*ky*0.50,0,0,Math.PI*2);ctx.fill();
-    ctx.restore();
+    /* ════════════════════════════════════
+       VẼ — Painter's algorithm: lùi → gần
+       ════════════════════════════════════ */
 
-    // Painter's order: lùi trước → gần sau
+    /* 1. Bóng đổ tổng thể dưới đáy */
+    {
+      ctx.save();
+      const sg=ctx.createRadialGradient(cx,cy+DP*1.05,R*0.15, cx,cy+DP*1.05,R*1.30);
+      sg.addColorStop(0,'rgba(0,0,0,0.42)');
+      sg.addColorStop(0.5,'rgba(0,0,0,0.18)');
+      sg.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=sg;
+      ctx.beginPath();
+      ctx.ellipse(cx,cy+DP*1.05,R*1.32,R*1.32*KY*0.55,0,0,Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    /* 2. Sort: sin(mid) nhỏ → lùi → vẽ trước */
     const sorted=[...segs].sort((a,b)=>Math.sin(a.mid)-Math.sin(b.mid));
 
-    sorted.forEach(({a1,a2,mid,c,ex,ey,pct})=>{
+    sorted.forEach(({a1,a2,mid,c,pct})=>{
 
-      // ① Mặt đáy — rất tối
+      /* 2a. Mặt đáy (tối nhất) */
       ctx.save();
-      pathBot(a1,a2,ex,ey);
-      ctx.fillStyle=sh(c,0.18);ctx.fill();
+      pBot(a1,a2);
+      ctx.fillStyle=dk(c,0.20);
+      ctx.fill();
       ctx.restore();
 
-      // ② Tường bên — dark gradient, viền neon dưới
+      /* 2b. Tường bên — gradient đậm, neon rim dưới */
       ctx.save();
-      pathSide(a1,a2,ex,ey);
-      const[mx,my]=pt(mid,R*0.6,ex,ey,D*0.65);
-      const wg=ctx.createLinearGradient(ex,ey,mx,my);
-      wg.addColorStop(0,sh(c,0.60));
-      wg.addColorStop(0.35,sh(c,0.32));
-      wg.addColorStop(1,sh(c,0.14));
-      ctx.fillStyle=wg;ctx.fill();
-      ctx.restore();
-
-      // Neon glow — viền đáy tường
-      ctx.save();
+      pSide(a1,a2);
+      const mp=ep(mid,R*0.55,DP*0.70);
+      const wg=ctx.createLinearGradient(cx,cy,mp.x,mp.y);
+      wg.addColorStop(0,   dk(c,0.62));
+      wg.addColorStop(0.40,dk(c,0.36));
+      wg.addColorStop(1,   dk(c,0.16));
+      ctx.fillStyle=wg;
+      ctx.fill();
+      /* viền neon dưới tường */
       ctx.beginPath();
-      ctx.ellipse(ex,ey+D,R,R*ky,0,a1,a2,false);
-      ctx.strokeStyle=ra(c,0.55);ctx.lineWidth=2.5;
-      ctx.shadowColor=c;ctx.shadowBlur=14;
+      ctx.ellipse(cx,cy+DP,R,R*KY,0,a1,a2,false);
+      ctx.strokeStyle=al(c,0.70);
+      ctx.lineWidth=3;
+      ctx.shadowColor=c;
+      ctx.shadowBlur=18;
       ctx.stroke();
       ctx.restore();
 
-      // ③ Mặt trên — base color + gloss chéo sáng bóng như kính
+      /* 2c. Mặt trên — gradient rực + gloss chéo */
       ctx.save();
-      pathTop(a1,a2,ex,ey);
-      // Radial gradient base (sáng ở góc trên-trái như ảnh)
-      const rg=ctx.createRadialGradient(ex-R*0.20,ey-R*ky*0.55,0,ex,ey,R);
-      rg.addColorStop(0,sh(c,1.55));
-      rg.addColorStop(0.40,sh(c,1.15));
-      rg.addColorStop(0.80,c);
-      rg.addColorStop(1,sh(c,0.72));
-      ctx.fillStyle=rg;ctx.fill();
+      pTop(a1,a2);
+      /* radial gradient gốc: sáng tâm-trên-trái → tối rìa */
+      const rg=ctx.createRadialGradient(
+        cx-R*0.18, cy-R*KY*0.45, 0,
+        cx, cy, R);
+      rg.addColorStop(0,   dk(c,1.60));
+      rg.addColorStop(0.35,dk(c,1.22));
+      rg.addColorStop(0.75,c);
+      rg.addColorStop(1,   dk(c,0.70));
+      ctx.fillStyle=rg;
+      ctx.fill();
 
-      // Vệt gloss chéo đặc trưng (như ảnh mẫu — dải trắng chéo ngang mặt)
-      pathTop(a1,a2,ex,ey);
+      /* gloss streak chéo — clip vào mảnh */
+      pTop(a1,a2);
       ctx.clip();
-      const gx1=ex-R*0.80, gy1=ey-R*ky*1.2;
-      const gx2=ex+R*0.55, gy2=ey+R*ky*0.65;
-      const gloss=ctx.createLinearGradient(gx1,gy1,gx2,gy2);
-      gloss.addColorStop(0.00,'rgba(255,255,255,0.00)');
-      gloss.addColorStop(0.28,'rgba(255,255,255,0.52)');
-      gloss.addColorStop(0.45,'rgba(255,255,255,0.78)');
-      gloss.addColorStop(0.58,'rgba(255,255,255,0.45)');
-      gloss.addColorStop(0.72,'rgba(255,255,255,0.10)');
-      gloss.addColorStop(1.00,'rgba(255,255,255,0.00)');
-      ctx.fillStyle=gloss;ctx.fill();
-
-      // Second softer gloss band (dải thứ 2 mờ hơn)
-      const gloss2=ctx.createLinearGradient(ex-R*0.55,ey-R*ky*0.6,ex+R*0.8,gy2+R*ky*0.3);
-      gloss2.addColorStop(0,'rgba(255,255,255,0.00)');
-      gloss2.addColorStop(0.4,'rgba(255,255,255,0.18)');
-      gloss2.addColorStop(1,'rgba(255,255,255,0.00)');
-      ctx.fillStyle=gloss2;ctx.fill();
+      const gx1=cx-R*0.85, gy1=cy-R*KY*1.15;
+      const gx2=cx+R*0.55, gy2=cy+R*KY*0.65;
+      const gl=ctx.createLinearGradient(gx1,gy1,gx2,gy2);
+      gl.addColorStop(0.00,'rgba(255,255,255,0.00)');
+      gl.addColorStop(0.22,'rgba(255,255,255,0.40)');
+      gl.addColorStop(0.40,'rgba(255,255,255,0.75)');
+      gl.addColorStop(0.55,'rgba(255,255,255,0.38)');
+      gl.addColorStop(0.72,'rgba(255,255,255,0.06)');
+      gl.addColorStop(1.00,'rgba(255,255,255,0.00)');
+      ctx.fillStyle=gl;
+      ctx.fill();
       ctx.restore();
 
-      // Neon glow — viền rìa ngoài mặt trên
+      /* viền neon trên rìa ngoài */
       ctx.save();
       ctx.beginPath();
-      ctx.moveTo(...pt(a1,R,ex,ey,0));
-      ctx.ellipse(ex,ey,R,R*ky,0,a1,a2,false);
-      ctx.strokeStyle=ra(c,0.70);ctx.lineWidth=1.8;
-      ctx.shadowColor=sh(c,1.4);ctx.shadowBlur=12;
+      ctx.ellipse(cx,cy,R,R*KY,0,a1,a2,false);
+      ctx.strokeStyle=al(c,0.75);
+      ctx.lineWidth=2;
+      ctx.shadowColor=dk(c,1.35);
+      ctx.shadowBlur=14;
       ctx.stroke();
       ctx.restore();
 
-      // Label % trắng có glow trên mặt
-      if(prog>0.88&&pct>=5){
-        const[lx2,ly2]=pt(mid,R*0.58,ex,ey,0);
+      /* label % trắng nổi */
+      if(prog>=0.95&&pct>=5){
+        const lp=ep(mid,R*0.60);
+        const fs=Math.max(10,Math.round(R*0.16));
         ctx.save();
-        ctx.textAlign='center';ctx.textBaseline='middle';
-        const fs=Math.max(9,~~(R*0.155));
         ctx.font=`bold ${fs}px "Be Vietnam Pro",sans-serif`;
-        ctx.fillStyle='rgba(0,0,0,0.45)';
-        ctx.fillText(`${pct}%`,lx2+0.8,ly2+1.2);
+        ctx.textAlign='center';
+        ctx.textBaseline='middle';
+        ctx.fillStyle='rgba(0,0,0,0.50)';
+        ctx.fillText(`${pct}%`,lp.x+1,lp.y+1.5);
         ctx.fillStyle='#fff';
-        ctx.shadowColor='rgba(255,255,255,0.9)';ctx.shadowBlur=6;
-        ctx.fillText(`${pct}%`,lx2,ly2);
+        ctx.shadowColor='rgba(255,255,255,0.95)';
+        ctx.shadowBlur=9;
+        ctx.fillText(`${pct}%`,lp.x,lp.y);
         ctx.restore();
       }
     });
 
-    // Highlight viền trên cùng (rim glow toàn bộ)
-    if(prog>0.90){
+    /* 3. Rim highlight toàn vòng */
+    if(prog>=0.95){
       ctx.save();
-      ctx.beginPath();ctx.ellipse(cx,cy,R,R*ky,0,0,Math.PI*2);
-      ctx.strokeStyle='rgba(255,255,255,0.28)';ctx.lineWidth=2;
-      ctx.shadowColor='rgba(255,255,255,0.6)';ctx.shadowBlur=10;
+      ctx.beginPath();
+      ctx.ellipse(cx,cy,R,R*KY,0,0,Math.PI*2);
+      ctx.strokeStyle='rgba(255,255,255,0.30)';
+      ctx.lineWidth=2.5;
+      ctx.shadowColor='rgba(255,255,255,0.55)';
+      ctx.shadowBlur=14;
       ctx.stroke();
       ctx.restore();
     }
 
-    // Legend nằm ngang dưới chart
-    if(prog>0.5){
+    /* ── Legend ngang ở đáy ── */
+    if(prog>=0.40){
       ctx.save();
-      const cols=Math.min(N,4);
-      const itemW=W/cols;
-      const legY=H-LEG_H+6;
-      ctx.font=`600 10.5px "Be Vietnam Pro",sans-serif`;
-      data.forEach((v2,i)=>{
-        const pct2=Math.round(v2/tot*100);
+      const cols=Math.min(N,Math.ceil(N/2)>3?4:N);
+      const iW=W/cols;
+      const legY=H-LH+8;
+      data.forEach((v,i)=>{
+        const pct2=Math.round(v/tot*100);
         const col=i%cols, row=Math.floor(i/cols);
-        const ix=col*itemW+10, iy=legY+row*21;
-        // Chấm màu
-        ctx.fillStyle=colors[i%colors.length];
+        const ix=col*iW+8, iy=legY+row*22;
+        const cc=colors[i%colors.length];
+        /* chấm tròn màu */
+        ctx.fillStyle=cc;
+        ctx.shadowColor=cc; ctx.shadowBlur=7;
         ctx.beginPath();ctx.arc(ix+5,iy+5,5,0,Math.PI*2);ctx.fill();
-        // Label
+        ctx.shadowBlur=0;
+        /* tên + % */
         ctx.fillStyle='#1e293b';
+        ctx.font=`600 10.5px "Be Vietnam Pro",sans-serif`;
         ctx.textAlign='left';ctx.textBaseline='top';
         let lbl=labels[i];
-        const maxW=itemW-36;
-        while(lbl.length>4&&ctx.measureText(lbl).width>maxW)lbl=lbl.slice(0,-1);
+        while(lbl.length>3&&ctx.measureText(`${lbl}… · ${pct2}%`).width>iW-22)lbl=lbl.slice(0,-1);
         if(lbl!==labels[i])lbl+='…';
         ctx.fillText(`${lbl} · ${pct2}%`,ix+14,iy);
-        // Giá trị
-        ctx.fillStyle='#64748b';
+        ctx.fillStyle='#94a3b8';
         ctx.font=`9px "Be Vietnam Pro",sans-serif`;
-        ctx.fillText(`(${v2} HS)`,ix+14,iy+12);
-        ctx.font=`600 10.5px "Be Vietnam Pro",sans-serif`;
+        ctx.fillText(`${v} HS`,ix+14,iy+13);
       });
       ctx.restore();
     }
-  }
+  }// end draw()
 
-  function ease(t){const c=1.70;return t<1?1+c*(Math.pow(t-1,3))+(c-0.6)*(Math.pow(t-1,2)):1;}
-  const dur=1200,t0=performance.now();
-  function anim(now){
-    const t=Math.min((now-t0)/dur,1);
-    render(ease(t));
-    if(t<1)raf=requestAnimationFrame(anim);else render(1);
+  /* ── Animation easeOutCubic ── */
+  function ease(t){return 1-Math.pow(1-Math.min(t,1),3);}
+  const DUR=1400, t0=performance.now();
+  function loop(now){
+    draw(ease((now-t0)/DUR));
+    if(now-t0<DUR)raf=requestAnimationFrame(loop);
+    else draw(1);
   }
-  raf=requestAnimationFrame(anim);
+  raf=requestAnimationFrame(loop);
   CHARTS[id]={destroy(){if(raf)cancelAnimationFrame(raf);}};
 }
 </script>
