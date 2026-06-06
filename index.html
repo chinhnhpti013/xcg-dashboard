@@ -360,8 +360,8 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
 </head>
 <body>
 
-<!-- UPLOAD SCREEN -->
-<div id="upload-screen">
+<!-- UPLOAD SCREEN (chỉ hiện khi lỗi tải Drive hoặc người dùng muốn đổi nguồn) -->
+<div id="upload-screen" style="display:none">
   <div class="logo-badge">PTISOS · Văn phòng Miền Bắc · Quảng Ninh</div>
   <h1>PTISOS - Văn phòng Miền Bắc<br/><span>Phòng Khu vực Quảng Ninh</span></h1>
   <p class="subtitle">Chọn nguồn dữ liệu để xem dashboard báo cáo tiến trình giám định bồi thường xe cơ giới</p>
@@ -402,11 +402,6 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
     </div>
   </div>
 
-  <!-- Nút khôi phục phiên trước -->
-  <button id="btn-restore" onclick="restoreSession()" style="display:none;margin-top:16px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;padding:10px 28px;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;gap:8px;align-items:center">
-    🔄 <span id="restore-label">Khôi phục phiên làm việc trước</span>
-  </button>
-
   <div class="features">
     <div class="feat"><div class="feat-dot"></div>Filter theo GĐV &amp; nghiệp vụ</div>
     <div class="feat"><div class="feat-dot"></div>Biểu đồ Chart.js động</div>
@@ -415,8 +410,8 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
   </div>
 </div>
 
-<!-- LOADING -->
-<div id="loading-screen" style="display:none">
+<!-- LOADING (hiện mặc định khi trang vừa mở — auto-load từ Drive) -->
+<div id="loading-screen">
   <div class="spinner"></div>
   <p>Đang phân tích dữ liệu…</p>
 </div>
@@ -536,43 +531,21 @@ function showFileDateBadge(dateMs, isGDrive){
     +(diffDays===0?' (hôm nay)':diffDays===1?' (hôm qua)':' ('+diffDays+' ngày trước)');
 }
 
-// ─── SESSION RESTORE ─────────────────────────────────────────────────────────
+// ─── AUTO-LOAD FROM GOOGLE DRIVE ON STARTUP ──────────────────────────────────
 (function initSession(){
   try{
-    const saved=localStorage.getItem(LS_KEY);
-    const fname=localStorage.getItem(LS_FILE)||'Dulieu.xlsx';
-    if(saved){
-      const btn=document.getElementById('btn-restore');
-      const lbl=document.getElementById('restore-label');
-      if(btn&&lbl){lbl.textContent='Khôi phục: '+fname;btn.style.display='inline-flex';}
-      // Điền lại file ID tùy chỉnh (nếu lần trước dùng ID khác mặc định)
-      const savedId=localStorage.getItem('pti_gdrive_id');
-      if(savedId){
-        const inp=document.getElementById('drive-url-input');
-        if(inp)inp.value=savedId;
-      }
-    }
-  }catch(e){}
+    // Lưu file ID cố định vào localStorage để theo dõi nguồn dữ liệu
+    localStorage.setItem('pti_gdrive_id', GDRIVE_FILE_ID);
+    // Tự động tải từ Google Drive ngay khi mở trang
+    loadFromGoogleDrive();
+  }catch(e){
+    // Nếu lỗi JS thì hiện upload screen
+    show('upload-screen');
+  }
 })();
 
 function restoreSession(){
-  try{
-    const fname=localStorage.getItem(LS_FILE)||'Dulieu.xlsx';
-    // Nếu lần trước dùng Google Drive → tải lại từ Drive để lấy dữ liệu mới nhất
-    if(fname==='Google Drive'){loadFromGoogleDrive();return;}
-    const saved=localStorage.getItem(LS_KEY);
-    if(!saved)return;
-    show('loading-screen');
-    setTimeout(()=>{
-      RAW=JSON.parse(saved);
-      document.getElementById('topbar-file').textContent=fname;
-      buildGdvFilter();renderAll();show('dashboard');
-      const savedDate=localStorage.getItem(LS_FDATE);
-      showFileDateBadge(savedDate?+savedDate:null, false);
-      document.getElementById('footer-date').textContent=
-        new Date().toLocaleDateString('vi-VN',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'});
-    },300);
-  }catch(e){alert('Không thể khôi phục phiên: '+e.message);}
+  // Không còn dùng — app tự auto-load từ Google Drive khi mở trang
 }
 
 // ─── FILE LOAD ───────────────────────────────────────────────────────────────
@@ -710,8 +683,6 @@ function resetApp(){
   const gs=document.getElementById('_gviz_script');if(gs)gs.remove();
   _gvizResetBtn();
   try{localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_FILE);}catch(e){}
-  const btn=document.getElementById('btn-restore');
-  if(btn)btn.style.display='none';
   show('upload-screen');
 }
 
