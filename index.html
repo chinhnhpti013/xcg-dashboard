@@ -153,18 +153,44 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
 
 /* FILTER BAR */
 .filter-bar{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  background:linear-gradient(135deg,rgba(219,234,254,.65) 0%,rgba(237,233,254,.55) 50%,rgba(253,241,238,.55) 100%);
+  border:1px solid rgba(99,102,241,.18);border-radius:var(--radius);
   padding:14px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:20px;
+  box-shadow:0 2px 12px rgba(99,102,241,.07),inset 0 1px 0 rgba(255,255,255,.7);
+  backdrop-filter:blur(4px);
 }
-.filter-bar label{font-size:.78rem;font-weight:600;color:var(--text2);white-space:nowrap}
+.filter-bar label{
+  font-size:.78rem;font-weight:700;color:#3730a3;white-space:nowrap;
+  text-shadow:0 1px 0 rgba(255,255,255,.8);
+}
 .filter-bar select{
-  padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);
-  font-size:.82rem;background:var(--surface2);color:var(--text);
-  cursor:pointer;outline:none;font-family:'Be Vietnam Pro',sans-serif;
+  padding:7px 32px 7px 12px;border:1.5px solid rgba(99,102,241,.25);border-radius:var(--radius-sm);
+  font-size:.82rem;font-family:'Be Vietnam Pro',sans-serif;
+  color:#1e1b4b;font-weight:500;cursor:pointer;outline:none;
+  appearance:none;-webkit-appearance:none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236366f1' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center,
+    linear-gradient(160deg,rgba(255,255,255,.92) 0%,rgba(238,242,255,.85) 100%);
+  box-shadow:0 2px 6px rgba(99,102,241,.1),inset 0 1px 0 rgba(255,255,255,.9);
+  transition:border-color .18s,box-shadow .18s,transform .12s;
 }
-.filter-bar select:focus{border-color:var(--blue-mid)}
-.filter-sep{width:1px;height:24px;background:var(--border)}
-.filter-info{font-size:.78rem;color:var(--text3);margin-left:auto}
+.filter-bar select:hover{
+  border-color:rgba(99,102,241,.5);
+  box-shadow:0 4px 12px rgba(99,102,241,.18),inset 0 1px 0 rgba(255,255,255,.9);
+  transform:translateY(-1px);
+}
+.filter-bar select:focus{
+  border-color:#6366f1;
+  box-shadow:0 0 0 3px rgba(99,102,241,.15),0 4px 12px rgba(99,102,241,.15);
+  transform:translateY(-1px);
+}
+.filter-sep{width:1px;height:28px;background:linear-gradient(to bottom,transparent,rgba(99,102,241,.25),transparent)}
+.filter-info{
+  font-size:.78rem;font-weight:600;margin-left:auto;
+  color:#6d28d9;background:rgba(237,233,254,.7);
+  padding:4px 12px;border-radius:20px;border:1px solid rgba(124,58,237,.2);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+}
 
 /* TABS — 3D Press Button */
 .tabs{display:flex;gap:8px;margin-bottom:24px;background:rgba(255,255,255,0.55);
