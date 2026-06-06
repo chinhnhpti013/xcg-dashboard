@@ -101,6 +101,7 @@ Thay vì chỉ upload file, màn hình upload có 2 card song song:
 - Google Drive file ID: `1KqAQmNh9W-C8MsbWuYrywnNouGC4t2ISwRMa7oYH4_0` · Sheet GID: `101924388` (cố định, không có ô nhập URL)
 - File phải chia sẻ "Bất kỳ ai có liên kết" mới tải được
 - Hàm tải: `loadFromGoogleDrive()` — luôn dùng `GDRIVE_FILE_ID`, không đọc input từ người dùng
+- ⚠️ URL **bắt buộc** có `&headers=1` để gviz đọc hàng đầu làm tên cột (thiếu tham số này → cột trả về dạng A, B, C, toàn bộ số liệu = 0)
 - ⚠️ URL **bắt buộc** có `&_=${Date.now()}` để tránh browser cache: khi cập nhật file Drive mới, không có cache-buster sẽ vẫn tải dữ liệu cũ
 - **Không thêm lại ô nhập URL/ID tùy chỉnh** — người dùng cập nhật dữ liệu bằng cách ghi đè file Drive giữ nguyên ID
 

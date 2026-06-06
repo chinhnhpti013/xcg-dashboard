@@ -576,14 +576,13 @@ function _processGvizData(data){
       })
       .filter(r=>Object.values(r).some(v=>v!==''&&v!=null));
     if(!RAW.length)throw new Error('Không có dữ liệu trong sheet');
-    // Kiểm tra cột quan trọng — nếu thiếu cảnh báo để debug
-    const KEY_COLS=['Số HSBT','Trạng thái hồ sơ','Số ngày tồn','Ngày mở HSBT'];
+    // Kiểm tra cột quan trọng — cảnh báo nếu thiếu cột
+    const KEY_COLS=['Số HSBT','Trạng thái hồ sơ','Số ngày tồn','Ngày mở HSBT','GĐV thụ lý','Mã nghiệp vụ'];
     const foundCols=cols.filter(c=>c.trim()!=='');
-    const missing=KEY_COLS.filter(k=>!foundCols.includes(k));
+    const missing=KEY_COLS.filter(k=>!foundCols.map(c=>c.trim()).includes(k.trim()));
     if(missing.length){
-      console.warn('[PTI] Cột thiếu:',missing);
-      console.info('[PTI] Cột thực tế:',foundCols.slice(0,20));
-      alert('⚠️ Sheet mới có cấu trúc cột khác!\n\nCột thiếu: '+missing.join(', ')+'\n\nCột đọc được (20 đầu):\n'+foundCols.slice(0,20).join(' | ')+'\n\nVui lòng kiểm tra tên cột trong sheet.');
+      console.warn('[PTI] Cột thiếu:',missing,'| Cột thực tế:',foundCols.slice(0,20));
+      alert('⚠️ Sheet thiếu cột: '+missing.join(', ')+'\n\nKiểm tra lại tên cột trong Google Sheet.');
     }
     try{
       localStorage.setItem(LS_KEY,JSON.stringify(RAW));
@@ -637,7 +636,7 @@ function loadFromGoogleDrive(){
   // tq=select * + 2 tham số random: bypass cả browser cache và Google server cache
   const cb='ptiGvizCb';
   const bust=`&_=${Date.now()}&r=${Math.random().toString(36).slice(2)}`;
-  script.src=`https://docs.google.com/spreadsheets/d/${fileId}/gviz/tq?tqx=out:json;callback:${cb}&tq=select+*&gid=${GDRIVE_GID}${bust}`;
+  script.src=`https://docs.google.com/spreadsheets/d/${fileId}/gviz/tq?tqx=out:json;callback:${cb}&tq=select+*&gid=${GDRIVE_GID}&headers=1${bust}`;
   script.onerror=()=>{
     clearTimeout(window.__gvizTimeout);
     show('upload-screen');_gvizResetBtn();{const rb=document.getElementById('btn-refresh');if(rb){rb.disabled=false;rb.textContent='🔄 Làm mới';}}
