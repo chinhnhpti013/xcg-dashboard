@@ -609,7 +609,7 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
   function hideLogin(){
     document.getElementById('login-screen').style.display='none';
   }
-  if(!isLoggedIn()) showLogin(); else hideLogin();
+  if(!isLoggedIn()){showLogin();}else{hideLogin();setTimeout(function(){if(typeof initSession==='function')initSession();},0);}
   document.getElementById('login-form').addEventListener('submit',function(e){
     e.preventDefault();
     const u=document.getElementById('inp-user').value.trim();
@@ -618,7 +618,9 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
     if(USERS[u]&&USERS[u]===p){
       sessionStorage.setItem(KEY,'1');
       hideLogin();
-      document.getElementById('upload-screen').style.display='flex';
+      // Gọi initSession sau khi đăng nhập — tự động load Drive
+      if(typeof initSession==='function') initSession();
+      else document.getElementById('upload-screen').style.display='flex';
     } else {
       err.textContent='Tài khoản hoặc mật khẩu không đúng.';
       document.getElementById('inp-pass').value='';
@@ -801,15 +803,14 @@ function refreshFromDrive(){
 }
 
 // ─── AUTO-LOAD FROM GOOGLE DRIVE ON STARTUP ──────────────────────────────────
-// Đặt SAU khi GDRIVE_FILE_ID và loadFromGoogleDrive() đã được định nghĩa
-(function initSession(){
+// Chỉ chạy sau khi đã đăng nhập thành công
+function initSession(){
   try{
     localStorage.setItem('pti_gdrive_id', GDRIVE_FILE_ID);
     localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_FILE);localStorage.removeItem(LS_FDATE);
-    // Tự động tải Drive — upload-screen vẫn hiển thị nền phía sau nếu lỗi
     loadFromGoogleDrive();
   }catch(e){}
-})();
+}
 
 function loadFile(file){
   show('loading-screen');
