@@ -208,11 +208,11 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
 /* CHART GRID */
 .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
 @media(max-width:800px){.chart-row{grid-template-columns:1fr}}
-.chart-card{background:#FAFAF5;border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:0 4px 24px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.04)}
+.chart-card{background:#FAFAF5;border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:0 4px 24px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.04);overflow:hidden}
 .chart-card h3{font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:14px;
   padding-bottom:10px;border-bottom:2px solid var(--claude-light)}
 .chart-wrap{position:relative;height:260px;width:100%}
-.chart-wrap-pie{position:relative;height:340px;width:100%;overflow:visible}
+.chart-wrap-pie{position:relative;height:300px;width:100%;overflow:hidden}
 
 /* TABLE */
 .table-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
