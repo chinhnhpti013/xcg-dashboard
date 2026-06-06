@@ -58,6 +58,17 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
 .src-title{font-size:1rem;font-weight:700;color:#fff;line-height:1.3}
 .src-desc{font-size:.8rem;color:rgba(255,255,255,.55);line-height:1.5;max-width:260px}
 .src-hint{font-size:.73rem;color:rgba(255,255,255,.35);margin-top:2px}
+.drive-url-wrap{width:100%;margin-top:10px;display:flex;flex-direction:column;gap:4px}
+.drive-url-label{font-size:.72rem;color:rgba(255,255,255,.55);text-align:left}
+.drive-url-input{
+  width:100%;box-sizing:border-box;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+  border-radius:8px;padding:7px 10px;color:#fff;font-size:.78rem;
+  font-family:'Be Vietnam Pro',sans-serif;outline:none;
+  transition:border-color .15s;
+}
+.drive-url-input::placeholder{color:rgba(255,255,255,.3)}
+.drive-url-input:focus{border-color:rgba(66,133,244,.7);background:rgba(255,255,255,.15)}
 .btn-src{
   display:inline-flex;align-items:center;gap:8px;
   padding:10px 22px;border-radius:10px;border:none;font-size:.85rem;font-weight:700;
@@ -358,18 +369,24 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
   <!-- Hai lựa chọn nguồn dữ liệu -->
   <div class="src-options">
     <!-- Lựa chọn 1: Google Drive -->
-    <div class="src-card" id="src-gdrive" onclick="loadFromGoogleDrive()">
+    <div class="src-card" id="src-gdrive">
       <div class="src-icon" style="background:rgba(66,133,244,.18)">
         <svg viewBox="0 0 24 24" fill="none" stroke="#4285f4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 19h20L12 2z"/><path d="M12 2L6 19"/><path d="M12 2l6 17"/></svg>
       </div>
       <div class="src-badge" style="background:#4285f4">Google Drive</div>
       <div class="src-title">Lấy dữ liệu từ Google Drive</div>
-      <div class="src-desc">Tự động tải file Dulieu.xlsx mới nhất từ Google Drive dùng chung của đơn vị</div>
-      <button class="btn-src btn-drive" id="btn-drive">
+      <div class="src-desc">Dán link Google Sheet hoặc để mặc định — nhấn tải để lấy dữ liệu mới nhất</div>
+      <div class="drive-url-wrap" onclick="event.stopPropagation()">
+        <span class="drive-url-label">Link Google Sheet (tuỳ chọn — để mặc định nếu không đổi)</span>
+        <input class="drive-url-input" id="drive-url-input" type="text"
+          placeholder="https://docs.google.com/spreadsheets/d/...  hoặc chỉ file ID"
+          spellcheck="false" autocomplete="off"/>
+      </div>
+      <button class="btn-src btn-drive" id="btn-drive" onclick="loadFromGoogleDrive()">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
         Tải từ Google Drive
       </button>
-      <p class="src-hint">Kết nối internet · Luôn có dữ liệu mới nhất</p>
+      <p class="src-hint">Kết nối internet · Paste link file mới nếu đã upload lại lên Drive</p>
     </div>
 
     <!-- Lựa chọn 2: Upload file -->
@@ -534,6 +551,12 @@ function showFileDateBadge(dateMs, isGDrive){
       const btn=document.getElementById('btn-restore');
       const lbl=document.getElementById('restore-label');
       if(btn&&lbl){lbl.textContent='Khôi phục: '+fname;btn.style.display='inline-flex';}
+      // Điền lại file ID tùy chỉnh (nếu lần trước dùng ID khác mặc định)
+      const savedId=localStorage.getItem('pti_gdrive_id');
+      if(savedId){
+        const inp=document.getElementById('drive-url-input');
+        if(inp)inp.value=savedId;
+      }
     }
   }catch(e){}
 })();
@@ -592,7 +615,15 @@ function _processGvizData(data){
       })
       .filter(r=>Object.values(r).some(v=>v!==''&&v!=null));
     if(!RAW.length)throw new Error('Không có dữ liệu trong sheet');
-    try{localStorage.setItem(LS_KEY,JSON.stringify(RAW));localStorage.setItem(LS_FILE,'Google Drive');localStorage.removeItem(LS_FDATE);}catch(e){}
+    try{
+      localStorage.setItem(LS_KEY,JSON.stringify(RAW));
+      localStorage.setItem(LS_FILE,'Google Drive');
+      localStorage.removeItem(LS_FDATE);
+      // Lưu file ID đang dùng để hiển thị lại khi restore
+      if(window.__gvizFileId&&window.__gvizFileId!==GDRIVE_FILE_ID)
+        localStorage.setItem('pti_gdrive_id',window.__gvizFileId);
+      else localStorage.removeItem('pti_gdrive_id');
+    }catch(e){}
     document.getElementById('topbar-file').textContent='Google Drive — Dulieu.xlsx';
     buildGdvFilter();renderAll();show('dashboard');
     showFileDateBadge(null,true);
@@ -609,17 +640,32 @@ window.google={visualization:{Query:{setResponse:_processGvizData}}};
 // Fallback: custom callback name
 window.ptiGvizCb=_processGvizData;
 
+function _extractFileId(input){
+  // Nếu là URL đầy đủ, trích file ID từ /d/{ID}/
+  const m=input.match(/\/spreadsheets\/d\/([\w-]+)/);
+  return m?m[1]:input.trim();
+}
+
 function loadFromGoogleDrive(){
   const btn=document.getElementById('btn-drive');
   if(btn){btn.disabled=true;btn.innerHTML='⏳ Đang tải...';}
+
+  // Đọc file ID từ ô nhập, fallback về hardcode
+  const urlInput=document.getElementById('drive-url-input');
+  const rawInput=(urlInput&&urlInput.value.trim())||'';
+  const fileId=rawInput?_extractFileId(rawInput):GDRIVE_FILE_ID;
+
+  // Lưu file ID đang dùng để _processGvizData ghi nhận
+  window.__gvizFileId=fileId;
+
   show('loading-screen');
 
   const old=document.getElementById('_gviz_script');if(old)old.remove();
 
   const script=document.createElement('script');
   script.id='_gviz_script';
-  // Thêm timestamp để tránh browser cache khi file Drive được cập nhật
-  script.src=`https://docs.google.com/spreadsheets/d/${GDRIVE_FILE_ID}/gviz/tq?tqx=out:json;callback:ptiGvizCb&_=${Date.now()}`;
+  // &_=timestamp: tránh browser cache mỗi lần nhấn; fileId động theo input
+  script.src=`https://docs.google.com/spreadsheets/d/${fileId}/gviz/tq?tqx=out:json;callback:ptiGvizCb&_=${Date.now()}`;
   script.onerror=()=>{
     clearTimeout(window.__gvizTimeout);
     show('upload-screen');_gvizResetBtn();
