@@ -540,23 +540,6 @@ function showFileDateBadge(dateMs, isGDrive){
     +(diffDays===0?' (hôm nay)':diffDays===1?' (hôm qua)':' ('+diffDays+' ngày trước)');
 }
 
-// ─── AUTO-LOAD FROM GOOGLE DRIVE ON STARTUP ──────────────────────────────────
-(function initSession(){
-  try{
-    // Lưu file ID cố định vào localStorage để theo dõi nguồn dữ liệu
-    localStorage.setItem('pti_gdrive_id', GDRIVE_FILE_ID);
-    // Tự động tải từ Google Drive ngay khi mở trang
-    loadFromGoogleDrive();
-  }catch(e){
-    // Nếu lỗi JS thì hiện upload screen
-    show('upload-screen');
-  }
-})();
-
-function restoreSession(){
-  // Không còn dùng — app tự auto-load từ Google Drive khi mở trang
-}
-
 // ─── FILE LOAD ───────────────────────────────────────────────────────────────
 const dz=document.getElementById('drop-zone');
 dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over')});
@@ -663,6 +646,17 @@ function refreshFromDrive(){
   if(rb){rb.disabled=true;rb.textContent='⏳ Đang tải...';}
   loadFromGoogleDrive();
 }
+
+// ─── AUTO-LOAD FROM GOOGLE DRIVE ON STARTUP ──────────────────────────────────
+// Đặt SAU khi GDRIVE_FILE_ID và loadFromGoogleDrive() đã được định nghĩa
+(function initSession(){
+  try{
+    localStorage.setItem('pti_gdrive_id', GDRIVE_FILE_ID);
+    loadFromGoogleDrive();
+  }catch(e){
+    show('upload-screen');
+  }
+})();
 
 function loadFile(file){
   show('loading-screen');
