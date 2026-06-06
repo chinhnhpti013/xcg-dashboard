@@ -618,8 +618,8 @@ function loadFromGoogleDrive(){
 
   const script=document.createElement('script');
   script.id='_gviz_script';
-  // Thử với callback tường minh "ptiGvizCb"
-  script.src=`https://docs.google.com/spreadsheets/d/${GDRIVE_FILE_ID}/gviz/tq?tqx=out:json;callback:ptiGvizCb`;
+  // Thêm timestamp để tránh browser cache khi file Drive được cập nhật
+  script.src=`https://docs.google.com/spreadsheets/d/${GDRIVE_FILE_ID}/gviz/tq?tqx=out:json;callback:ptiGvizCb&_=${Date.now()}`;
   script.onerror=()=>{
     clearTimeout(window.__gvizTimeout);
     show('upload-screen');_gvizResetBtn();

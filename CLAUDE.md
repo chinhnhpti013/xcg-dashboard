@@ -101,6 +101,7 @@ Thay vì chỉ upload file, màn hình upload có 2 card song song:
 - Google Drive file ID: `19UaOHaUB5HFzldLD4oQatjgDwPs56SmY9NwzHJqcUjM`
 - File phải chia sẻ "Bất kỳ ai có liên kết" mới tải được
 - Hàm tải: `loadFromGoogleDrive()` — dùng `<script>` tag inject JSONP
+- ⚠️ URL **bắt buộc** có `&_=${Date.now()}` để tránh browser cache: khi cập nhật file Drive mới, không có cache-buster sẽ vẫn tải dữ liệu cũ
 
 ## Badge ngày dữ liệu (`#file-date-badge`)
 
