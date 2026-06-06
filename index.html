@@ -548,7 +548,8 @@ dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag-over
 document.getElementById('file-input').addEventListener('change',e=>{if(e.target.files[0])loadFile(e.target.files[0])});
 
 // ─── GOOGLE DRIVE LOAD (JSONP qua gviz API) ──────────────────────────────────
-const GDRIVE_FILE_ID='19UaOHaUB5HFzldLD4oQatjgDwPs56SmY9NwzHJqcUjM';
+const GDRIVE_FILE_ID='1KqAQmNh9W-C8MsbWuYrywnNouGC4t2ISwRMa7oYH4_0';
+const GDRIVE_GID='101924388';
 const DRIVE_BTN_HTML='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Tải từ Google Drive';
 
 function _gvizResetBtn(){
@@ -627,7 +628,7 @@ function loadFromGoogleDrive(){
   // tq=select * + 2 tham số random: bypass cả browser cache và Google server cache
   const cb='ptiGvizCb';
   const bust=`&_=${Date.now()}&r=${Math.random().toString(36).slice(2)}`;
-  script.src=`https://docs.google.com/spreadsheets/d/${fileId}/gviz/tq?tqx=out:json;callback:${cb}&tq=select+*${bust}`;
+  script.src=`https://docs.google.com/spreadsheets/d/${fileId}/gviz/tq?tqx=out:json;callback:${cb}&tq=select+*&gid=${GDRIVE_GID}${bust}`;
   script.onerror=()=>{
     clearTimeout(window.__gvizTimeout);
     show('upload-screen');_gvizResetBtn();{const rb=document.getElementById('btn-refresh');if(rb){rb.disabled=false;rb.textContent='🔄 Làm mới';}}

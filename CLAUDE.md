@@ -98,7 +98,7 @@ Thay vì chỉ upload file, màn hình upload có 2 card song song:
 | **Google Drive** | Tải tự động qua JSONP (`gviz/tq`) từ file ID cố định. Không bị CORS. Callback: `ptiGvizCb` |
 | **Upload file** | Kéo thả hoặc chọn file `.xlsx` từ máy tính |
 
-- Google Drive file ID: `19UaOHaUB5HFzldLD4oQatjgDwPs56SmY9NwzHJqcUjM` (cố định, không có ô nhập URL)
+- Google Drive file ID: `1KqAQmNh9W-C8MsbWuYrywnNouGC4t2ISwRMa7oYH4_0` · Sheet GID: `101924388` (cố định, không có ô nhập URL)
 - File phải chia sẻ "Bất kỳ ai có liên kết" mới tải được
 - Hàm tải: `loadFromGoogleDrive()` — luôn dùng `GDRIVE_FILE_ID`, không đọc input từ người dùng
 - ⚠️ URL **bắt buộc** có `&_=${Date.now()}` để tránh browser cache: khi cập nhật file Drive mới, không có cache-buster sẽ vẫn tải dữ liệu cũ
