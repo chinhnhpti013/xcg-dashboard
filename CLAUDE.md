@@ -89,11 +89,39 @@ Infographic tính toán theo địa bàn (không phải GĐV):
 `tyGQ = Math.round(resolved / tongCanGQ * 1000) / 10` → kết quả là % (vd: 75.6%)
 ⚠️ Lưu ý: phải nhân 1000 rồi chia 10 (không phải nhân 10 chia 10) để ra đúng đơn vị %.
 
+## Màn hình đăng nhập — 2 lựa chọn nguồn dữ liệu
+
+Thay vì chỉ upload file, màn hình upload có 2 card song song:
+
+| Lựa chọn | Mô tả |
+|----------|-------|
+| **Google Drive** | Tải tự động qua JSONP (`gviz/tq`) từ file ID cố định. Không bị CORS. Callback: `ptiGvizCb` |
+| **Upload file** | Kéo thả hoặc chọn file `.xlsx` từ máy tính |
+
+- Google Drive file ID: `19UaOHaUB5HFzldLD4oQatjgDwPs56SmY9NwzHJqcUjM`
+- File phải chia sẻ "Bất kỳ ai có liên kết" mới tải được
+- Hàm tải: `loadFromGoogleDrive()` — dùng `<script>` tag inject JSONP
+
+## Badge ngày dữ liệu (`#file-date-badge`)
+
+Hiển thị trên topbar, màu sắc theo độ cũ:
+- 🟢 `fresh`: ≤3 ngày (upload file) / ≤14 ngày (Google Drive)
+- 🟡 `warn`: 4–7 ngày (upload) / 4–14 ngày (Drive)
+- 🔴 `old`: >7 ngày (upload) / >14 ngày (Drive)
+
+**Upload file**: đọc `file.lastModified` → lưu vào `localStorage` key `pti_filedate`
+**Google Drive**: quét `Ngày mở HSBT` tìm max → dùng làm mốc "Dữ liệu đến ngày..."
+Hàm: `showFileDateBadge(dateMs, isGDrive)` — gọi sau `renderAll()`
+
 ## Lưu phiên làm việc
 
-Dùng `localStorage` với key `pti_raw_v1` (JSON dữ liệu) và `pti_filename`.
-- Khi tải file → tự động lưu
-- Khi mở lại trang → nút "🔄 Khôi phục" xuất hiện, tự restore
+Dùng `localStorage` với 3 key:
+- `pti_raw_v1` — JSON dữ liệu
+- `pti_filename` — tên file
+- `pti_filedate` — timestamp `lastModified` (chỉ có khi upload file, không có khi dùng Drive)
+
+- Khi tải file → tự động lưu cả 3 key
+- Khi mở lại trang → nút "🔄 Khôi phục" xuất hiện, tự restore + hiện lại badge
 - "↩ Tải file khác" → xoá cache, quay về upload
 
 ## Thiết kế UI hiện tại (quan trọng — không thay đổi tuỳ tiện)
@@ -170,7 +198,7 @@ Mỗi tab có màu gradient riêng, hiệu ứng nổi/nhấn kiểu nút 3D v�
 - `parseTon(v)` — parse số ngày tồn, trả về `null` nếu `n <= 0`
 - `parseMoney(v)` — parse số tiền, trả về `0` nếu không hợp lệ
 
-## Tab Báo cáo XO — Nội dung mới
+## Tab Báo cáo XO — Nội dung
 
 ### BC1 — Thống kê Doanh thu SC các Gara/Showroom (PS năm hiện tại)
 
@@ -183,7 +211,7 @@ Tham chiếu Query: `select P, Count(AX), sum(AX), sum(BC) Where Y >= date 'năm
 | Tiền SC ước BT | Cột AX = `Tiền ước/duyệt BT` | Sum |
 | Tiền SC đã BT | Cột BC = `Tiền BT đã trả cho GR` | Sum |
 
-Điều kiện lọc: `Ngày mở HSBT` (cột Y) ≥ 01/01/năm hiện tại · Sắp xếp giảm dần theo tổng tiền ước BT · Giới hạn Top 10
+Điều kiện lọc: `Ngày mở HSBT` (cột Y) ≥ 01/01/năm hiện tại · Sắp xếp giảm dần theo tổng tiền ước BT · **Top 30** · Khung cố định `max-height:480px` + scroll dọc, thead sticky
 
 ### BC2 — Danh sách chi tiết HS tồn ≥ 90 ngày
 
@@ -202,4 +230,10 @@ Tham chiếu Query: `Select C, D, E, N, P, AN, AP, AX, BH, BI WHERE BI>=90 Order
 | BH (col 60) | Trạng thái hồ sơ | |
 | BI (col 61) | Số ngày tồn | Điều kiện ≥ 90 |
 
-Tô màu: 🔴 ≥ 180 ngày · 🟡 120–179 ngày · Sắp xếp ngày tồn giảm dần
+Tô màu: 🔴 ≥ 180 ngày · 🟡 120–179 ngày · Sắp xếp ngày tồn giảm dần · Header đỏ
+
+### BC3 — Danh sách chi tiết HS tồn >45 và ≤90 ngày
+
+Cùng cấu trúc cột với BC2, lọc: `n > 45 && n < 90` · Header màu vàng/cam · Khung `max-height:480px` + scroll dọc
+
+Helper dùng chung: `makeHsTonRows(list)` và `hsTonHeader` string — tái sử dụng cho cả BC2 và BC3
