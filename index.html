@@ -644,6 +644,8 @@ function loadFromGoogleDrive(){
 function refreshFromDrive(){
   const rb=document.getElementById('btn-refresh');
   if(rb){rb.disabled=true;rb.textContent='⏳ Đang tải...';}
+  // Xóa cache cũ trước khi tải lại từ Drive
+  try{localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_FILE);localStorage.removeItem(LS_FDATE);}catch(e){}
   loadFromGoogleDrive();
 }
 
@@ -652,6 +654,8 @@ function refreshFromDrive(){
 (function initSession(){
   try{
     localStorage.setItem('pti_gdrive_id', GDRIVE_FILE_ID);
+    // Xóa cache cũ để luôn lấy dữ liệu mới nhất từ Drive
+    localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_FILE);localStorage.removeItem(LS_FDATE);
     loadFromGoogleDrive();
   }catch(e){
     show('upload-screen');
