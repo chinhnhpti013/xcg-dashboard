@@ -375,18 +375,12 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
       </div>
       <div class="src-badge" style="background:#4285f4">Google Drive</div>
       <div class="src-title">Lấy dữ liệu từ Google Drive</div>
-      <div class="src-desc">Dán link Google Sheet hoặc để mặc định — nhấn tải để lấy dữ liệu mới nhất</div>
-      <div class="drive-url-wrap" onclick="event.stopPropagation()">
-        <span class="drive-url-label">Link Google Sheet (tuỳ chọn — để mặc định nếu không đổi)</span>
-        <input class="drive-url-input" id="drive-url-input" type="text"
-          placeholder="https://docs.google.com/spreadsheets/d/...  hoặc chỉ file ID"
-          spellcheck="false" autocomplete="off"/>
-      </div>
+      <div class="src-desc">Nhấn tải để lấy dữ liệu mới nhất từ file Google Sheet đã cấu hình</div>
       <button class="btn-src btn-drive" id="btn-drive" onclick="loadFromGoogleDrive()">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
         Tải từ Google Drive
       </button>
-      <p class="src-hint">Kết nối internet · Paste link file mới nếu đã upload lại lên Drive</p>
+      <p class="src-hint">Kết nối internet · Dữ liệu luôn lấy từ file Drive mới nhất</p>
     </div>
 
     <!-- Lựa chọn 2: Upload file -->
@@ -650,10 +644,7 @@ function loadFromGoogleDrive(){
   const btn=document.getElementById('btn-drive');
   if(btn){btn.disabled=true;btn.innerHTML='⏳ Đang tải...';}
 
-  // Đọc file ID từ ô nhập, fallback về hardcode
-  const urlInput=document.getElementById('drive-url-input');
-  const rawInput=(urlInput&&urlInput.value.trim())||'';
-  const fileId=rawInput?_extractFileId(rawInput):GDRIVE_FILE_ID;
+  const fileId=GDRIVE_FILE_ID;
 
   // Lưu file ID đang dùng để _processGvizData ghi nhận
   window.__gvizFileId=fileId;
@@ -857,7 +848,7 @@ function computeStats(data){
     tyLe:pct(resolved.length,total),
     ton:tonRows.length,duoi45:duoi45.length,qua45:qua45.length,qua90:qua90.length,
     tnds:tnds.length,vcx:vcx.length,avgDays,totalBt,totalDaTra,
-    gdvStats,buckets:{b1,b2,b3,b4},warnRows,curMonth
+    gdvStats,buckets:{b1,b2,b3,b4},warnRows,curMonth,rows:data
   };
 }
 
@@ -1131,13 +1122,14 @@ function renderAging(s){
 // TAB 4: BÁO CÁO XO
 function renderBaoCao(s){
   const el=document.getElementById('tab-baocao');
+  const data=s.rows;
   const curYear=new Date().getFullYear();
   const curYearStart=new Date(curYear,0,1);
 
   // ── Báo cáo 1: Top 10 Gara/Showroom ──
   // Ánh xạ: P=Tên garage, AX=Tiền ước/duyệt BT, BC=Tiền BT đã trả cho GR, Y=Ngày mở HSBT
   const garaMap={};
-  RAW.forEach(r=>{
+  data.forEach(r=>{
     const ngay=parseDate(r['Ngày mở HSBT']);
     if(!ngay||ngay<curYearStart)return;
     const tenGR=String(r['Tên garage']||'').trim();
@@ -1198,13 +1190,13 @@ function renderBaoCao(s){
   </tr>`;
 
   // ── Báo cáo 2: Hồ sơ tồn >= 90 ngày ──
-  const ton90=RAW
+  const ton90=data
     .filter(r=>{const n=parseFloat(String(r['Số ngày tồn']||'').replace(/,/g,''));return n>=90;})
     .sort((a,b)=>parseFloat(String(b['Số ngày tồn']||'').replace(/,/g,''))-parseFloat(String(a['Số ngày tồn']||'').replace(/,/g,'')));
   const rows2=makeHsTonRows(ton90);
 
   // ── Báo cáo 3: Hồ sơ tồn > 45 và <= 90 ngày ──
-  const ton45_90=RAW
+  const ton45_90=data
     .filter(r=>{const n=parseFloat(String(r['Số ngày tồn']||'').replace(/,/g,''));return n>45&&n<90;})
     .sort((a,b)=>parseFloat(String(b['Số ngày tồn']||'').replace(/,/g,''))-parseFloat(String(a['Số ngày tồn']||'').replace(/,/g,'')));
   const rows3=makeHsTonRows(ton45_90);

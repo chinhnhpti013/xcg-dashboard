@@ -98,10 +98,11 @@ Thay vì chỉ upload file, màn hình upload có 2 card song song:
 | **Google Drive** | Tải tự động qua JSONP (`gviz/tq`) từ file ID cố định. Không bị CORS. Callback: `ptiGvizCb` |
 | **Upload file** | Kéo thả hoặc chọn file `.xlsx` từ máy tính |
 
-- Google Drive file ID: `19UaOHaUB5HFzldLD4oQatjgDwPs56SmY9NwzHJqcUjM`
+- Google Drive file ID: `19UaOHaUB5HFzldLD4oQatjgDwPs56SmY9NwzHJqcUjM` (cố định, không có ô nhập URL)
 - File phải chia sẻ "Bất kỳ ai có liên kết" mới tải được
-- Hàm tải: `loadFromGoogleDrive()` — dùng `<script>` tag inject JSONP
+- Hàm tải: `loadFromGoogleDrive()` — luôn dùng `GDRIVE_FILE_ID`, không đọc input từ người dùng
 - ⚠️ URL **bắt buộc** có `&_=${Date.now()}` để tránh browser cache: khi cập nhật file Drive mới, không có cache-buster sẽ vẫn tải dữ liệu cũ
+- **Không thêm lại ô nhập URL/ID tùy chỉnh** — người dùng cập nhật dữ liệu bằng cách ghi đè file Drive giữ nguyên ID
 
 ## Badge ngày dữ liệu (`#file-date-badge`)
 
@@ -171,7 +172,7 @@ Mỗi tab có màu gradient riêng, hiệu ứng nổi/nhấn kiểu nút 3D v�
 ### Quy tắc khi Claude chỉnh sửa index.html
 
 - Không thay đổi cấu trúc upload → loading → dashboard
-- Không thay đổi hàm `computeStats()` trừ khi thêm trường mới
+- Không thay đổi hàm `computeStats()` trừ khi thêm trường mới — hàm trả về `rows: data` (mảng đã lọc) để các hàm render dùng thay vì `RAW`
 - Khi thêm tab mới: thêm cả button, div container, case switchTab, hàm render, và gọi trong renderAll()
 - Tiêu đề thống nhất: **PTISOS - Văn phòng Miền Bắc - Phòng Khu vực Quảng Ninh**
 - Màu brand PTI: `#1565C0` · Font: `Be Vietnam Pro`
