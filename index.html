@@ -368,8 +368,8 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
 </head>
 <body>
 
-<!-- UPLOAD SCREEN (chỉ hiện khi lỗi tải Drive hoặc người dùng muốn đổi nguồn) -->
-<div id="upload-screen" style="display:none">
+<!-- UPLOAD SCREEN -->
+<div id="upload-screen">
   <div class="logo-badge">PTISOS · Văn phòng Miền Bắc · Quảng Ninh</div>
   <h1>PTISOS - Văn phòng Miền Bắc<br/><span>Phòng Khu vực Quảng Ninh</span></h1>
   <p class="subtitle">Chọn nguồn dữ liệu để xem dashboard báo cáo tiến trình giám định bồi thường xe cơ giới</p>
@@ -418,8 +418,8 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
   </div>
 </div>
 
-<!-- LOADING (hiện mặc định khi trang vừa mở — auto-load từ Drive) -->
-<div id="loading-screen">
+<!-- LOADING -->
+<div id="loading-screen" style="display:none">
   <div class="spinner"></div>
   <p>Đang phân tích dữ liệu…</p>
 </div>
@@ -655,12 +655,10 @@ function refreshFromDrive(){
 (function initSession(){
   try{
     localStorage.setItem('pti_gdrive_id', GDRIVE_FILE_ID);
-    // Xóa cache cũ để luôn lấy dữ liệu mới nhất từ Drive
     localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_FILE);localStorage.removeItem(LS_FDATE);
+    // Tự động tải Drive — upload-screen vẫn hiển thị nền phía sau nếu lỗi
     loadFromGoogleDrive();
-  }catch(e){
-    show('upload-screen');
-  }
+  }catch(e){}
 })();
 
 function loadFile(file){
