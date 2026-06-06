@@ -140,6 +140,14 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
   font-size:.78rem;cursor:pointer;transition:all .15s;font-family:'Be Vietnam Pro',sans-serif;white-space:nowrap;
 }
 .btn-reset:hover{background:rgba(255,255,255,.22)}
+.btn-refresh{
+  background:rgba(66,133,244,.22);border:1px solid rgba(66,133,244,.45);
+  color:#90caf9;padding:6px 14px;border-radius:6px;
+  font-size:.78rem;cursor:pointer;transition:all .15s;font-family:'Be Vietnam Pro',sans-serif;white-space:nowrap;
+  display:none;
+}
+.btn-refresh:hover{background:rgba(66,133,244,.38)}
+.btn-refresh:disabled{opacity:.5;cursor:not-allowed}
 
 .content{padding:24px 28px;max-width:1400px;margin:0 auto}
 
@@ -429,6 +437,7 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
         </div>
       </div>
     </div>
+    <button id="btn-refresh" class="btn-refresh" onclick="refreshFromDrive()">🔄 Làm mới</button>
     <button class="btn-reset" onclick="resetApp()">↩ Tải file khác</button>
   </div>
 
@@ -594,11 +603,14 @@ function _processGvizData(data){
     }catch(e){}
     document.getElementById('topbar-file').textContent='Google Drive — Dulieu.xlsx';
     buildGdvFilter();renderAll();show('dashboard');
+    // Hiện nút Làm mới (chỉ dành cho nguồn Drive) và reset trạng thái
+    const rb=document.getElementById('btn-refresh');
+    if(rb){rb.style.display='inline-block';rb.disabled=false;rb.textContent='🔄 Làm mới';}
     showFileDateBadge(null,true);
     document.getElementById('footer-date').textContent=
       new Date().toLocaleDateString('vi-VN',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'});
   }catch(err){
-    show('upload-screen');_gvizResetBtn();
+    show('upload-screen');_gvizResetBtn();{const rb=document.getElementById('btn-refresh');if(rb){rb.disabled=false;rb.textContent='🔄 Làm mới';}}
     alert('Lỗi xử lý dữ liệu: '+err.message);
   }
 }
@@ -629,19 +641,27 @@ function loadFromGoogleDrive(){
 
   const script=document.createElement('script');
   script.id='_gviz_script';
-  // &_=timestamp: tránh browser cache mỗi lần nhấn; fileId động theo input
-  script.src=`https://docs.google.com/spreadsheets/d/${fileId}/gviz/tq?tqx=out:json;callback:ptiGvizCb&_=${Date.now()}`;
+  // tq=select * + 2 tham số random: bypass cả browser cache và Google server cache
+  const cb='ptiGvizCb';
+  const bust=`&_=${Date.now()}&r=${Math.random().toString(36).slice(2)}`;
+  script.src=`https://docs.google.com/spreadsheets/d/${fileId}/gviz/tq?tqx=out:json;callback:${cb}&tq=select+*${bust}`;
   script.onerror=()=>{
     clearTimeout(window.__gvizTimeout);
-    show('upload-screen');_gvizResetBtn();
+    show('upload-screen');_gvizResetBtn();{const rb=document.getElementById('btn-refresh');if(rb){rb.disabled=false;rb.textContent='🔄 Làm mới';}}
     alert('❌ Không tải được từ Google Drive.\n\nKiểm tra:\n• File đã chia sẻ "Bất kỳ ai có liên kết" chưa?\n• Có kết nối internet không?');
   };
   window.__gvizTimeout=setTimeout(()=>{
     const s=document.getElementById('_gviz_script');if(s)s.remove();
-    show('upload-screen');_gvizResetBtn();
+    show('upload-screen');_gvizResetBtn();{const rb=document.getElementById('btn-refresh');if(rb){rb.disabled=false;rb.textContent='🔄 Làm mới';}}
     alert('⏱ Quá thời gian chờ (15s).\n\nHãy kiểm tra kết nối mạng và thử lại.');
   },15000);
   document.head.appendChild(script);
+}
+
+function refreshFromDrive(){
+  const rb=document.getElementById('btn-refresh');
+  if(rb){rb.disabled=true;rb.textContent='⏳ Đang tải...';}
+  loadFromGoogleDrive();
 }
 
 function loadFile(file){
@@ -682,6 +702,7 @@ function resetApp(){
   clearTimeout(window.__gvizTimeout);
   const gs=document.getElementById('_gviz_script');if(gs)gs.remove();
   _gvizResetBtn();
+  const rb=document.getElementById('btn-refresh');if(rb){rb.style.display='none';rb.disabled=false;rb.textContent='🔄 Làm mới';}
   try{localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_FILE);}catch(e){}
   show('upload-screen');
 }
