@@ -388,6 +388,16 @@ table.gdv td.hl-green{color:#059669}
   border-top:1px solid var(--border);
 }
 
+/* ── TLBT section responsive layout ── */
+.tlbt-body{
+  display:grid;
+  grid-template-columns:1fr 1.4fr;
+  gap:16px;padding:16px;align-items:start;
+}
+.tlbt-table-wrap{overflow-x:auto;}
+.tlbt-table{min-width:320px;width:100%;}
+.tlbt-chart-card{margin:0;}
+
 footer{
   text-align:center;padding:20px 24px;color:var(--text3);font-size:.75rem;
   margin-top:8px;border-top:1px solid var(--border);line-height:1.8;
@@ -530,6 +540,18 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
   .topbar-title{font-size:.82rem}
   .chart-wrap{height:220px}
   .chart-wrap-pie{height:260px}
+  /* TLBT — tablet: xếp dọc, chart cao hơn */
+  .tlbt-body{grid-template-columns:1fr}
+  .tlbt-chart-card{min-height:260px}
+}
+
+/* TLBT — điện thoại ≤600px: xếp dọc hoàn toàn */
+@media(max-width:600px){
+  .tlbt-body{grid-template-columns:1fr;gap:12px;padding:10px}
+  .tlbt-table{font-size:.7rem}
+  .tlbt-table th,.tlbt-table td{padding:6px 6px;font-size:.65rem}
+  .tlbt-chart-card{min-height:220px}
+  .tlbt-chart-card h3{font-size:.72rem}
 }
 </style>
 </head>
@@ -1308,22 +1330,22 @@ function buildNvBtSection(curYear){
           <div class="title">TỶ LỆ BỒI THƯỜNG XO THEO LOẠI HÌNH NGHIỆP VỤ (SỐ LIỆU THEO NĂM NGHIỆP VỤ)</div>
           <div class="period">Năm nghiệp vụ ${cy} &nbsp;·&nbsp; Nguồn: Sheet <em>ty-le-bt</em> · Google Drive</div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:16px;padding:16px;align-items:start">
-          <div class="gdv-table-outer" style="overflow-x:auto">
-            <table class="gdv" style="min-width:360px">
+        <div class="tlbt-body">
+          <div class="tlbt-table-wrap">
+            <table class="gdv tlbt-table">
               <thead>
                 <tr>
-                  <th>Stt</th>
+                  <th style="width:36px">Stt</th>
                   <th style="min-width:52px">Mã NV</th>
-                  <th style="text-align:left;min-width:200px">Tên nghiệp vụ</th>
-                  <th class="lv3">D.thu NV (Đ)</th>
-                  <th class="lv3">TLBT (%)</th>
+                  <th style="text-align:left">Tên nghiệp vụ</th>
+                  <th class="lv3" style="min-width:110px">D.thu NV (Đ)</th>
+                  <th class="lv3" style="min-width:72px">TLBT (%)</th>
                 </tr>
               </thead>
               <tbody>${tableRows}</tbody>
             </table>
           </div>
-          <div class="chart-card" style="margin:0">
+          <div class="chart-card tlbt-chart-card">
             <h3>Doanh thu &amp; Tỷ lệ bồi thường năm NV ${cy}</h3>
             <div class="chart-wrap"><canvas id="chart-nv-bt"></canvas></div>
           </div>
