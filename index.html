@@ -951,6 +951,15 @@ function resetApp(){
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 function parseTon(v){const n=parseFloat(String(v).replace(/,/g,''));return(n>0)?n:null}
 function parseMoney(v){return parseFloat(String(v).replace(/,/g,''))||0}
+function workingDaysYTD(year){
+  const start=new Date(year,0,1);
+  const today=new Date();today.setHours(0,0,0,0);
+  let n=0;
+  for(let d=new Date(start);d<=today;d.setDate(d.getDate()+1)){
+    const dw=d.getDay();if(dw!==0&&dw!==6)n++;
+  }
+  return n;
+}
 function parseDate(v){
   if(!v)return null;
   if(v instanceof Date)return v;
@@ -1139,6 +1148,95 @@ function renderOverview(s){
   },10);
 }
 
+// ─── BẢNG PHÁT SINH THEO THÁNG ───────────────────────────────────────────────
+function buildPhatSinhSection(curYear){
+  const curYearStart=new Date(curYear,0,1);
+  const wdays=workingDaysYTD(curYear);
+
+  // Duyệt RAW một lần — gom phát sinh từng tháng + đã GQ theo từng GĐV
+  const mMap={}, gqMap={};
+  Object.keys(GDV_NAMES).forEach(code=>{mMap[code]=new Array(12).fill(0);gqMap[code]=0;});
+  const totM=new Array(12).fill(0);
+  let totGQ=0;
+
+  RAW.forEach(r=>{
+    const d=parseDate(r['Ngày mở HSBT']);
+    if(!d||d.getFullYear()!==curYear)return;
+    const code=gdvKey(r);
+    const mi=d.getMonth();
+    if(mMap[code]){mMap[code][mi]++;totM[mi]++;}
+    if(isResolved(r)){if(gqMap[code]!==undefined)gqMap[code]++;totGQ++;}
+  });
+
+  const MONTHS=12;
+  const mHeaders=[...Array(MONTHS)].map((_,i)=>`<th class="lv3">T${i+1}</th>`).join('');
+
+  const rows=Object.keys(GDV_NAMES).map((code,i)=>{
+    const mc=mMap[code];
+    const totalPS=mc.reduce((a,b)=>a+b,0);
+    const daGQ=gqMap[code]||0;
+    const ns=wdays>0?(totalPS/wdays).toFixed(2):'—';
+    const ty=totalPS>0?Math.round(daGQ/totalPS*1000)/10:0;
+    const clsTy=ty>=80?'hl-green':ty>=50?'hl-amber':'hl-red';
+    const mCells=mc.map(c=>`<td>${c||'–'}</td>`).join('');
+    return`<tr>
+      <td>${i+1}</td>
+      <td class="left"><b style="font-family:'JetBrains Mono',monospace">${code}</b><br/><span style="font-size:.67rem;color:#64748b">${GDV_NAMES[code]}</span></td>
+      ${mCells}
+      <td><b>${totalPS}</b></td>
+      <td>${ns}</td>
+      <td class="hl-green">${daGQ}</td>
+      <td class="${clsTy}">${ty}%</td>
+    </tr>`;
+  }).join('');
+
+  const totPS=totM.reduce((a,b)=>a+b,0);
+  const totNS=wdays>0?(totPS/wdays).toFixed(2):'—';
+  const totTy=totPS>0?Math.round(totGQ/totPS*1000)/10:0;
+  const clsTotTy=totTy>=80?'hl-green':totTy>=50?'hl-amber':'hl-red';
+  const totCells=totM.map(c=>`<td><b>${c||'–'}</b></td>`).join('');
+
+  return`
+    <div class="gdv-report-wrap" style="margin-top:24px">
+      <div class="gdv-report-header">
+        <div class="title">THỐNG KÊ HỒ SƠ PHÁT SINH TRONG NĂM ${curYear} (Đã mở hồ sơ)</div>
+        <div class="period">Phát sinh từng tháng · Năng suất lao động · Tỷ lệ giải quyết HS phát sinh năm ${curYear}</div>
+      </div>
+      <div class="gdv-table-outer">
+        <table class="gdv" style="min-width:960px">
+          <thead>
+            <tr>
+              <th rowspan="2">Stt</th>
+              <th rowspan="2" style="min-width:90px;text-align:left">Mã GĐV</th>
+              ${mHeaders}
+              <th rowspan="2" class="lv2">HS PS<br/>${curYear}</th>
+              <th rowspan="2" class="lv2">Năng suất<br/>LĐ</th>
+              <th rowspan="2" class="lv2">Đã GQ<br/>PS ${curYear}</th>
+              <th rowspan="2" class="lv2">Tỷ lệ<br/>GQ</th>
+            </tr>
+            <tr></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2" class="left"><b>Tổng cộng</b></td>
+              ${totCells}
+              <td><b>${totPS}</b></td>
+              <td>${totNS}</td>
+              <td class="hl-green"><b>${totGQ}</b></td>
+              <td class="${clsTotTy}">${totTy}%</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <div class="gdv-report-footer">
+        Số ngày làm việc tính từ 01/01/${curYear} đến nay (Thứ 2–6): <b>${wdays} ngày</b> &nbsp;·&nbsp;
+        Năng suất LĐ = HS PS ${curYear} ÷ số ngày LV &nbsp;·&nbsp;
+        Tỷ lệ GQ = HS đã GQ ÷ HS PS ${curYear}
+      </div>
+    </div>`;
+}
+
 // TAB 2: THEO GĐV — khớp mẫu Excel (4 hàng header, 18 cột, kẻ ô đầy đủ)
 function renderGdv(s){
   const el=document.getElementById('tab-gdv');
@@ -1285,7 +1383,7 @@ function renderGdv(s){
       <div class="chart-card"><h3>Cơ cấu tồn theo nghiệp vụ (TNDS / VCX)</h3><div class="chart-wrap"><canvas id="chart-gdv-nv"></canvas></div></div>
       <div class="chart-card"><h3>Chi tiết tồn theo dải ngày</h3><div class="chart-wrap"><canvas id="chart-gdv-aging"></canvas></div></div>
     </div>
-  `;
+  `+buildPhatSinhSection(curYear);
   setTimeout(()=>{
     buildDonut('chart-donut-gdv',
       s.gdvStats.map(g=>g.code),
