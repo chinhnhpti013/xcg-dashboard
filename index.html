@@ -801,6 +801,12 @@ function _processGvizData(data){
   try{
     if(!data||!data.table)throw new Error('Dữ liệu trả về không hợp lệ');
     const cols=data.table.cols.map(c=>c.label||c.id||'');
+    // Guard: nếu không phải main sheet (không có cột HSBT/Trạng thái) → route sang TLBT handler
+    const MAIN_CHECK=['Số HSBT','Trạng thái hồ sơ','Ngày mở HSBT'];
+    if(cols.length>0&&!cols.some(c=>MAIN_CHECK.includes(c.trim()))){
+      if(typeof window.ptiTlbtCb==='function'){window.ptiTlbtCb(data);}
+      return;
+    }
     RAW=(data.table.rows||[])
       .filter(row=>row&&row.c)
       .map(row=>{
