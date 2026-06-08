@@ -1132,10 +1132,11 @@ window.ptiTlbtCb=function(resp){
         return n>0&&n<1?Math.round(n*1000)/10:Math.round(n*10)/10;
       }
       function parseDThu(raw){return parseFloat(String(raw||0).replace(/[,\s]/g,''))||0;}
+      // TLBT (%) nằm cố định ở cột K (index 10) trong sheet ty-le-bt
       data.push({
         code,name,
         curDThu:parseDThu(v[xi+2]),
-        curTlbt:parsePct(v[xi+3]),
+        curTlbt:parsePct(v[10]),
         prevDThu:parseDThu(v[xi+4]),
         prevTlbt:parsePct(v[xi+5])
       });
@@ -1155,6 +1156,16 @@ function loadTlbtSheet(){
   document.head.appendChild(sc);
 }
 
+// Tên nghiệp vụ chuẩn tiếng Việt theo mã
+const NV_NAME_VI={
+  'XO':  'Xe ô tô (Tổng hợp)',
+  'XO.1':'Trách nhiệm dân sự chủ xe (TNDS)',
+  'XO.2':'Tai nạn người ngồi trên xe',
+  'XO.3':'Bảo hiểm tự nguyện người ngồi xe',
+  'XO.4':'Vật chất xe (VCX)'
+};
+const NV_SHOW_CODES=['XO','XO.1','XO.2','XO.3','XO.4'];
+
 function _refreshNvBtSection(){
   const el=document.getElementById('nv-bt-section');
   if(!el)return;
@@ -1163,12 +1174,52 @@ function _refreshNvBtSection(){
   // Rebuild chart sau khi DOM cập nhật
   setTimeout(()=>{
     if(!TLBT_DATA||!TLBT_DATA.rows)return;
-    const NV_CODES=TLBT_DATA.rows.filter(r=>r.code!=='XO').map(r=>r.code);
-    buildBar('chart-nv-bt',NV_CODES,[
-      {label:'D.thu năm '+TLBT_DATA.curYear+' (triệu đ)',data:TLBT_DATA.rows.filter(r=>r.code!=='XO').map(r=>Math.round(r.curDThu/1e6)),backgroundColor:'#3b82f6'},
-      {label:'D.thu cùng kỳ '+TLBT_DATA.prevYear+' (triệu đ)',data:TLBT_DATA.rows.filter(r=>r.code!=='XO').map(r=>Math.round(r.prevDThu/1e6)),backgroundColor:'#94a3b8'}
-    ]);
+    const visRows=TLBT_DATA.rows.filter(r=>NV_SHOW_CODES.includes(r.code)&&r.code!=='XO');
+    const labels=visRows.map(r=>r.code);
+    const dthuData=visRows.map(r=>Math.round(r.curDThu/1e6));
+    const tlbtData=visRows.map(r=>r.curTlbt||0);
+    // Dual-axis chart: doanh thu (trái) + TLBT% (phải)
+    _buildDualNvBtChart('chart-nv-bt',labels,dthuData,tlbtData,TLBT_DATA.curYear);
   },50);
+}
+
+function _buildDualNvBtChart(canvasId,labels,dthuData,tlbtData,cy){
+  const old=Chart.getChart(canvasId);if(old)old.destroy();
+  const ctx=document.getElementById(canvasId);if(!ctx)return;
+  // Scale trục phải để cột TLBT% cao tương đương cột doanh thu
+  const maxDthu=Math.max(...dthuData,1);
+  const maxTlbt=Math.max(...tlbtData,1);
+  const ratio=maxDthu/maxTlbt; // nhân tlbt để scale bằng dthu
+  new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {label:'Doanh thu NV (triệu đ)',data:dthuData,backgroundColor:'rgba(59,130,246,0.82)',yAxisID:'yDt',order:2},
+        {label:'TLBT (%)',data:tlbtData,backgroundColor:'rgba(239,68,68,0.78)',yAxisID:'yTl',order:1}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'bottom',labels:{font:{family:"'Be Vietnam Pro',sans-serif",size:12}}},
+        tooltip:{callbacks:{
+          label:function(ctx){
+            if(ctx.datasetIndex===0)return`D.thu: ${ctx.parsed.y.toLocaleString('vi-VN')} tr.đ`;
+            return`TLBT: ${ctx.parsed.y}%`;
+          }
+        }}
+      },
+      scales:{
+        yDt:{type:'linear',position:'left',title:{display:true,text:'Doanh thu (triệu đ)',font:{size:11}},grid:{color:'rgba(0,0,0,.06)'}},
+        yTl:{type:'linear',position:'right',min:0,max:Math.ceil(maxTlbt*1.25),
+          title:{display:true,text:'TLBT (%)',font:{size:11}},
+          grid:{drawOnChartArea:false},
+          ticks:{callback:v=>v+'%'}
+        }
+      }
+    }
+  });
 }
 
 // ─── RENDER ──────────────────────────────────────────────────────────────────
@@ -1235,45 +1286,37 @@ function buildNvBtSection(curYear){
   // ── Nếu đã có dữ liệu từ sheet ty-le-bt trên Drive → dùng trực tiếp ──
   if(TLBT_DATA&&TLBT_DATA.rows&&TLBT_DATA.rows.length){
     const cy=TLBT_DATA.curYear||curYear;
-    const py=TLBT_DATA.prevYear||prevYear;
-    const tableRows=TLBT_DATA.rows.map((g,i)=>{
+    // Chỉ hiện mã XO, XO.1, XO.2, XO.3, XO.4
+    const visRows=TLBT_DATA.rows.filter(r=>NV_SHOW_CODES.includes(r.code));
+    let stt=0;
+    const tableRows=visRows.map(g=>{
+      stt++;
       const isTotal=g.code==='XO';
       const bold=isTotal?'font-weight:700;background:#e8f0fe':'';
-      const diff=g.prevTlbt>0?Math.round((g.curTlbt-g.prevTlbt)*10)/10:null;
-      const diffHtml=diff===null?'—':diff>0?`<span style="color:#ef4444">▲${diff}%</span>`:`<span style="color:#10b981">▼${Math.abs(diff)}%</span>`;
+      const displayName=NV_NAME_VI[g.code]||g.name||'—';
       return`<tr style="${bold}">
-        <td>${i+1}</td>
+        <td>${stt}</td>
         <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#1565C0">${g.code}</td>
-        <td class="left">${g.name||'—'}</td>
+        <td class="left">${displayName}</td>
         <td>${g.curDThu?fmtM(g.curDThu):'—'}</td>
         <td class="${clsTlbt(g.curTlbt)}">${g.curTlbt||0}%</td>
-        <td>${g.prevDThu?fmtM(g.prevDThu):'—'}</td>
-        <td class="${clsTlbt(g.prevTlbt)}">${g.prevTlbt||0}%</td>
-        <td style="text-align:center">${diffHtml}</td>
       </tr>`;
     }).join('');
     return`
       <div id="nv-bt-section" class="gdv-report-wrap" style="margin-top:24px">
         <div class="gdv-report-header" style="background:linear-gradient(135deg,#1565C0 0%,#1976d2 60%,#0d47a1 100%)">
           <div class="title">TỶ LỆ BỒI THƯỜNG XO THEO LOẠI HÌNH NGHIỆP VỤ (SỐ LIỆU THEO NĂM NGHIỆP VỤ)</div>
-          <div class="period">Năm nghiệp vụ ${cy} so với cùng kỳ năm ${py} &nbsp;·&nbsp; Nguồn: Sheet <em>ty-le-bt</em> · Google Drive</div>
+          <div class="period">Năm nghiệp vụ ${cy} &nbsp;·&nbsp; Nguồn: Sheet <em>ty-le-bt</em> · Google Drive</div>
         </div>
-        <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;padding:16px;align-items:start">
+        <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:16px;padding:16px;align-items:start">
           <div class="gdv-table-outer" style="overflow-x:auto">
-            <table class="gdv" style="min-width:560px">
+            <table class="gdv" style="min-width:360px">
               <thead>
                 <tr>
-                  <th rowspan="2">Stt</th>
-                  <th rowspan="2" style="min-width:52px">Mã NV</th>
-                  <th rowspan="2" style="text-align:left;min-width:200px">Tên nghiệp vụ</th>
-                  <th colspan="2" class="lv2" style="background:#1565C0;color:#fff">Năm NV ${cy}</th>
-                  <th colspan="2" class="lv2" style="background:#546e7a;color:#fff">Cùng kỳ ${py}</th>
-                  <th rowspan="2" class="lv3">Tăng/Giảm<br/>TLBT</th>
-                </tr>
-                <tr>
-                  <th class="lv3">D.thu NV (đ)</th>
-                  <th class="lv3">TLBT (%)</th>
-                  <th class="lv3">D.thu NV (đ)</th>
+                  <th>Stt</th>
+                  <th style="min-width:52px">Mã NV</th>
+                  <th style="text-align:left;min-width:200px">Tên nghiệp vụ</th>
+                  <th class="lv3">D.thu NV (Đ)</th>
                   <th class="lv3">TLBT (%)</th>
                 </tr>
               </thead>
@@ -1281,7 +1324,7 @@ function buildNvBtSection(curYear){
             </table>
           </div>
           <div class="chart-card" style="margin:0">
-            <h3>Doanh thu NV — ${cy} vs ${py}</h3>
+            <h3>Doanh thu &amp; Tỷ lệ bồi thường năm NV ${cy}</h3>
             <div class="chart-wrap"><canvas id="chart-nv-bt"></canvas></div>
           </div>
         </div>
