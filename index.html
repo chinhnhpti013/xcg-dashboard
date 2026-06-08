@@ -734,6 +734,7 @@ const GDV_NAMES={
 };
 let RAW=[],CHARTS={};
 const LS_KEY='pti_raw_v1', LS_FILE='pti_filename', LS_FDATE='pti_filedate';
+let TLBT_DATA=null; // dữ liệu sheet ty-le-bt từ Google Drive
 
 function showFileDateBadge(dateMs, isGDrive){
   const badge=document.getElementById('file-date-badge');
@@ -1098,12 +1099,80 @@ function computeStats(data){
   };
 }
 
+// ─── TLBT SHEET LOADER (sheet ty-le-bt, JSONP gviz) ─────────────────────────
+const GDRIVE_TLBT_SHEET='ty-le-bt';
+
+window.ptiTlbtCb=function(resp){
+  try{
+    const rows=resp&&resp.table&&resp.table.rows;
+    if(!rows)return;
+    const cols=(resp.table.cols||[]).map(c=>c.label||'');
+    // Detect curYear from column headers (e.g. "D.thu năm nghiệp vụ 2026")
+    let curYear=new Date().getFullYear();
+    cols.forEach(l=>{const m=l.match(/20(\d\d)/);if(m)curYear=parseInt(m[0]);});
+    const data=[];
+    rows.forEach(row=>{
+      if(!row.c)return;
+      const v=row.c.map(c=>c?(c.v!==null&&c.v!==undefined?c.v:''):'');
+      // Tìm cell chứa mã XO
+      const xi=v.findIndex(x=>/^XO/.test(String(x).trim()));
+      if(xi<0)return;
+      const code=String(v[xi]).trim();
+      const name=String(v[xi+1]||'').trim();
+      function parsePct(raw){
+        const s=String(raw||0).replace(/,/g,'').replace(/%/,'').trim();
+        const n=parseFloat(s)||0;
+        // Nếu đã là dạng thập phân (0.267) → nhân 100
+        return n>0&&n<1?Math.round(n*1000)/10:Math.round(n*10)/10;
+      }
+      function parseDThu(raw){return parseFloat(String(raw||0).replace(/[,\s]/g,''))||0;}
+      data.push({
+        code,name,
+        curDThu:parseDThu(v[xi+2]),
+        curTlbt:parsePct(v[xi+3]),
+        prevDThu:parseDThu(v[xi+4]),
+        prevTlbt:parsePct(v[xi+5])
+      });
+    });
+    TLBT_DATA={curYear,prevYear:curYear-1,rows:data};
+    // Re-render section nếu tab overview đang hiển thị
+    _refreshNvBtSection();
+  }catch(e){console.error('TLBT parse',e);}
+};
+
+function loadTlbtSheet(){
+  const old=document.getElementById('_tlbt_script');if(old)old.remove();
+  const sc=document.createElement('script');
+  sc.id='_tlbt_script';
+  const bust=`&_=${Date.now()}`;
+  sc.src=`https://docs.google.com/spreadsheets/d/${GDRIVE_FILE_ID}/gviz/tq?tqx=out:json;callback:ptiTlbtCb&tq=select+*&sheet=${encodeURIComponent(GDRIVE_TLBT_SHEET)}&headers=0${bust}`;
+  document.head.appendChild(sc);
+}
+
+function _refreshNvBtSection(){
+  const el=document.getElementById('nv-bt-section');
+  if(!el)return;
+  const curYear=TLBT_DATA?TLBT_DATA.curYear:new Date().getFullYear();
+  el.outerHTML=buildNvBtSection(curYear);
+  // Rebuild chart sau khi DOM cập nhật
+  setTimeout(()=>{
+    if(!TLBT_DATA||!TLBT_DATA.rows)return;
+    const NV_CODES=TLBT_DATA.rows.filter(r=>r.code!=='XO').map(r=>r.code);
+    buildBar('chart-nv-bt',NV_CODES,[
+      {label:'D.thu năm '+TLBT_DATA.curYear+' (triệu đ)',data:TLBT_DATA.rows.filter(r=>r.code!=='XO').map(r=>Math.round(r.curDThu/1e6)),backgroundColor:'#3b82f6'},
+      {label:'D.thu cùng kỳ '+TLBT_DATA.prevYear+' (triệu đ)',data:TLBT_DATA.rows.filter(r=>r.code!=='XO').map(r=>Math.round(r.prevDThu/1e6)),backgroundColor:'#94a3b8'}
+    ]);
+  },50);
+}
+
 // ─── RENDER ──────────────────────────────────────────────────────────────────
 function renderAll(){
   const data=getFiltered();const s=computeStats(data);
   document.getElementById('filter-info').textContent=`Đang hiển thị ${data.length} / ${RAW.length} hồ sơ`;
   destroyCharts();
   renderOverview(s);renderGdv(s);renderAging(s);renderBaoCao(s);renderWarnings(s);renderInfographic();
+  // Tải sheet TLBT song song (không block render chính)
+  loadTlbtSheet();
 }
 
 function kpi(val,label,sub,color){
@@ -1115,6 +1184,8 @@ function prog(p,color){return`<div class="prog"><div class="prog-fill" style="wi
 // TAB 1: TỔNG QUAN
 function renderOverview(s){
   const el=document.getElementById('tab-overview');
+  const curYear=new Date().getFullYear();
+  const prevYear=curYear-1;
   el.innerHTML=`
     <div class="kpi-grid">
       ${kpi(fmtN(s.total),'Tổng tiếp nhận','toàn bộ hồ sơ','blue')}
@@ -1135,6 +1206,7 @@ function renderOverview(s){
       <div class="chart-card"><h3>Phân bổ hồ sơ tồn theo thời gian</h3><div class="chart-wrap-pie"><canvas id="chart-donut-age"></canvas></div></div>
     </div>
   `;
+  el.innerHTML+=buildNvBtSection(curYear);
   setTimeout(()=>{
     buildBar('chart-bar-main',s.gdvStats.map(g=>g.code),[
       {label:'Tổng tiếp nhận',data:s.gdvStats.map(g=>g.total),backgroundColor:'#90caf9'},
@@ -1145,7 +1217,86 @@ function renderOverview(s){
       ['1–30 ngày','31–45 ngày','46–89 ngày','≥90 ngày'],
       [s.buckets.b1,s.buckets.b2,s.buckets.b3,s.buckets.b4],
       ['#10b981','#f59e0b','#f97316','#ef4444']);
+    // Chart NV BT được vẽ bởi _refreshNvBtSection() khi TLBT_DATA tải xong
   },10);
+}
+
+// ─── BẢNG TLBT THEO LOẠI HÌNH NGHIỆP VỤ ─────────────────────────────────────
+function buildNvBtSection(curYear){
+  const prevYear=curYear-1;
+  function clsTlbt(v){return v>=60?'hl-red':v>=40?'hl-amber':'hl-green';}
+
+  // ── Nếu đã có dữ liệu từ sheet ty-le-bt trên Drive → dùng trực tiếp ──
+  if(TLBT_DATA&&TLBT_DATA.rows&&TLBT_DATA.rows.length){
+    const cy=TLBT_DATA.curYear||curYear;
+    const py=TLBT_DATA.prevYear||prevYear;
+    const tableRows=TLBT_DATA.rows.map((g,i)=>{
+      const isTotal=g.code==='XO';
+      const bold=isTotal?'font-weight:700;background:#e8f0fe':'';
+      const diff=g.prevTlbt>0?Math.round((g.curTlbt-g.prevTlbt)*10)/10:null;
+      const diffHtml=diff===null?'—':diff>0?`<span style="color:#ef4444">▲${diff}%</span>`:`<span style="color:#10b981">▼${Math.abs(diff)}%</span>`;
+      return`<tr style="${bold}">
+        <td>${i+1}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#1565C0">${g.code}</td>
+        <td class="left">${g.name||'—'}</td>
+        <td>${g.curDThu?fmtM(g.curDThu):'—'}</td>
+        <td class="${clsTlbt(g.curTlbt)}">${g.curTlbt||0}%</td>
+        <td>${g.prevDThu?fmtM(g.prevDThu):'—'}</td>
+        <td class="${clsTlbt(g.prevTlbt)}">${g.prevTlbt||0}%</td>
+        <td style="text-align:center">${diffHtml}</td>
+      </tr>`;
+    }).join('');
+    return`
+      <div id="nv-bt-section" class="gdv-report-wrap" style="margin-top:24px">
+        <div class="gdv-report-header" style="background:linear-gradient(135deg,#1565C0 0%,#1976d2 60%,#0d47a1 100%)">
+          <div class="title">TỶ LỆ BỒI THƯỜNG XO THEO LOẠI HÌNH NGHIỆP VỤ (SỐ LIỆU THEO NĂM NGHIỆP VỤ)</div>
+          <div class="period">Năm nghiệp vụ ${cy} so với cùng kỳ năm ${py} &nbsp;·&nbsp; Nguồn: Sheet <em>ty-le-bt</em> · Google Drive</div>
+        </div>
+        <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;padding:16px;align-items:start">
+          <div class="gdv-table-outer" style="overflow-x:auto">
+            <table class="gdv" style="min-width:560px">
+              <thead>
+                <tr>
+                  <th rowspan="2">Stt</th>
+                  <th rowspan="2" style="min-width:52px">Mã NV</th>
+                  <th rowspan="2" style="text-align:left;min-width:200px">Tên nghiệp vụ</th>
+                  <th colspan="2" class="lv2" style="background:#1565C0;color:#fff">Năm NV ${cy}</th>
+                  <th colspan="2" class="lv2" style="background:#546e7a;color:#fff">Cùng kỳ ${py}</th>
+                  <th rowspan="2" class="lv3">Tăng/Giảm<br/>TLBT</th>
+                </tr>
+                <tr>
+                  <th class="lv3">D.thu NV (đ)</th>
+                  <th class="lv3">TLBT (%)</th>
+                  <th class="lv3">D.thu NV (đ)</th>
+                  <th class="lv3">TLBT (%)</th>
+                </tr>
+              </thead>
+              <tbody>${tableRows}</tbody>
+            </table>
+          </div>
+          <div class="chart-card" style="margin:0">
+            <h3>Doanh thu NV — ${cy} vs ${py}</h3>
+            <div class="chart-wrap"><canvas id="chart-nv-bt"></canvas></div>
+          </div>
+        </div>
+        <div class="gdv-report-footer">
+          Nguồn dữ liệu: sheet <b>ty-le-bt</b> trong file Google Drive &nbsp;·&nbsp;
+          TLBT = Bồi thường thực trả ÷ Doanh thu phí bảo hiểm × 100%
+        </div>
+      </div>`;
+  }
+
+  // ── Fallback: chờ tải hoặc hiển thị skeleton ──
+  return`
+    <div id="nv-bt-section" class="gdv-report-wrap" style="margin-top:24px">
+      <div class="gdv-report-header" style="background:linear-gradient(135deg,#1565C0 0%,#1976d2 60%,#0d47a1 100%)">
+        <div class="title">TỶ LỆ BỒI THƯỜNG XO THEO LOẠI HÌNH NGHIỆP VỤ (SỐ LIỆU THEO NĂM NGHIỆP VỤ)</div>
+        <div class="period">Đang tải dữ liệu từ sheet <em>ty-le-bt</em>…</div>
+      </div>
+      <div style="padding:32px;text-align:center;color:#94a3b8;font-size:.9rem">
+        ⏳ Đang lấy dữ liệu từ Google Drive…
+      </div>
+    </div>`;
 }
 
 // ─── BẢNG PHÁT SINH THEO THÁNG ───────────────────────────────────────────────
