@@ -65,8 +65,9 @@ Cột quan trọng:
 | Theo GĐV | `tab-gdv` | Bảng tổng hợp hồ sơ tồn theo GĐV — kiểu Excel, 4 hàng header |
 | Phân tích tồn | `tab-aging` | Aging bucket + biểu đồ |
 | Báo cáo XO | `tab-baocao` | BC1 Top 10 Gara/Showroom doanh thu SC + BC2 Danh sách HS tồn ≥90 ngày |
-| Cảnh báo | `tab-warnings` | HS tồn >90 ngày + GĐV nguy hiểm |
 | Infographic | `tab-infographic` | Báo cáo tổng hợp dạng infographic theo địa bàn |
+
+> Tab "Cảnh báo" (`tab-warnings`) đã bị xóa (06/2026) — các bảng HS tồn >90 ngày và GĐV nguy hiểm đã có trong tab Báo cáo XO và Phân tích tồn. `warnRows` trong `computeStats()` vẫn giữ nguyên.
 
 ## Cấu hình Địa bàn (dùng cho tab Infographic)
 
@@ -149,8 +150,11 @@ Mỗi tab có màu gradient riêng, hiệu ứng nổi/nhấn kiểu nút 3D v�
 | 👤 Theo GĐV | `#34d399 → #047857` (xanh lá) |
 | ⏳ Phân tích tồn | `#fbbf24 → #b45309` (vàng) |
 | 📋 Báo cáo XO | `#c084fc → #6d28d9` (tím) |
-| ⚠️ Cảnh báo | `#f87171 → #b91c1c` (đỏ) |
 | 🗺️ Infographic | `#22d3ee → #0e7490` (cyan) |
+
+**Nền nội dung tab (`.tab-pane`)**: mỗi tab có nền gradient pastel dịu cùng tông màu nút tab (xanh dương / xanh lá / vàng / tím / cyan nhạt), bo góc 16px, viền trắng mờ.
+
+**Filter bar**: nền gradient đậm `#312e81 → #4c1d95 → #6d28d9` (indigo→tím), label chữ trắng, select nền trắng với viền accent riêng từng bộ lọc (`#filter-gdv` xanh lá, `#filter-nv` xanh dương, `#filter-tt` vàng), `filter-info` dạng pill trắng mờ.
 
 - Trạng thái mặc định: `transform: translateY(-3px)`, `box-shadow: 0 6px 0 rgba(0,0,0,0.22)`
 - Hover: `translateY(-5px)`, shadow `8px`
@@ -164,7 +168,11 @@ Mỗi tab có màu gradient riêng, hiệu ứng nổi/nhấn kiểu nút 3D v�
 - `borderRadius: {topLeft:0, topRight:0, bottomLeft:5, bottomRight:5}`
 - Animation: `easeOutQuart`, 1000ms
 
-**Donut chart (vòng tròn 3D):**
+**Chart TLBT XO (`_buildDualNvBtChart`)**: dual-axis bar (doanh thu trái, TLBT% phải) — đồng dạng `buildBar`: gradient cột đậm→sáng, `cylinderPlugin`, `borderRadius` đáy 5px, animation `easeOutQuart` 1000ms.
+
+**Donut chart (vòng tròn 3D — ánh kim):**
+- Gradient kim loại theo bán kính từng múi (`shadeHex`): sáng ở trong → màu gốc → tối ở mép
+- `metallicSheenPlugin`: dải sáng chéo trắng + viền sáng mép ngoài trên vành donut
 - CSS transform trực tiếp trên canvas: `perspective(480px) rotateX(24deg) scaleY(0.86)`
 - Hover chuột: `rotateX(12deg)` — ngẩng lên
 - `shadow3DPlugin`: đổ bóng canvas

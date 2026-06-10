@@ -199,45 +199,47 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
 
 .content{padding:24px 28px;max-width:1400px;margin:0 auto}
 
-/* FILTER BAR */
+/* FILTER BAR — nền đậm làm nổi bật chức năng lọc */
 .filter-bar{
-  background:linear-gradient(135deg,rgba(219,234,254,.65) 0%,rgba(237,233,254,.55) 50%,rgba(253,241,238,.55) 100%);
-  border:1px solid rgba(99,102,241,.18);border-radius:var(--radius);
+  background:linear-gradient(135deg,#312e81 0%,#4c1d95 55%,#6d28d9 100%);
+  border:1px solid rgba(255,255,255,.18);border-radius:var(--radius);
   padding:14px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:20px;
-  box-shadow:0 2px 12px rgba(99,102,241,.07),inset 0 1px 0 rgba(255,255,255,.7);
-  backdrop-filter:blur(4px);
+  box-shadow:0 6px 22px rgba(76,29,149,.32),inset 0 1px 0 rgba(255,255,255,.15);
 }
 .filter-bar label{
-  font-size:.78rem;font-weight:700;color:#3730a3;white-space:nowrap;
-  text-shadow:0 1px 0 rgba(255,255,255,.8);
+  font-size:.78rem;font-weight:700;color:rgba(255,255,255,.92);white-space:nowrap;
+  text-shadow:0 1px 2px rgba(0,0,0,.3);
 }
 .filter-bar select{
-  padding:7px 32px 7px 12px;border:1.5px solid rgba(99,102,241,.25);border-radius:var(--radius-sm);
+  padding:7px 32px 7px 12px;border:1.5px solid rgba(255,255,255,.4);border-radius:var(--radius-sm);
   font-size:.82rem;font-family:'Be Vietnam Pro',sans-serif;
-  color:#1e1b4b;font-weight:500;cursor:pointer;outline:none;
+  color:#1e1b4b;font-weight:600;cursor:pointer;outline:none;
   appearance:none;-webkit-appearance:none;
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236366f1' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center,
-    linear-gradient(160deg,rgba(255,255,255,.92) 0%,rgba(238,242,255,.85) 100%);
-  box-shadow:0 2px 6px rgba(99,102,241,.1),inset 0 1px 0 rgba(255,255,255,.9);
+    linear-gradient(160deg,#ffffff 0%,#eef2ff 100%);
+  box-shadow:0 3px 10px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.9);
   transition:border-color .18s,box-shadow .18s,transform .12s;
 }
+/* Mỗi bộ lọc một màu accent riêng */
+#filter-gdv{border-color:#6ee7b7}
+#filter-nv{border-color:#93c5fd}
+#filter-tt{border-color:#fcd34d}
 .filter-bar select:hover{
-  border-color:rgba(99,102,241,.5);
-  box-shadow:0 4px 12px rgba(99,102,241,.18),inset 0 1px 0 rgba(255,255,255,.9);
+  box-shadow:0 5px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.9);
   transform:translateY(-1px);
 }
 .filter-bar select:focus{
-  border-color:#6366f1;
-  box-shadow:0 0 0 3px rgba(99,102,241,.15),0 4px 12px rgba(99,102,241,.15);
+  border-color:#fff;
+  box-shadow:0 0 0 3px rgba(255,255,255,.3),0 5px 16px rgba(0,0,0,.25);
   transform:translateY(-1px);
 }
-.filter-sep{width:1px;height:28px;background:linear-gradient(to bottom,transparent,rgba(99,102,241,.25),transparent)}
+.filter-sep{width:1px;height:28px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.4),transparent)}
 .filter-info{
-  font-size:.78rem;font-weight:600;margin-left:auto;
-  color:#6d28d9;background:rgba(237,233,254,.7);
-  padding:4px 12px;border-radius:20px;border:1px solid rgba(124,58,237,.2);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+  font-size:.78rem;font-weight:700;margin-left:auto;
+  color:#fff;background:rgba(255,255,255,.16);
+  padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.35);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2);
 }
 
 /* TABS — 3D Press Button */
@@ -262,8 +264,20 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
 .tabs .tab:nth-child(2){background:linear-gradient(160deg,#34d399 0%,#047857 100%)}
 .tabs .tab:nth-child(3){background:linear-gradient(160deg,#fbbf24 0%,#b45309 100%)}
 .tabs .tab:nth-child(4){background:linear-gradient(160deg,#c084fc 0%,#6d28d9 100%)}
-.tabs .tab:nth-child(5){background:linear-gradient(160deg,#f87171 0%,#b91c1c 100%)}
-.tabs .tab:nth-child(6){background:linear-gradient(160deg,#22d3ee 0%,#0e7490 100%)}
+.tabs .tab:nth-child(5){background:linear-gradient(160deg,#22d3ee 0%,#0e7490 100%)}
+
+/* Nền nội dung từng tab — pastel dịu cùng tông màu nút tab */
+.tab-pane{
+  border-radius:16px;padding:18px 16px;
+  border:1px solid rgba(255,255,255,.75);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 2px 14px rgba(0,0,0,.04);
+}
+#tab-overview{background:linear-gradient(170deg,rgba(219,234,254,.65) 0%,rgba(239,246,255,.4) 100%)}
+#tab-gdv{background:linear-gradient(170deg,rgba(209,250,229,.6) 0%,rgba(240,253,244,.4) 100%)}
+#tab-aging{background:linear-gradient(170deg,rgba(254,243,199,.6) 0%,rgba(255,251,235,.4) 100%)}
+#tab-baocao{background:linear-gradient(170deg,rgba(237,233,254,.65) 0%,rgba(245,243,255,.4) 100%)}
+#tab-infographic{background:linear-gradient(170deg,rgba(207,250,254,.6) 0%,rgba(236,254,255,.4) 100%)}
+@media(max-width:600px){.tab-pane{padding:10px 8px;border-radius:12px}}
 
 /* KPI CARDS */
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:12px;margin-bottom:20px}
@@ -692,16 +706,14 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
       <button class="tab" onclick="switchTab('gdv',this)">👤 Theo GĐV</button>
       <button class="tab" onclick="switchTab('aging',this)">⏳ Phân tích tồn</button>
       <button class="tab" onclick="switchTab('baocao',this)">📋 Báo cáo XO</button>
-      <button class="tab" onclick="switchTab('warnings',this)">⚠️ Cảnh báo</button>
       <button class="tab" onclick="switchTab('infographic',this)">🗺️ Infographic</button>
     </div>
 
-    <div id="tab-overview"></div>
-    <div id="tab-gdv" style="display:none"></div>
-    <div id="tab-aging" style="display:none"></div>
-    <div id="tab-baocao" style="display:none"></div>
-    <div id="tab-warnings" style="display:none"></div>
-    <div id="tab-infographic" style="display:none"></div>
+    <div id="tab-overview" class="tab-pane"></div>
+    <div id="tab-gdv" class="tab-pane" style="display:none"></div>
+    <div id="tab-aging" class="tab-pane" style="display:none"></div>
+    <div id="tab-baocao" class="tab-pane" style="display:none"></div>
+    <div id="tab-infographic" class="tab-pane" style="display:none"></div>
   </div>
 
   <footer>
@@ -1208,36 +1220,52 @@ function _refreshNvBtSection(){
 function _buildDualNvBtChart(canvasId,labels,dthuData,tlbtData,cy){
   const old=Chart.getChart(canvasId);if(old)old.destroy();
   const ctx=document.getElementById(canvasId);if(!ctx)return;
-  // Scale trục phải để cột TLBT% cao tương đương cột doanh thu
-  const maxDthu=Math.max(...dthuData,1);
   const maxTlbt=Math.max(...tlbtData,1);
-  const ratio=maxDthu/maxTlbt; // nhân tlbt để scale bằng dthu
-  new Chart(ctx,{
+  // Gradient cột đồng dạng buildBar: đậm ở đáy → sáng ở đỉnh
+  function gradBar(top,bot){
+    return function(context){
+      const chart=context.chart;
+      const{ctx:c,chartArea}=chart;
+      if(!chartArea)return top;
+      const g=c.createLinearGradient(0,chartArea.bottom,0,chartArea.top);
+      g.addColorStop(0,bot);g.addColorStop(0.5,top);g.addColorStop(1,'rgba(255,255,255,0.2)');
+      return g;
+    };
+  }
+  const barStyle={borderRadius:{topLeft:0,topRight:0,bottomLeft:5,bottomRight:5},borderSkipped:'bottom',borderWidth:0};
+  CHARTS[canvasId]=new Chart(ctx,{
     type:'bar',
     data:{
       labels,
       datasets:[
-        {label:'Doanh thu NV (triệu đ)',data:dthuData,backgroundColor:'rgba(59,130,246,0.82)',yAxisID:'yDt',order:2},
-        {label:'TLBT (%)',data:tlbtData,backgroundColor:'rgba(239,68,68,0.78)',yAxisID:'yTl',order:1}
+        {label:'Doanh thu NV (triệu đ)',data:dthuData,backgroundColor:gradBar('#60a5fa','#1d4ed8'),yAxisID:'yDt',order:2,...barStyle},
+        {label:'TLBT (%)',data:tlbtData,backgroundColor:gradBar('#f87171','#b91c1c'),yAxisID:'yTl',order:1,...barStyle}
       ]
     },
+    plugins:[cylinderPlugin],
     options:{
       responsive:true,maintainAspectRatio:false,
+      animation:{duration:1000,easing:'easeOutQuart'},
       plugins:{
-        legend:{position:'bottom',labels:{font:{family:"'Be Vietnam Pro',sans-serif",size:12}}},
-        tooltip:{callbacks:{
-          label:function(ctx){
-            if(ctx.datasetIndex===0)return`D.thu: ${ctx.parsed.y.toLocaleString('vi-VN')} tr.đ`;
-            return`TLBT: ${ctx.parsed.y}%`;
+        legend:{position:'top',labels:{font:{size:11},boxWidth:14,usePointStyle:true}},
+        tooltip:{mode:'index',intersect:false,cornerRadius:8,
+          callbacks:{
+            label:function(ctx){
+              if(ctx.datasetIndex===0)return` D.thu: ${ctx.parsed.y.toLocaleString('vi-VN')} tr.đ`;
+              return` TLBT: ${ctx.parsed.y}%`;
+            }
           }
-        }}
+        }
       },
       scales:{
-        yDt:{type:'linear',position:'left',title:{display:true,text:'Doanh thu (triệu đ)',font:{size:11}},grid:{color:'rgba(0,0,0,.06)'}},
+        x:{grid:{display:false},ticks:{font:{size:11}},border:{display:false}},
+        yDt:{type:'linear',position:'left',beginAtZero:true,
+          title:{display:true,text:'Doanh thu (triệu đ)',font:{size:11}},
+          grid:{color:'rgba(0,0,0,.05)',lineWidth:1},ticks:{font:{size:11}},border:{display:false}},
         yTl:{type:'linear',position:'right',min:0,max:Math.ceil(maxTlbt*1.25),
           title:{display:true,text:'TLBT (%)',font:{size:11}},
-          grid:{drawOnChartArea:false},
-          ticks:{callback:v=>v+'%'}
+          grid:{drawOnChartArea:false},border:{display:false},
+          ticks:{font:{size:11},callback:v=>v+'%'}
         }
       }
     }
@@ -1249,7 +1277,7 @@ function renderAll(){
   const data=getFiltered();const s=computeStats(data);
   document.getElementById('filter-info').textContent=`Đang hiển thị ${data.length} / ${RAW.length} hồ sơ`;
   destroyCharts();
-  renderOverview(s);renderGdv(s);renderAging(s);renderBaoCao(s);renderWarnings(s);renderInfographic();
+  renderOverview(s);renderGdv(s);renderAging(s);renderBaoCao(s);renderInfographic();
   // Tải sheet TLBT song song (không block render chính)
   loadTlbtSheet();
 }
@@ -1989,60 +2017,11 @@ function fmtMBC(v){
   return new Intl.NumberFormat('vi-VN').format(Math.round(v));
 }
 
-// TAB 5: CẢNH BÁO
-function renderWarnings(s){
-  const el=document.getElementById('tab-warnings');
-  const wRows=s.warnRows.map((w,i)=>`<tr class="crit-row">
-    <td style="color:var(--text3);font-size:.75rem">${i+1}</td>
-    <td class="mono" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${w.hsbt}">${w.hsbt}</td>
-    <td><b>${w.bienso}</b></td>
-    <td><span class="mono">${w.gdv}</span><br/><span style="font-size:.72rem;color:var(--text3)">${GDV_NAMES[w.gdv]||w.gdv}</span></td>
-    <td class="center">${badge('🔴 '+w.ngayTon+' ngày','red')}</td>
-    <td style="font-size:.78rem">${w.trangThai}</td>
-    <td>${badge(w.maNv,w.maNv.startsWith('XO.1')?'blue':'teal')}</td>
-    <td class="right mono">${fmtM(w.bt)}</td>
-  </tr>`).join('');
-
-  const attnRows=s.gdvStats.filter(g=>g.wl>=2).map(g=>`<tr>
-    <td><span class="mono">${g.code}</span></td><td>${g.name}</td>
-    <td>${fmtPct(g.tyLeTon)}</td>
-    <td class="center" style="color:${g.qua45?'var(--orange)':'inherit'}">${g.qua45}</td>
-    <td class="center" style="color:${g.qua90?'var(--red)':'inherit'}">${g.qua90}</td>
-    <td>${badge((g.wl===3?'🔴 Cấp độ 3':'🟡 Cấp độ 2'),g.wcolor)}</td>
-  </tr>`).join('');
-
-  el.innerHTML=`
-    <div class="kpi-grid" style="margin-bottom:20px">
-      ${kpi(fmtN(s.qua90),'Hồ sơ tồn >90 ngày','cần xử lý khẩn','red')}
-      ${kpi(fmtN(s.buckets.b3),'Tồn 46–90 ngày','theo dõi','orange')}
-      ${kpi(s.gdvStats.filter(g=>g.wl>=2).length,'GĐV cần chú ý','cấp độ 2 & 3','amber')}
-      ${kpi(s.gdvStats.filter(g=>g.wl===3).length,'GĐV cấp độ 3','nguy hiểm','red')}
-    </div>
-    <div class="table-card">
-      <div class="sec-head">
-        <h3 style="font-size:.88rem;font-weight:600">⚠️ Danh sách hồ sơ tồn >90 ngày</h3>
-        <span class="count-pill">${s.warnRows.length} hồ sơ</span>
-      </div>
-      ${s.warnRows.length===0
-        ? '<p style="color:var(--green);padding:20px 0">✅ Không có hồ sơ nào tồn quá 90 ngày!</p>'
-        : `<table><thead><tr><th>#</th><th>Số HSBT</th><th>Biển số</th><th>GĐV</th><th class="center">Ngày tồn</th><th>Trạng thái</th><th>Mã NV</th><th class="right">BT ước/duyệt</th></tr></thead><tbody>${wRows}</tbody></table>`
-      }
-    </div>
-    <div class="table-card">
-      <h3>GĐV cần chú ý / cấp độ nguy hiểm</h3>
-      ${attnRows
-        ? `<table><thead><tr><th>Mã GĐV</th><th>Họ tên</th><th>Tỷ lệ tồn/PS</th><th class="center">Quá 45</th><th class="center">Quá 90</th><th>Mức độ</th></tr></thead><tbody>${attnRows}</tbody></table>`
-        : '<p style="color:var(--green);padding:12px 0">✅ Tất cả GĐV đang hoạt động trong ngưỡng bình thường</p>'
-      }
-    </div>
-  `;
-}
-
 // ─── TAB SWITCH ──────────────────────────────────────────────────────────────
 function switchTab(name,btn){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
-  ['overview','gdv','aging','baocao','warnings','infographic'].forEach(t=>{
+  ['overview','gdv','aging','baocao','infographic'].forEach(t=>{
     document.getElementById('tab-'+t).style.display=t===name?'block':'none';
   });
 }
@@ -2255,6 +2234,51 @@ const shadow3DPlugin={
   afterDatasetsDraw(chart){chart.ctx.restore();}
 };
 
+// Trộn màu hex với trắng (p>0) hoặc đen (p<0) — dùng tạo gradient ánh kim
+function shadeHex(hex,p){
+  const n=parseInt(hex.slice(1),16);
+  let r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  if(p>0){r+= (255-r)*p;g+=(255-g)*p;b+=(255-b)*p;}
+  else{r*=1+p;g*=1+p;b*=1+p;}
+  return`rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
+}
+
+// Plugin dải sáng chéo trên vành donut — hiệu ứng ánh kim sang trọng
+const metallicSheenPlugin={
+  id:'metallicSheen',
+  afterDatasetsDraw(chart){
+    if(chart.config.type!=='doughnut')return;
+    const meta=chart.getDatasetMeta(0);
+    if(!meta||!meta.data||!meta.data.length)return;
+    const arc=meta.data[0];
+    const{x,y,outerRadius:or,innerRadius:ir}=arc.getProps(['x','y','outerRadius','innerRadius'],true);
+    if(!isFinite(or)||or<=0)return;
+    const{ctx}=chart;
+    ctx.save();
+    // Clip theo vành khuyên
+    ctx.beginPath();
+    ctx.arc(x,y,or,0,Math.PI*2);
+    ctx.arc(x,y,Math.max(ir,0),0,Math.PI*2,true);
+    ctx.clip();
+    // Dải sáng chéo từ trên-trái xuống dưới-phải
+    const g=ctx.createLinearGradient(x-or,y-or,x+or,y+or);
+    g.addColorStop(0,'rgba(255,255,255,0.40)');
+    g.addColorStop(0.28,'rgba(255,255,255,0.14)');
+    g.addColorStop(0.5,'rgba(255,255,255,0)');
+    g.addColorStop(0.78,'rgba(0,0,0,0.08)');
+    g.addColorStop(1,'rgba(0,0,0,0.20)');
+    ctx.fillStyle=g;
+    ctx.fillRect(x-or,y-or,or*2,or*2);
+    // Viền sáng mảnh ở mép ngoài — nét kim loại đánh bóng
+    ctx.beginPath();
+    ctx.arc(x,y,or-0.8,0,Math.PI*2);
+    ctx.strokeStyle='rgba(255,255,255,0.55)';
+    ctx.lineWidth=1.2;
+    ctx.stroke();
+    ctx.restore();
+  }
+};
+
 // Plugin vẽ mũ trụ tròn 3D trên đỉnh mỗi cột bar
 const cylinderPlugin={
   id:'cylinder3D',
@@ -2365,14 +2389,29 @@ function buildDonut(id,labels,data,colors){
       labels,
       datasets:[{
         data,
-        backgroundColor:colors,
-        borderColor:'rgba(255,255,255,0.6)',
+        // Gradient kim loại theo bán kính: sáng ở trong → màu gốc → tối ở mép ngoài
+        backgroundColor:function(context){
+          const col=colors[context.dataIndex%colors.length];
+          const chart=context.chart;
+          const{ctx,chartArea}=chart;
+          if(!chartArea)return col;
+          const cx=(chartArea.left+chartArea.right)/2;
+          const cyy=(chartArea.top+chartArea.bottom)/2;
+          const r=Math.max(Math.min(chartArea.width,chartArea.height)/2,1);
+          const g=ctx.createRadialGradient(cx,cyy,r*0.45,cx,cyy,r);
+          g.addColorStop(0,shadeHex(col,0.55));
+          g.addColorStop(0.35,shadeHex(col,0.18));
+          g.addColorStop(0.7,col);
+          g.addColorStop(1,shadeHex(col,-0.3));
+          return g;
+        },
+        borderColor:'rgba(255,255,255,0.85)',
         borderWidth:2,
         hoverBorderWidth:3,
         hoverOffset:12
       }]
     },
-    plugins:[shadow3DPlugin],
+    plugins:[shadow3DPlugin,metallicSheenPlugin],
     options:{
       responsive:true,
       maintainAspectRatio:false,
