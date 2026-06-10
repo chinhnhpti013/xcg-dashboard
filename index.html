@@ -279,19 +279,30 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
 #tab-infographic{background:linear-gradient(170deg,rgba(207,250,254,.6) 0%,rgba(236,254,255,.4) 100%)}
 @media(max-width:600px){.tab-pane{padding:10px 8px;border-radius:12px}}
 
-/* KPI CARDS */
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:12px;margin-bottom:20px}
+/* KPI CARDS — compact (~1/3 cũ), nền màu nổi bật số liệu */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:8px;margin-bottom:20px}
 .kpi{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:16px 18px;border-left:4px solid transparent;
+  border:1px solid rgba(0,0,0,.05);border-radius:8px;
+  padding:7px 10px;border-left:3px solid transparent;
+  box-shadow:0 1px 4px rgba(0,0,0,.05),inset 0 1px 0 rgba(255,255,255,.6);
 }
-.kpi.blue{border-left-color:var(--blue-mid)}.kpi.green{border-left-color:var(--green)}
-.kpi.amber{border-left-color:var(--amber)}.kpi.red{border-left-color:var(--red)}
-.kpi.purple{border-left-color:var(--purple)}.kpi.teal{border-left-color:var(--teal)}
-.kpi.orange{border-left-color:var(--orange)}
-.kpi-label{font-size:.7rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
-.kpi-val{font-size:1.8rem;font-weight:700;color:var(--text);line-height:1;font-family:'JetBrains Mono',monospace}
-.kpi-sub{font-size:.73rem;color:var(--text3);margin-top:5px}
+.kpi.blue{background:linear-gradient(135deg,#dbeafe,#f0f7ff);border-left-color:var(--blue-mid)}
+.kpi.blue .kpi-val{color:#1d4ed8}
+.kpi.green{background:linear-gradient(135deg,#d1fae5,#f0fdf6);border-left-color:var(--green)}
+.kpi.green .kpi-val{color:#047857}
+.kpi.amber{background:linear-gradient(135deg,#fef3c7,#fffbeb);border-left-color:var(--amber)}
+.kpi.amber .kpi-val{color:#b45309}
+.kpi.red{background:linear-gradient(135deg,#fee2e2,#fff5f5);border-left-color:var(--red)}
+.kpi.red .kpi-val{color:#b91c1c}
+.kpi.purple{background:linear-gradient(135deg,#ede9fe,#faf5ff);border-left-color:var(--purple)}
+.kpi.purple .kpi-val{color:#6d28d9}
+.kpi.teal{background:linear-gradient(135deg,#cffafe,#f0fdff);border-left-color:var(--teal)}
+.kpi.teal .kpi-val{color:#0e7490}
+.kpi.orange{background:linear-gradient(135deg,#ffedd5,#fff7ed);border-left-color:var(--orange)}
+.kpi.orange .kpi-val{color:#c2410c}
+.kpi-label{font-size:.55rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.kpi-val{font-size:1.05rem;font-weight:700;line-height:1;font-family:'JetBrains Mono',monospace}
+.kpi-sub{font-size:.6rem;color:var(--text3);margin-top:2px}
 
 /* CHART GRID */
 .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
@@ -491,12 +502,12 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
   .tabs::-webkit-scrollbar{display:none}
   .tab{padding:6px 9px;font-size:.68rem;flex-shrink:0}
 
-  /* KPI cards — 2 cột trên điện thoại */
-  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:8px}
-  .kpi{padding:10px 12px}
-  .kpi-val{font-size:1.35rem}
-  .kpi-label{font-size:.62rem}
-  .kpi-sub{font-size:.65rem}
+  /* KPI cards — 3 cột trên điện thoại (card đã compact) */
+  .kpi-grid{grid-template-columns:repeat(3,1fr);gap:6px}
+  .kpi{padding:6px 8px}
+  .kpi-val{font-size:.92rem}
+  .kpi-label{font-size:.5rem}
+  .kpi-sub{font-size:.54rem}
 
   /* Chart */
   .chart-card{padding:10px 10px}
@@ -549,8 +560,8 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
 @media(min-width:601px) and (max-width:900px){
   .content{padding:16px 14px}
   .tab{padding:7px 13px;font-size:.76rem}
-  .kpi-val{font-size:1.55rem}
-  .kpi-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .kpi-val{font-size:1rem}
+  .kpi-grid{grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
   .topbar-title{font-size:.82rem}
   .chart-wrap{height:220px}
   .chart-wrap-pie{height:260px}
@@ -1660,87 +1671,60 @@ function renderGdv(s){
   },10);
 }
 
-// TAB 3: PHÂN TÍCH TỒN
+// TAB 3: PHÂN TÍCH TỒN — Đánh giá tổng quan: ngắn gọn, tập trung giải pháp giảm tồn quá hạn
 function generateAnalysis(s){
   const now=new Date();
   const month=now.getMonth()+1;
   const year=now.getFullYear();
 
   const tyLeGQ=s.tyLe;
-  const tyLeTonTong=s.total>0?Math.round(s.ton/s.total*1000)/10:0;
-  const tyLeQua90=s.ton>0?Math.round(s.qua90/s.ton*1000)/10:0;
-  const tyLeQua45=s.ton>0?Math.round(s.qua45/s.ton*1000)/10:0;
-  const tyLeVcx=s.total>0?Math.round(s.vcx/s.total*1000)/10:0;
-  const tyLeTnds=s.total>0?Math.round(s.tnds/s.total*1000)/10:0;
   const tongTon=s.ton;
+  const quaHan=s.buckets.b3+s.buckets.b4; // tồn quá 45 ngày
+  const tyLeQuaHan=tongTon>0?Math.round(quaHan/tongTon*100):0;
   const pctB1=tongTon>0?Math.round(s.buckets.b1/tongTon*100):0;
   const pctB2=tongTon>0?Math.round(s.buckets.b2/tongTon*100):0;
   const pctB3=tongTon>0?Math.round(s.buckets.b3/tongTon*100):0;
   const pctB4=tongTon>0?Math.round(s.buckets.b4/tongTon*100):0;
 
   let mucDo,iconTQ,bgTQ;
-  if(tyLeGQ>=65&&tyLeQua90<15){mucDo='TÍCH CỰC';iconTQ='✅';bgTQ='linear-gradient(135deg,#064e3b,#059669)';}
-  else if(tyLeGQ>=45&&tyLeQua90<30){mucDo='TRUNG BÌNH — CẦN THEO DÕI';iconTQ='⚠️';bgTQ='linear-gradient(135deg,#78350f,#d97706)';}
+  if(tyLeGQ>=65&&pctB4<15){mucDo='TÍCH CỰC';iconTQ='✅';bgTQ='linear-gradient(135deg,#064e3b,#059669)';}
+  else if(tyLeGQ>=45&&pctB4<30){mucDo='TRUNG BÌNH — CẦN THEO DÕI';iconTQ='⚠️';bgTQ='linear-gradient(135deg,#78350f,#d97706)';}
   else{mucDo='ĐÁNG LO NGẠI — CẦN XỬ LÝ NGAY';iconTQ='🔴';bgTQ='linear-gradient(135deg,#7f1d1d,#dc2626)';}
 
   const gdvCap3=s.gdvStats.filter(g=>g.wl===3);
-  const gdvCap2=s.gdvStats.filter(g=>g.wl===2);
   const gdvCap1=s.gdvStats.filter(g=>g.wl===1);
-  const gdvSortGQ=[...s.gdvStats].sort((a,b)=>b.tyLeGQ-a.tyLeGQ);
-  const gdvTotNhat=gdvSortGQ[0];
-  const gdvYeuNhat=gdvSortGQ[gdvSortGQ.length-1];
+  const gdvQua90=s.gdvStats.filter(g=>g.qua90>0).sort((a,b)=>b.qua90-a.qua90);
+  const deadline=new Date(now.getTime()+14*86400000).toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit'});
 
   const num=(n,c='#1565C0')=>`<b style="color:${c}">${fmtN(n)}</b>`;
   const pct=(n,c='#1565C0')=>`<b style="color:${c}">${n}%</b>`;
-  const gdvBadge=(g,wl)=>`<span style="font-family:'JetBrains Mono',monospace;background:${wl===3?'#fee2e2':wl===2?'#fef3c7':'#dcfce7'};color:${wl===3?'#991b1b':wl===2?'#92400e':'#166534'};padding:2px 7px;border-radius:5px;font-size:.75rem;font-weight:700">${g.code} — ${g.name}</span>`;
 
-  const nxTQ=tyLeGQ>=65
-    ?`Tỷ lệ giải quyết đạt ${pct(tyLeGQ,'#059669')} cho thấy đơn vị đang duy trì được nhịp độ xử lý hồ sơ ở mức khá. Tuy nhiên, với số hồ sơ tồn đọng hiện tại là ${num(tongTon,'#dc2626')} hồ sơ — chiếm ${pct(tyLeTonTong,'#dc2626')} tổng lượng tiếp nhận — cần tiếp tục đẩy mạnh để đưa tỷ lệ tồn xuống dưới ngưỡng an toàn.`
-    :tyLeGQ>=45
-    ?`Tỷ lệ giải quyết chỉ đạt ${pct(tyLeGQ,'#d97706')}, thấp hơn kỳ vọng. Còn ${num(s.processing,'#dc2626')} hồ sơ chưa được giải quyết trong tổng số ${num(s.total)} hồ sơ cần xử lý. Đây là dấu hiệu áp lực công việc đang tích lũy, cần có biện pháp can thiệp kịp thời.`
-    :`Tỷ lệ giải quyết chỉ đạt ${pct(tyLeGQ,'#dc2626')} — mức rất thấp. Số hồ sơ tồn đọng chiếm ${pct(tyLeTonTong,'#dc2626')} tổng lượng, trong đó có ${num(s.qua90,'#dc2626')} hồ sơ vượt ngưỡng 90 ngày. Tình hình đáng báo động và cần hành động khẩn cấp.`;
+  // I. Nhận định chính — đi thẳng vào con số quyết định
+  const nhanDinh=[];
+  nhanDinh.push(`Tỷ lệ giải quyết ${pct(tyLeGQ,tyLeGQ>=65?'#059669':tyLeGQ>=45?'#d97706':'#dc2626')} trên ${num(s.total)} hồ sơ. Còn ${num(s.processing,'#d97706')} HS đang xử lý, trong đó ${num(tongTon,'#7c3aed')} HS có ngày tồn — bình quân <b style="color:#7c3aed">${s.avgDays} ngày</b>/hồ sơ.`);
+  nhanDinh.push(`Tồn quá hạn &gt;45 ngày: ${num(quaHan,'#ea580c')} HS, chiếm ${pct(tyLeQuaHan,'#ea580c')} tổng tồn. Riêng nhóm ≥90 ngày còn ${num(s.buckets.b4,'#dc2626')} HS — chỉ số quyết định xếp loại đơn vị, phải kéo về <b style="color:#dc2626">0</b>.`);
+  if(gdvQua90.length) nhanDinh.push(`Toàn bộ HS ≥90 ngày tập trung ở ${gdvQua90.length} GĐV: ${gdvQua90.map(g=>`<b>${g.name}</b> (${g.qua90} HS)`).join(', ')} — xử lý đúng người, đúng hồ sơ sẽ loại bỏ phần lớn rủi ro hiện tại.`);
+  if(gdvCap3.length) nhanDinh.push(`${gdvCap3.length} GĐV vượt ngưỡng tải Cấp độ 3 (tồn/PS tháng &gt;130%): ${gdvCap3.map(g=>`<b style="color:#dc2626">${g.name}</b>`).join(', ')} — nếu không san tải, tồn quá hạn sẽ tiếp tục phát sinh từ đây.`);
 
-  const nxNV=s.vcx>s.tnds
-    ?`Hồ sơ <b>VCX</b> chiếm ưu thế với ${num(s.vcx)} HS (${pct(tyLeVcx,'#7c3aed')}), vượt hồ sơ <b>TNDS</b> là ${num(s.tnds)} HS (${pct(tyLeTnds,'#0891b2')}). VCX thường có giá trị bồi thường lớn hơn và quy trình thẩm định phức tạp hơn — đây có thể là một phần nguyên nhân khiến tỷ lệ tồn cao.`
-    :`Hồ sơ <b>TNDS</b> chiếm ưu thế với ${num(s.tnds)} HS (${pct(tyLeTnds,'#0891b2')}), so với VCX là ${num(s.vcx)} HS (${pct(tyLeVcx,'#7c3aed')}). Khối lượng TNDS lớn thường dễ xử lý hơn, tuy nhiên số lượng nhiều có thể tạo áp lực về tốc độ.`;
-
-  const uuDiem=[];
-  if(tyLeGQ>=50) uuDiem.push(`Tỷ lệ giải quyết đạt ${tyLeGQ}% — đơn vị đang hoàn thành trên nửa khối lượng công việc được giao.`);
-  if(gdvCap1.length>0) uuDiem.push(`Có ${gdvCap1.length}/${s.gdvStats.length} giám định viên đạt <b>Cấp độ 1</b> (an toàn): ${gdvCap1.map(g=>`<span style="color:#059669;font-weight:700">${g.name}</span>`).join(', ')} — đây là lực lượng nòng cốt cần phát huy.`);
-  if(gdvTotNhat&&gdvTotNhat.tyLeGQ>=60) uuDiem.push(`GĐV xuất sắc nhất kỳ này là ${gdvBadge(gdvTotNhat,1)} với tỷ lệ giải quyết ${pct(gdvTotNhat.tyLeGQ,'#059669')} — có thể nhân rộng phương pháp làm việc của GĐV này.`);
-  if(pctB1>=40) uuDiem.push(`${pctB1}% hồ sơ tồn đọng nằm trong dải an toàn 1–30 ngày (${num(s.buckets.b1)} HS) — phần lớn chưa vượt ngưỡng nguy hiểm.`);
-  if(uuDiem.length===0) uuDiem.push('Chưa ghi nhận điểm mạnh nổi bật trong kỳ này. Đơn vị cần nỗ lực cải thiện toàn diện.');
-
-  const nhuocDiem=[];
-  if(s.qua90>0) nhuocDiem.push(`<b style="color:#dc2626">Nghiêm trọng:</b> Có ${num(s.qua90,'#dc2626')} hồ sơ vượt ngưỡng 90 ngày (chiếm ${pct(tyLeQua90,'#dc2626')} tổng tồn) — rủi ro cao nhất, ảnh hưởng trực tiếp đến uy tín và chỉ tiêu khu vực.`);
-  if(gdvCap3.length>0) nhuocDiem.push(`${gdvCap3.length} GĐV đang ở <b style="color:#dc2626">Cấp độ 3 — nguy hiểm</b>: ${gdvCap3.map(g=>gdvBadge(g,3)).join(' ')}. Tỷ lệ HS tồn / HS PS TB tháng vượt 130%, cần hỗ trợ hoặc điều phối lại ngay.`);
-  if(gdvCap2.length>0) nhuocDiem.push(`${gdvCap2.length} GĐV ở <b style="color:#d97706">Cấp độ 2 — cần theo dõi</b>: ${gdvCap2.map(g=>gdvBadge(g,2)).join(' ')}. Tỷ lệ tồn đang tiệm cận ngưỡng nguy hiểm.`);
-  if(tyLeQua45>30) nhuocDiem.push(`${pct(tyLeQua45,'#ea580c')} hồ sơ tồn đã vượt 45 ngày (${num(s.qua45,'#ea580c')} HS) — nguy cơ leo thang thành tồn >90 ngày nếu không xử lý trong 1–2 tuần tới.`);
-  if(s.avgDays>45) nhuocDiem.push(`Số ngày tồn trung bình là <b style="color:#dc2626">${s.avgDays} ngày</b> — vượt ngưỡng an toàn 45 ngày, phản ánh hồ sơ đang bị ùn ứ ở các giai đoạn trung gian.`);
-  if(gdvYeuNhat&&gdvYeuNhat.tyLeGQ<40) nhuocDiem.push(`GĐV có tỷ lệ giải quyết thấp nhất là ${gdvBadge(gdvYeuNhat,3)} — chỉ đạt ${pct(gdvYeuNhat.tyLeGQ,'#dc2626')} — cần xem xét nguyên nhân và hỗ trợ cụ thể.`);
-  if(nhuocDiem.length===0) nhuocDiem.push('Không phát hiện vấn đề nghiêm trọng nổi bật trong kỳ này.');
-
-  const gdvDetails=s.gdvStats.map(g=>{
-    const icon=g.wl===3?'🔴':g.wl===2?'🟡':'🟢';
-    const nxGdv=g.wl===3
-      ?`tồn đọng nghiêm trọng với ${g.tongTon} HS tồn${g.qua90>0?`, trong đó <b style="color:#dc2626">${g.qua90} HS vượt 90 ngày</b>`:''}. Tỷ lệ tồn/PS tháng: ${g.tyLeTon}% — cần can thiệp ngay.`
-      :g.wl===2
-      ?`đang chịu áp lực với ${g.tongTon} HS tồn (tỷ lệ ${g.tyLeTon}%). Cần theo dõi sát trong 2 tuần tới.`
-      :`hoạt động ổn định — ${g.tongTon} HS tồn, tỷ lệ tồn/PS: ${g.tyLeTon}%, tỷ lệ giải quyết: ${g.tyLeGQ}%.`;
-    return`<li style="margin-bottom:7px;padding:8px 12px;background:${g.wl===3?'#fff5f5':g.wl===2?'#fffbeb':'#f0fdf4'};border-left:3px solid ${g.wl===3?'#dc2626':g.wl===2?'#d97706':'#059669'};border-radius:0 6px 6px 0;font-size:.83rem;line-height:1.65;color:#334155">${icon} <b>${g.name}</b> <span style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#64748b">(${g.code})</span>: ${nxGdv}</li>`;
-  }).join('');
-
+  // II. Giải pháp — tập trung giảm hồ sơ tồn quá hạn, có mục tiêu & thời hạn
   const giaiphap=[];
-  if(s.qua90>0) giaiphap.push(`<b>Ưu tiên #1 — Giải quyết ngay ${s.qua90} hồ sơ >90 ngày:</b> Lãnh đạo phòng cần họp khẩn với từng GĐV phụ trách, xác định rõ nguyên nhân tắc nghẽn (thiếu chứng từ, chờ đối tác sửa chữa, tranh chấp...) và đặt deadline xử lý cụ thể cho từng hồ sơ.`);
-  if(gdvCap3.length>0) giaiphap.push(`<b>Điều phối lại khối lượng công việc:</b> GĐV Cấp độ 3 (${gdvCap3.map(g=>g.name).join(', ')}) đang quá tải — cân nhắc luân chuyển một phần hồ sơ mới sang GĐV có tỷ lệ tồn thấp hơn để cân bằng tải công việc trong nhóm.`);
-  if(s.buckets.b3>5) giaiphap.push(`<b>Tập trung xử lý ${s.buckets.b3} hồ sơ nhóm 46–89 ngày:</b> Đây là nhóm "cửa sổ vàng" — nếu không giải quyết trong 1–4 tuần sẽ chuyển thành tồn >90 ngày, làm xấu thêm chỉ tiêu. Ưu tiên xử lý nhóm này song song với nhóm >90 ngày.`);
-  giaiphap.push(`<b>Thiết lập cơ chế cảnh báo sớm nội bộ:</b> Khi hồ sơ chạm mốc 30 ngày chưa giải quyết, trưởng nhóm/hệ thống cần tự động nhắc GĐV phụ trách. Không để hồ sơ âm thầm vượt 45–90 ngày mà không có hành động can thiệp.`);
-  giaiphap.push(`<b>Rà soát quy trình nội bộ — tìm điểm nghẽn:</b> Phân tích xem hồ sơ thường bị ùn ứ ở giai đoạn nào (giám định hiện trường → chốt giá → phê duyệt → chi trả). Bước nào mất nhiều thời gian nhất cần được tối giản hoặc ủy quyền phê duyệt nhanh hơn.`);
-  giaiphap.push(`<b>Tăng cường phối hợp với Gara/Showroom:</b> Nhiều hồ sơ tồn do đối tác sửa chữa chậm trả chứng từ hoặc chờ xác nhận. Cần thiết lập thỏa thuận thời hạn (SLA) rõ ràng với các Gara đối tác chủ chốt.`);
-  if(s.vcx>s.tnds) giaiphap.push(`<b>Chú trọng đào tạo nghiệp vụ VCX:</b> VCX chiếm tỷ trọng lớn và phức tạp hơn TNDS. Nâng cao năng lực thẩm định VCX sẽ trực tiếp rút ngắn thời gian xử lý trung bình và giảm tỷ lệ tồn.`);
-  giaiphap.push(`<b>Đánh giá hiệu suất GĐV định kỳ & khen thưởng:</b> Duy trì đánh giá hiệu suất hàng tuần. GĐV duy trì Cấp độ 1 trong 3 tháng liên tiếp cần được ghi nhận — tạo động lực cạnh tranh tích cực và văn hóa trách nhiệm trong nhóm.`);
+  if(s.buckets.b4>0) giaiphap.push(`<b>Chiến dịch "xóa tồn ≥90 ngày" trong 14 ngày (hạn ${deadline}):</b> giao đích danh ${s.buckets.b4} hồ sơ (danh sách chi tiết tại tab Báo cáo XO — mục 2) cho từng GĐV kèm deadline từng hồ sơ. Phân loại ngay theo nguyên nhân tắc (chờ chứng từ gara · chờ khách hàng · chờ phê duyệt · tranh chấp) và xử lý theo nhóm nguyên nhân thay vì từng hồ sơ rời rạc.`);
+  if(s.buckets.b3>0) giaiphap.push(`<b>Chặn leo thang nhóm 46–89 ngày (${s.buckets.b3} HS — "cửa sổ vàng"):</b> đây là nguồn sinh tồn ≥90 ngày kế tiếp. Mục tiêu giải quyết tối thiểu 50% trong 30 ngày; ưu tiên trước các HS đã quá 75 ngày vì chỉ còn ~2 tuần trước khi vượt ngưỡng.`);
+  giaiphap.push(`<b>Chốt chặn sớm tại mốc 30 và 45 ngày:</b> sáng thứ 2 hàng tuần, trưởng nhóm rà danh sách HS vừa chạm mốc — GĐV nêu rõ vướng mắc và bước xử lý kế tiếp. Không để hồ sơ "trôi" qua 45 ngày mà chưa có hành động cụ thể.`);
+  if(gdvCap3.length&&gdvCap1.length) giaiphap.push(`<b>San tải tức thời:</b> chuyển bớt HS phát sinh mới từ ${gdvCap3.map(g=>g.name).join(', ')} (Cấp độ 3) sang ${gdvCap1.map(g=>g.name).join(', ')} (Cấp độ 1) để nhóm quá tải dồn toàn lực đóng tồn cũ.`);
+  giaiphap.push(`<b>Xử lý nguyên nhân gốc từ Gara/đối tác:</b> phần lớn tồn kéo dài do chậm chứng từ quyết toán. Chốt SLA 7 ngày trả chứng từ với các gara có nhiều HS tồn nhất (tham chiếu BC1 tab Báo cáo XO); gara vi phạm lặp lại cân nhắc giảm điều phối xe mới.`);
+  giaiphap.push(`<b>Gắn chỉ tiêu tuần cho từng GĐV:</b> mỗi GĐV đăng ký số HS quá hạn sẽ đóng trong tuần, kết quả công bố nội bộ sáng thứ 2 — tạo nhịp giảm tồn liên tục thay vì dồn về cuối tháng.`);
 
-  const ketluan=`Qua phân tích tổng thể ${fmtN(s.total)} hồ sơ tính đến tháng ${month}/${year}, Phòng Khu vực Quảng Ninh cần tập trung vào việc rút ngắn thời gian tồn đọng, đặc biệt với ${fmtN(s.qua90)} hồ sơ đã vượt ngưỡng 90 ngày. Sự phân bổ áp lực công việc không đồng đều giữa các GĐV cũng là bài toán cần sớm có lời giải để đảm bảo chất lượng dịch vụ bồi thường đến tay khách hàng đúng hạn và chuyên nghiệp.`;
+  // III. GĐV cần ưu tiên — chỉ nêu người có vấn đề, một dòng/người
+  const gdvUuTien=s.gdvStats.filter(g=>g.wl>=2||g.qua90>0);
+  const gdvDetails=gdvUuTien.length?gdvUuTien.map(g=>{
+    const icon=g.wl===3?'🔴':g.wl===2?'🟡':'🟠';
+    const hanhDong=g.wl===3?'san tải + lãnh đạo rà từng hồ sơ tồn':g.wl===2?'theo dõi sát, không để phát sinh quá hạn mới':'tập trung đóng dứt điểm HS ≥90 ngày';
+    return`<li style="margin-bottom:6px;padding:7px 12px;background:${g.wl===3?'#fff5f5':g.wl===2?'#fffbeb':'#fff7ed'};border-left:3px solid ${g.wl===3?'#dc2626':g.wl===2?'#d97706':'#ea580c'};border-radius:0 6px 6px 0;font-size:.82rem;line-height:1.6;color:#334155">${icon} <b>${g.name}</b> <span style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#64748b">(${g.code})</span>: tồn ${g.tongTon} HS (≥90 ngày: <b style="color:#dc2626">${g.qua90}</b> · 46–89: ${g.g45_90}) · tồn/PS tháng ${g.tyLeTon}% → <b>${hanhDong}</b>.</li>`;
+  }).join('')
+  :`<li style="padding:7px 12px;background:#f0fdf4;border-left:3px solid #059669;border-radius:0 6px 6px 0;font-size:.82rem;color:#166534">🟢 Không có GĐV nào ở mức cảnh báo — duy trì nhịp xử lý hiện tại.</li>`;
+
+  const ketluan=`Mục tiêu đến hết tháng ${month}/${year}: đưa tồn ≥90 ngày từ ${fmtN(s.buckets.b4)} HS về <b>0</b>, giảm tối thiểu 50% nhóm 46–89 ngày (${fmtN(s.buckets.b3)} HS) và giữ tỷ lệ tồn quá hạn dưới 15% tổng tồn. ${gdvQua90.length?`Ưu tiên nguồn lực vào ${gdvQua90.map(g=>g.name).join(', ')} — nơi tập trung toàn bộ hồ sơ rủi ro cao nhất.`:''}`;
 
   return`
   <div style="background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:24px;box-shadow:0 4px 24px rgba(0,0,0,.08)">
@@ -1755,58 +1739,44 @@ function generateAnalysis(s){
         <div style="font-size:1.8rem;font-weight:800;color:#fff;line-height:1">${tyLeGQ}%</div>
       </div>
     </div>
-    <div style="padding:20px 24px;display:flex;flex-direction:column;gap:20px">
+    <div style="padding:20px 24px;display:flex;flex-direction:column;gap:18px">
 
       <div>
-        <div style="font-size:.75rem;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">📋 I. NHẬN XÉT TỔNG QUAN</div>
-        <p style="font-size:.84rem;line-height:1.8;color:#334155;margin:0">${nxTQ} ${nxNV}</p>
+        <div style="font-size:.75rem;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">📋 I. NHẬN ĐỊNH CHÍNH</div>
+        <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px">${nhanDinh.map(n=>`<li style="font-size:.83rem;line-height:1.7;color:#334155;padding:6px 12px 6px 32px;position:relative;background:#f8fafc;border-radius:7px"><span style="position:absolute;left:12px;top:7px;color:#1565C0;font-weight:800">▸</span>${n}</li>`).join('')}</ul>
       </div>
 
       <hr style="border:none;border-top:1px solid #e2e8f0;margin:0"/>
 
       <div>
-        <div style="font-size:.75rem;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">⏳ II. PHÂN TÍCH CƠ CẤU HỒ SƠ TỒN ĐỌNG</div>
-        <div class="analysis-buckets" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">
+        <div style="font-size:.75rem;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">⏳ II. CƠ CẤU HỒ SƠ TỒN</div>
+        <div class="analysis-buckets" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px">
           <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px;text-align:center"><div style="font-size:1.25rem;font-weight:800;color:#059669">${fmtN(s.buckets.b1)}</div><div style="font-size:.68rem;color:#166534;font-weight:600">1–30 ngày</div><div style="font-size:.65rem;color:#6b7280;margin-top:2px">chiếm ${pctB1}%</div></div>
           <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px;text-align:center"><div style="font-size:1.25rem;font-weight:800;color:#d97706">${fmtN(s.buckets.b2)}</div><div style="font-size:.68rem;color:#92400e;font-weight:600">31–45 ngày</div><div style="font-size:.65rem;color:#6b7280;margin-top:2px">chiếm ${pctB2}%</div></div>
           <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:10px;text-align:center"><div style="font-size:1.25rem;font-weight:800;color:#ea580c">${fmtN(s.buckets.b3)}</div><div style="font-size:.68rem;color:#c2410c;font-weight:600">46–89 ngày</div><div style="font-size:.65rem;color:#6b7280;margin-top:2px">chiếm ${pctB3}%</div></div>
           <div style="background:#fff5f5;border:1px solid #fecaca;border-radius:8px;padding:10px;text-align:center"><div style="font-size:1.25rem;font-weight:800;color:#dc2626">${fmtN(s.buckets.b4)}</div><div style="font-size:.68rem;color:#991b1b;font-weight:600">≥90 ngày</div><div style="font-size:.65rem;color:#6b7280;margin-top:2px">chiếm ${pctB4}%</div></div>
         </div>
-        <p style="font-size:.83rem;line-height:1.8;color:#334155;margin:0">Tổng số hồ sơ tồn đọng (ngày tồn > 0): ${num(tongTon,'#7c3aed')} hồ sơ — bình quân <b style="color:#7c3aed">${s.avgDays} ngày</b>/hồ sơ. ${pctB1>=50?`Cơ cấu tương đối lành mạnh khi ${pctB1}% tồn vẫn trong ngưỡng an toàn.`:`Đáng lo khi chỉ ${pctB1}% hồ sơ tồn nằm trong vùng an toàn (1–30 ngày).`} Nhóm "cửa sổ vàng" (46–89 ngày) có ${num(s.buckets.b3,'#ea580c')} hồ sơ — nếu không xử lý kịp sẽ leo thang thành tồn >90 ngày trong vài tuần tới.${s.qua90>0?` Đặc biệt, ${num(s.qua90,'#dc2626')} hồ sơ đã vượt ngưỡng 90 ngày — cần ưu tiên xử lý cao nhất.`:''}</p>
+        <p style="font-size:.82rem;line-height:1.7;color:#334155;margin:0">${pctB1>=50?`Cơ cấu tương đối lành mạnh: ${pctB1}% tồn còn trong vùng an toàn 1–30 ngày.`:`Chỉ ${pctB1}% tồn nằm trong vùng an toàn 1–30 ngày — cơ cấu đang già hóa.`} Trọng tâm là ${num(quaHan,'#ea580c')} HS quá hạn &gt;45 ngày: nhóm 46–89 ngày là "cửa sổ vàng" còn cứu được, nhóm ≥90 ngày phải đóng dứt điểm.</p>
       </div>
 
       <hr style="border:none;border-top:1px solid #e2e8f0;margin:0"/>
 
       <div>
-        <div style="font-size:.75rem;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">✅ III. ĐIỂM MẠNH</div>
-        <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px">${uuDiem.map(u=>`<li style="font-size:.83rem;line-height:1.75;color:#334155;padding:7px 12px 7px 36px;position:relative;background:#f0fdf4;border-radius:7px"><span style="position:absolute;left:12px;top:8px;color:#059669;font-weight:800">✔</span>${u}</li>`).join('')}</ul>
+        <div style="font-size:.75rem;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">🎯 III. GIẢI PHÁP GIẢM HỒ SƠ TỒN QUÁ HẠN</div>
+        <ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px">${giaiphap.map((g,i)=>`<li style="font-size:.83rem;line-height:1.75;color:#334155;padding:8px 12px 8px 40px;position:relative;background:${i===0?'#fff5f5':'#eff6ff'};border-radius:7px;border-left:3px solid ${i===0?'#dc2626':'#1565C0'}"><span style="position:absolute;left:10px;top:8px;width:20px;height:20px;background:${i===0?'#dc2626':'#1565C0'};color:#fff;border-radius:50%;font-size:.65rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center">${i+1}</span>${g}</li>`).join('')}</ol>
       </div>
 
       <hr style="border:none;border-top:1px solid #e2e8f0;margin:0"/>
 
       <div>
-        <div style="font-size:.75rem;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">⚠️ IV. VẤN ĐỀ CẦN KHẮC PHỤC</div>
-        <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px">${nhuocDiem.map(n=>`<li style="font-size:.83rem;line-height:1.75;color:#334155;padding:7px 12px 7px 36px;position:relative;background:#fff5f5;border-radius:7px"><span style="position:absolute;left:12px;top:8px;color:#dc2626;font-weight:800">✗</span>${n}</li>`).join('')}</ul>
-      </div>
-
-      <hr style="border:none;border-top:1px solid #e2e8f0;margin:0"/>
-
-      <div>
-        <div style="font-size:.75rem;font-weight:700;color:#0891b2;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">👤 V. ĐÁNH GIÁ TỪNG GIÁM ĐỊNH VIÊN</div>
+        <div style="font-size:.75rem;font-weight:700;color:#0891b2;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">👤 IV. GĐV CẦN ƯU TIÊN HỖ TRỢ</div>
         <ul style="margin:0;padding:0;list-style:none">${gdvDetails}</ul>
       </div>
 
       <hr style="border:none;border-top:1px solid #e2e8f0;margin:0"/>
 
-      <div>
-        <div style="font-size:.75rem;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">🎯 VI. GIẢI PHÁP ĐỀ XUẤT</div>
-        <ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px">${giaiphap.map((g,i)=>`<li style="font-size:.83rem;line-height:1.8;color:#334155;padding:8px 12px 8px 40px;position:relative;background:#eff6ff;border-radius:7px;border-left:3px solid #1565C0"><span style="position:absolute;left:10px;top:8px;width:20px;height:20px;background:#1565C0;color:#fff;border-radius:50%;font-size:.65rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center">${i+1}</span>${g}</li>`).join('')}</ol>
-      </div>
-
-      <hr style="border:none;border-top:1px solid #e2e8f0;margin:0"/>
-
       <div style="background:linear-gradient(135deg,#f8fafc,#eff6ff);border:1px solid #bfdbfe;border-radius:10px;padding:14px 18px">
-        <div style="font-size:.72rem;font-weight:700;color:#1565C0;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">📌 KẾT LUẬN</div>
+        <div style="font-size:.72rem;font-weight:700;color:#1565C0;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">📌 MỤC TIÊU KỲ TỚI</div>
         <p style="font-size:.84rem;line-height:1.8;color:#1e3a5f;margin:0;font-style:italic">${ketluan}</p>
         <div style="font-size:.68rem;color:#94a3b8;margin-top:8px;text-align:right">Phân tích tự động · Dữ liệu tháng ${month}/${year} · PTISOS Quảng Ninh</div>
       </div>
