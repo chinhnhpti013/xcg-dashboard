@@ -715,9 +715,9 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
     <div class="tabs">
       <button class="tab active" onclick="switchTab('overview',this)">📊 Tổng quan</button>
       <button class="tab" onclick="switchTab('gdv',this)">👤 Theo GĐV</button>
-      <button class="tab" onclick="switchTab('aging',this)">⏳ Phân tích tồn</button>
+      <button class="tab" onclick="switchTab('aging',this)">⏳ Phân loại tồn</button>
       <button class="tab" onclick="switchTab('baocao',this)">📋 Báo cáo XO</button>
-      <button class="tab" onclick="switchTab('infographic',this)">🗺️ Infographic</button>
+      <button class="tab" onclick="switchTab('infographic',this)">🗺️ Phân tích</button>
     </div>
 
     <div id="tab-overview" class="tab-pane"></div>
@@ -1288,7 +1288,7 @@ function renderAll(){
   const data=getFiltered();const s=computeStats(data);
   document.getElementById('filter-info').textContent=`Đang hiển thị ${data.length} / ${RAW.length} hồ sơ`;
   destroyCharts();
-  renderOverview(s);renderGdv(s);renderAging(s);renderBaoCao(s);renderInfographic();
+  renderOverview(s);renderGdv(s);renderAging(s);renderBaoCao(s);renderInfographic(s);
   // Tải sheet TLBT song song (không block render chính)
   loadTlbtSheet();
 }
@@ -1308,7 +1308,6 @@ function renderOverview(s){
     <div class="kpi-grid">
       ${kpi(fmtN(s.total),'Tổng tiếp nhận','toàn bộ hồ sơ','blue')}
       ${kpi(fmtN(s.resolved),'Đã giải quyết',s.tyLe+'% tổng','green')}
-      ${kpi(fmtN(s.processing),'Đang xử lý','chưa giải quyết','amber')}
       ${kpi(s.tyLe+'%','Tỷ lệ giải quyết','đã thanh toán / hủy','teal')}
       ${kpi(fmtN(s.ton),'Hồ sơ có tồn','số ngày tồn > 0','purple')}
       ${kpi(fmtN(s.duoi45),'Trong hạn ≤45 ngày','an toàn','green')}
@@ -1815,7 +1814,6 @@ function renderAging(s){
         <th class="center">46–90 ngày</th><th class="center">>90 ngày</th><th class="center">TB ngày tồn</th>
       </tr></thead><tbody>${rows}</tbody></table>
     </div>
-    ${generateAnalysis(s)}
   `;
   setTimeout(()=>{
     buildBar('chart-bar-age',['1–30 ngày','31–45 ngày','46–89 ngày','≥90 ngày'],[
@@ -2035,7 +2033,7 @@ function computeDiabanStats(){
   return{result,curYear,curMonth,prevYear:curYear-1};
 }
 
-function renderInfographic(){
+function renderInfographic(s){
   const el=document.getElementById('tab-infographic');
   if(!RAW.length){el.innerHTML='<p style="padding:20px;color:var(--text2)">Không có dữ liệu.</p>';return;}
   const now=new Date();
@@ -2175,7 +2173,8 @@ function renderInfographic(){
         <span><b>PTISOS</b> · Dữ liệu xử lý offline trong trình duyệt</span>
         <span>🟢 Cấp độ 1: &lt;80% &nbsp; 🟡 Cấp độ 2: 80–130% &nbsp; 🔴 Cấp độ 3: &gt;130%</span>
       </div>
-    </div>`;
+    </div>
+    ${s?generateAnalysis(s):''}`;
 }
 
 // ─── CHARTS ──────────────────────────────────────────────────────────────────

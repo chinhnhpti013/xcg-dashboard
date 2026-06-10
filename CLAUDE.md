@@ -63,9 +63,9 @@ Cột quan trọng:
 |-----|----|-------|
 | Tổng quan | `tab-overview` | KPI tổng hợp + biểu đồ |
 | Theo GĐV | `tab-gdv` | Bảng tổng hợp hồ sơ tồn theo GĐV — kiểu Excel, 4 hàng header |
-| Phân tích tồn | `tab-aging` | Aging bucket + biểu đồ |
+| Phân loại tồn | `tab-aging` | Aging bucket + biểu đồ |
 | Báo cáo XO | `tab-baocao` | BC1 Top 10 Gara/Showroom doanh thu SC + BC2 Danh sách HS tồn ≥90 ngày |
-| Infographic | `tab-infographic` | Báo cáo tổng hợp dạng infographic theo địa bàn |
+| Phân tích | `tab-infographic` | Infographic theo địa bàn + khối "Đánh giá Tổng quan" (`generateAnalysis(s)`) ở cuối |
 
 > Tab "Cảnh báo" (`tab-warnings`) đã bị xóa (06/2026) — các bảng HS tồn >90 ngày và GĐV nguy hiểm đã có trong tab Báo cáo XO và Phân tích tồn. `warnRows` trong `computeStats()` vẫn giữ nguyên.
 
@@ -148,9 +148,9 @@ Mỗi tab có màu gradient riêng, hiệu ứng nổi/nhấn kiểu nút 3D v�
 |-----|-------------|
 | 📊 Tổng quan | `#60a5fa → #1d4ed8` (xanh dương) |
 | 👤 Theo GĐV | `#34d399 → #047857` (xanh lá) |
-| ⏳ Phân tích tồn | `#fbbf24 → #b45309` (vàng) |
+| ⏳ Phân loại tồn | `#fbbf24 → #b45309` (vàng) |
 | 📋 Báo cáo XO | `#c084fc → #6d28d9` (tím) |
-| 🗺️ Infographic | `#22d3ee → #0e7490` (cyan) |
+| 🗺️ Phân tích | `#22d3ee → #0e7490` (cyan) |
 
 **Nền nội dung tab (`.tab-pane`)**: mỗi tab có nền gradient pastel dịu cùng tông màu nút tab (xanh dương / xanh lá / vàng / tím / cyan nhạt), bo góc 16px, viền trắng mờ.
 
