@@ -162,13 +162,15 @@ Mỗi tab có màu gradient riêng, hiệu ứng nổi/nhấn kiểu nút 3D v�
 
 ### Biểu đồ — Chart.js 4
 
-**Bar chart (cột trụ 3D):**
-- `cylinderPlugin`: vẽ ellipse đỉnh (radial gradient trắng sáng) + ellipse đáy (bóng tối) → hình trụ 3D
-- Gradient cột: `GRAD_PALETTE` 7 màu (indigo/emerald/amber/red/violet/cyan/orange), đậm ở đáy → sáng ở đỉnh
+**Bar chart (cột trụ 3D — sắc nét):**
+- `cylinderPlugin`: nắp đỉnh = ellipse màu **đặc** sáng hơn màu cột (`shadeHex` +0.55→+0.12, gradient ngang) + viền đậm sắc nét (`shadeHex` −0.28, lineWidth 1.2); đáy = nửa ellipse dưới màu đậm của cột. **Không dùng radial gradient trắng mờ.**
+- Màu nắp lấy từ `ds._cyl` (`{top,bot}` hex) — `buildBar` tự gắn từ `GRAD_PALETTE`; nếu `backgroundColor` là mảng hex per-bar thì nắp theo từng bar
+- Gradient thân cột: đậm ở đáy → màu gốc (55%) → `shadeHex(top, 0.3)` sáng đặc ở đỉnh (không còn stop trắng trong suốt)
+- `GRAD_PALETTE` 7 màu (indigo/emerald/amber/red/violet/cyan/orange)
 - `borderRadius: {topLeft:0, topRight:0, bottomLeft:5, bottomRight:5}`
 - Animation: `easeOutQuart`, 1000ms
 
-**Chart TLBT XO (`_buildDualNvBtChart`)**: dual-axis bar (doanh thu trái, TLBT% phải) — đồng dạng `buildBar`: gradient cột đậm→sáng, `cylinderPlugin`, `borderRadius` đáy 5px, animation `easeOutQuart` 1000ms.
+**Chart TLBT XO (`_buildDualNvBtChart`)**: dual-axis bar (doanh thu trái, TLBT% phải) — đồng dạng `buildBar`: gradient cột đậm→sáng, `cylinderPlugin` (datasets gắn `_cyl` thủ công), `borderRadius` đáy 5px, animation `easeOutQuart` 1000ms. TLBT (%) hiển thị **2 số thập phân** (`toFixed(2)`) ở cả bảng và tooltip chart; `parsePct` làm tròn 2 chữ số.
 
 **Donut chart (vòng tròn 3D — ánh kim):**
 - Gradient kim loại theo bán kính từng múi (`shadeHex`): sáng ở trong → màu gốc → tối ở mép

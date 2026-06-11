@@ -1173,8 +1173,8 @@ window.ptiTlbtCb=function(resp){
       function parsePct(raw){
         const s=String(raw||0).replace(/,/g,'').replace(/%/,'').trim();
         const n=parseFloat(s)||0;
-        // Nếu đã là dạng thập phân (0.267) → nhân 100
-        return n>0&&n<1?Math.round(n*1000)/10:Math.round(n*10)/10;
+        // Nếu đã là dạng thập phân (0.267) → nhân 100 · giữ 2 số thập phân
+        return n>0&&n<1?Math.round(n*10000)/100:Math.round(n*100)/100;
       }
       function parseDThu(raw){return parseFloat(String(raw||0).replace(/[,\s]/g,''))||0;}
       // TLBT (%) nằm cố định ở cột K (index 10) trong sheet ty-le-bt
@@ -1239,7 +1239,7 @@ function _buildDualNvBtChart(canvasId,labels,dthuData,tlbtData,cy){
       const{ctx:c,chartArea}=chart;
       if(!chartArea)return top;
       const g=c.createLinearGradient(0,chartArea.bottom,0,chartArea.top);
-      g.addColorStop(0,bot);g.addColorStop(0.5,top);g.addColorStop(1,'rgba(255,255,255,0.2)');
+      g.addColorStop(0,bot);g.addColorStop(0.55,top);g.addColorStop(1,shadeHex(top,0.3));
       return g;
     };
   }
@@ -1249,8 +1249,8 @@ function _buildDualNvBtChart(canvasId,labels,dthuData,tlbtData,cy){
     data:{
       labels,
       datasets:[
-        {label:'Doanh thu NV (triệu đ)',data:dthuData,backgroundColor:gradBar('#60a5fa','#1d4ed8'),yAxisID:'yDt',order:2,...barStyle},
-        {label:'TLBT (%)',data:tlbtData,backgroundColor:gradBar('#f87171','#b91c1c'),yAxisID:'yTl',order:1,...barStyle}
+        {label:'Doanh thu NV (triệu đ)',data:dthuData,backgroundColor:gradBar('#60a5fa','#1d4ed8'),yAxisID:'yDt',order:2,_cyl:{top:'#60a5fa',bot:'#1d4ed8'},...barStyle},
+        {label:'TLBT (%)',data:tlbtData,backgroundColor:gradBar('#f87171','#b91c1c'),yAxisID:'yTl',order:1,_cyl:{top:'#f87171',bot:'#b91c1c'},...barStyle}
       ]
     },
     plugins:[cylinderPlugin],
@@ -1263,7 +1263,7 @@ function _buildDualNvBtChart(canvasId,labels,dthuData,tlbtData,cy){
           callbacks:{
             label:function(ctx){
               if(ctx.datasetIndex===0)return` D.thu: ${ctx.parsed.y.toLocaleString('vi-VN')} tr.đ`;
-              return` TLBT: ${ctx.parsed.y}%`;
+              return` TLBT: ${ctx.parsed.y.toFixed(2)}%`;
             }
           }
         }
@@ -1359,7 +1359,7 @@ function buildNvBtSection(curYear){
         <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#1565C0">${g.code}</td>
         <td class="left">${displayName}</td>
         <td>${g.curDThu?fmtM(g.curDThu):'—'}</td>
-        <td class="${clsTlbt(g.curTlbt)}">${g.curTlbt||0}%</td>
+        <td class="${clsTlbt(g.curTlbt)}">${(g.curTlbt||0).toFixed(2)}%</td>
       </tr>`;
     }).join('');
     return`
@@ -2248,7 +2248,7 @@ const metallicSheenPlugin={
   }
 };
 
-// Plugin vẽ mũ trụ tròn 3D trên đỉnh mỗi cột bar
+// Plugin vẽ mũ trụ tròn 3D trên đỉnh mỗi cột bar — màu đặc, viền sắc nét (không gradient mờ)
 const cylinderPlugin={
   id:'cylinder3D',
   afterDatasetsDraw(chart){
@@ -2256,32 +2256,36 @@ const cylinderPlugin={
     chart.data.datasets.forEach((ds,di)=>{
       const meta=chart.getDatasetMeta(di);
       if(meta.hidden||meta.type==='line')return;
+      const arrBg=Array.isArray(ds.backgroundColor)?ds.backgroundColor:null;
+      const pal=ds._cyl||GRAD_PALETTE[di%GRAD_PALETTE.length];
       meta.data.forEach((bar,idx)=>{
         const x=bar.x,topY=bar.y,baseY=bar.base;
         if(!isFinite(x)||!isFinite(topY)||!bar.width||bar.width<=0)return;
         const rx=Math.max(bar.width/2-1,3);
         const ry=Math.max(rx*0.28,4);
+        // Màu gốc của cột (hex) — per-bar nếu backgroundColor là mảng
+        const tHex=(arrBg&&typeof arrBg[idx]==='string')?arrBg[idx]:pal.top;
+        const bFill=arrBg?shadeHex(tHex,-0.3):pal.bot;
 
-        // Đáy trụ (bóng đổ)
+        // Đáy trụ — nửa ellipse dưới màu đậm của cột, mép sắc
         ctx.save();
         ctx.beginPath();
-        ctx.ellipse(x,baseY,rx,ry,0,0,Math.PI*2);
-        ctx.fillStyle='rgba(0,0,0,0.18)';
+        ctx.ellipse(x,baseY,rx,ry,0,0,Math.PI);
+        ctx.fillStyle=bFill;
         ctx.fill();
         ctx.restore();
 
-        // Mặt đỉnh trụ (highlight sáng)
+        // Mặt đỉnh trụ — màu sáng đặc của cột, viền đậm sắc nét
         ctx.save();
         ctx.beginPath();
         ctx.ellipse(x,topY,rx,ry,0,0,Math.PI*2);
-        const grad=ctx.createRadialGradient(x-rx*0.25,topY-ry*0.3,0,x,topY,rx);
-        grad.addColorStop(0,'rgba(255,255,255,0.75)');
-        grad.addColorStop(0.6,'rgba(255,255,255,0.35)');
-        grad.addColorStop(1,'rgba(255,255,255,0.05)');
+        const grad=ctx.createLinearGradient(x-rx,topY,x+rx,topY);
+        grad.addColorStop(0,shadeHex(tHex,0.55));
+        grad.addColorStop(1,shadeHex(tHex,0.12));
         ctx.fillStyle=grad;
         ctx.fill();
-        ctx.strokeStyle='rgba(255,255,255,0.4)';
-        ctx.lineWidth=0.8;
+        ctx.strokeStyle=shadeHex(tHex,-0.28);
+        ctx.lineWidth=1.2;
         ctx.stroke();
         ctx.restore();
       });
@@ -2306,9 +2310,10 @@ function buildBar(id,labels,datasets,extraDatasets){
         const{ctx:c,chartArea}=chart;
         if(!chartArea)return p.top;
         const g=c.createLinearGradient(0,chartArea.bottom,0,chartArea.top);
-        g.addColorStop(0,p.bot);g.addColorStop(0.5,p.top);g.addColorStop(1,'rgba(255,255,255,0.2)');
+        g.addColorStop(0,p.bot);g.addColorStop(0.55,p.top);g.addColorStop(1,shadeHex(p.top,0.3));
         return g;
-      }
+      },
+      _cyl:p
     };
   });
   const allDs=[...styled,...(extraDatasets||[])];
