@@ -2209,24 +2209,32 @@ function renderCLDV(s){
   const btTB=dangXL.filter(r=>{const v=parseMoney(r['Tiền ước/duyệt BT']);return v>=10e6&&v<50e6}).length;
   const btLon=dangXL.filter(r=>parseMoney(r['Tiền ước/duyệt BT'])>=50e6).length;
 
-  // === ĐỀ XUẤT ĐỘNG ===
-  const suggest1=[];
-  if(s.buckets.b4>0)suggest1.push(`<b>Xóa tồn ≥90 ngày trong 14 ngày:</b> có ${fmtN(s.buckets.b4)} hồ sơ vượt ngưỡng — giao đích danh từng GĐV, yêu cầu báo cáo tiến độ hàng ngày và hoàn thành trước ${new Date(now.getTime()+14*86400000).toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit'})}.`);
-  if(s.buckets.b3>0)suggest1.push(`<b>Kiểm soát "cửa sổ vàng" 46–89 ngày:</b> ${fmtN(s.buckets.b3)} HS đang tiến vào vùng nguy hiểm — thiết lập checklist bắt buộc ở mốc 30 ngày để can thiệp trước khi vượt 90 ngày.`);
-  suggest1.push(`<b>Chuẩn hóa quy trình cấp bảo lãnh:</b> ban hành mẫu hồ sơ thống nhất, đặt SLA${hasBaoLanh&&avgChuKy>30?` dưới ${Math.ceil(avgChuKy*0.8)} ngày (rút từ ${avgChuKy} ngày hiện tại)`:' tối đa 30 ngày từ mở HS → cấp bảo lãnh'} cho nghiệp vụ VCX.`);
+  // === NỘI DUNG ĐỀ XUẤT ===
+  const suggest1=[
+    `<b>Chuẩn hóa quy trình giám định:</b> ban hành checklist giám định hiện trường thống nhất (ảnh tổn thất, biên bản, xác minh nguyên nhân) để mọi GĐV làm đúng và đủ ngay từ đầu, giảm hồ sơ phải bổ sung.`,
+    `<b>Nâng chất lượng hồ sơ đầu vào:</b> hướng dẫn khách hàng/gara chuẩn bị đúng giấy tờ ngay từ khâu khai báo, tránh trả đi trả lại nhiều lần.`,
+    `<b>Kiểm soát chất lượng (QC) nội bộ:</b> rà soát ngẫu nhiên hồ sơ đã duyệt để phát hiện lỗi định mức, lỗi áp dụng điều khoản, từ đó đào tạo lại điểm yếu lặp lại.`,
+    `<b>Minh bạch định giá tổn thất:</b> áp dụng biểu giá vật tư/công sửa chữa nhất quán giữa các GĐV và gara, giảm tranh cãi và cảm giác "mỗi người một giá".`,
+    `<b>Số hóa lưu trữ:</b> lưu hồ sơ điện tử có thể tra cứu nhanh, phục vụ kiểm tra, đối soát và giải trình khi cần.`,
+  ];
 
-  const overloaded=s.gdvStats.filter(g=>g.wl>=2);
-  const optimal=s.gdvStats.filter(g=>g.wl===1);
-  const suggest2=[];
-  if(overloaded.length)suggest2.push(`<b>Tái phân bổ tức thời:</b> ${overloaded.map(g=>`${g.name} (${g.ton} HS tồn — Cấp độ ${g.wl})`).join('; ')} đang quá tải — chuyển HS phát sinh mới sang ${optimal.length?optimal.map(g=>g.name).join(', '):'GĐV còn năng lực'}.`);
-  suggest2.push(`<b>Chỉ tiêu tuần minh bạch:</b> mỗi GĐV cam kết số HS đóng/tuần vào sáng thứ Hai, kết quả công bố trong họp nhóm — tạo nhịp giảm tồn liên tục thay vì dồn cuối tháng.`);
-  suggest2.push(`<b>Giảm tồn VCX:</b> chu kỳ VCX phụ thuộc gara sửa chữa — HS VCX tồn >45 ngày cần xác định rõ điểm nghẽn (chứng từ · phê duyệt · chờ sửa chữa) để xử lý đúng nguyên nhân gốc.`);
+  const suggest2=[
+    `<b>Rút ngắn thời gian xử lý (TAT):</b> đặt mốc thời gian cho từng khâu (tiếp nhận → giám định → duyệt giá → bồi thường) và theo dõi bằng dashboard để phát hiện điểm nghẽn.`,
+    `<b>Phân loại hồ sơ theo độ phức tạp:</b> hồ sơ đơn giản, giá trị nhỏ xử lý nhanh theo luồng riêng (fast-track); hồ sơ lớn/nghi vấn mới đưa vào quy trình kỹ.`,
+    `<b>Tự động hóa văn bản và báo cáo:</b> dùng công cụ tạo biên bản, ghép ảnh, báo cáo tự động để GĐV tập trung vào nghiệp vụ thay vì soạn thảo thủ công.`,
+    `<b>Cân bằng tải công việc:</b> phân bổ hồ sơ theo năng lực và khối lượng tồn của từng GĐV, tránh người quá tải, người nhàn rỗi.`,
+    `<b>Theo dõi tồn đọng (aging):</b> cảnh báo sớm các hồ sơ quá hạn để ưu tiên xử lý, không để dồn cuối kỳ.`,
+    `<b>Đo lường năng suất:</b> thống kê số hồ sơ/GĐV, thời gian trung bình, tỷ lệ hồ sơ phải làm lại — làm cơ sở cải tiến và đánh giá.`,
+  ];
 
-  const suggest3=[];
-  if(topGaraTon.length)suggest3.push(`<b>SLA với đối tác Gara:</b> <b>${topGaraTon[0].name}</b> (${topGaraTon[0].count} HS tồn) và các gara top — ký cam kết hoàn chứng từ trong 7 ngày; vi phạm 3 lần liên tiếp → xem xét tạm dừng điều phối xe mới.`);
-  if(btLon>0)suggest3.push(`<b>Theo dõi HS giá trị lớn (≥50 triệu đ):</b> có ${btLon} HS đang xử lý — trưởng nhóm trực tiếp phụ trách, chủ động thông báo tiến độ cho khách hàng mỗi 7 ngày.`);
-  suggest3.push(`<b>Thông báo chủ động qua SMS/email:</b> tự động cập nhật tiến độ hồ sơ tại mốc 7, 15, 30 ngày — giảm cuộc gọi hỏi thăm và tăng hài lòng khách hàng.`);
-  suggest3.push(`<b>Khảo sát hài lòng sau đóng HS:</b> gửi form ngắn 3 câu khi hồ sơ được thanh toán — dữ liệu phản hồi thực tế giúp cải tiến quy trình liên tục.`);
+  const suggest3=[
+    `<b>Chủ động cập nhật tiến độ:</b> thông báo cho khách hàng tại các mốc quan trọng (đã giám định, đã duyệt giá, sắp chi trả) thay vì để khách hàng tự liên hệ hỏi.`,
+    `<b>Một đầu mối liên hệ:</b> mỗi hồ sơ có người phụ trách rõ ràng để khách hàng không bị "đẩy qua đẩy lại".`,
+    `<b>Giải thích minh bạch khi từ chối/giảm trừ:</b> nêu rõ căn cứ hợp đồng và lý do, kèm hướng xử lý tiếp theo để giảm khiếu nại.`,
+    `<b>Rút ngắn thời gian chi trả:</b> đây là yếu tố ảnh hưởng lớn nhất đến cảm nhận của khách hàng về dịch vụ.`,
+    `<b>Thu thập phản hồi sau bồi thường:</b> khảo sát mức độ hài lòng để phát hiện vấn đề và cải tiến liên tục.`,
+    `<b>Đào tạo kỹ năng giao tiếp cho GĐV:</b> đặc biệt khi xử lý khách hàng đang căng thẳng sau tai nạn, giữ thái độ chuyên nghiệp và đồng cảm.`,
+  ];
 
   function suggestList(arr,borderColor,bgColor,numBg){
     return arr.map((sg,i)=>`<li style="font-size:.82rem;line-height:1.7;color:#334155;padding:7px 12px 7px 36px;position:relative;background:#fff;border-radius:6px;border-left:3px solid ${borderColor}"><span style="position:absolute;left:10px;top:7px;width:18px;height:18px;background:${numBg};color:#fff;border-radius:50%;font-size:.62rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center">${i+1}</span>${sg}</li>`).join('');
