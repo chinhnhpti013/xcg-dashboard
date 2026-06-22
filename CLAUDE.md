@@ -63,11 +63,12 @@ Cột quan trọng:
 |-----|----|-------|
 | Tổng quan | `tab-overview` | KPI tổng hợp + biểu đồ |
 | Theo GĐV | `tab-gdv` | Bảng tổng hợp hồ sơ tồn theo GĐV — kiểu Excel, 4 hàng header |
-| Phân loại tồn | `tab-aging` | Aging bucket + biểu đồ |
-| Báo cáo XO | `tab-baocao` | BC1 Top 10 Gara/Showroom doanh thu SC + BC2 Danh sách HS tồn ≥90 ngày |
-| Phân tích | `tab-infographic` | Infographic theo địa bàn + khối "Đánh giá Tổng quan" (`generateAnalysis(s)`) ở cuối |
+| Báo cáo XO | `tab-baocao` | BC1 Top 30 Gara/Showroom doanh thu SC + BC2 Danh sách HS tồn ≥90 ngày + BC3 tồn 46–89 ngày |
+| Tổng hợp cảnh báo | `tab-infographic` | Infographic theo địa bàn + khối "Đánh giá Tổng quan" (`generateAnalysis(s)`) ở cuối |
+| Đề xuất cải tiến CLDV | `tab-cldv` | Phân tích 3 trục: Chất lượng dịch vụ · Hiệu quả & Năng suất · Quan hệ khách hàng; hàm `renderCLDV(s)` |
 
-> Tab "Cảnh báo" (`tab-warnings`) đã bị xóa (06/2026) — các bảng HS tồn >90 ngày và GĐV nguy hiểm đã có trong tab Báo cáo XO và Phân tích tồn. `warnRows` trong `computeStats()` vẫn giữ nguyên.
+> Tab "Phân loại tồn" (`tab-aging`) đã bị xóa (06/2026) — nội dung phân phối thời gian tồn đã được tích hợp vào tab Đề xuất cải tiến CLDV (Trục 1). `warnRows` trong `computeStats()` vẫn giữ nguyên.
+> Tab "Cảnh báo" (`tab-warnings`) đã bị xóa (06/2026) — các bảng HS tồn >90 ngày và GĐV nguy hiểm đã có trong tab Báo cáo XO và Tổng hợp cảnh báo.
 
 ## Cấu hình Địa bàn (dùng cho tab Infographic)
 
@@ -148,11 +149,11 @@ Mỗi tab có màu gradient riêng, hiệu ứng nổi/nhấn kiểu nút 3D v�
 |-----|-------------|
 | 📊 Tổng quan | `#60a5fa → #1d4ed8` (xanh dương) |
 | 👤 Theo GĐV | `#34d399 → #047857` (xanh lá) |
-| ⏳ Phân loại tồn | `#fbbf24 → #b45309` (vàng) |
 | 📋 Báo cáo XO | `#c084fc → #6d28d9` (tím) |
-| 🗺️ Phân tích | `#22d3ee → #0e7490` (cyan) |
+| 🚨 Tổng hợp cảnh báo | `#22d3ee → #0e7490` (cyan) |
+| 💡 Đề xuất cải tiến CLDV | `#fb7185 → #be123c` (hồng đỏ) |
 
-**Nền nội dung tab (`.tab-pane`)**: mỗi tab có nền gradient pastel dịu cùng tông màu nút tab (xanh dương / xanh lá / vàng / tím / cyan nhạt), bo góc 16px, viền trắng mờ.
+**Nền nội dung tab (`.tab-pane`)**: mỗi tab có nền gradient pastel dịu cùng tông màu nút tab (xanh dương / xanh lá / tím / cyan / hồng nhạt), bo góc 16px, viền trắng mờ.
 
 **Filter bar**: nền gradient đậm `#312e81 → #4c1d95 → #6d28d9` (indigo→tím), label chữ trắng, select nền trắng với viền accent riêng từng bộ lọc (`#filter-gdv` xanh lá, `#filter-nv` xanh dương, `#filter-tt` vàng), `filter-info` dạng pill trắng mờ.
 

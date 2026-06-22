@@ -262,9 +262,9 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
 /* Màu riêng từng tab */
 .tabs .tab:nth-child(1){background:linear-gradient(160deg,#60a5fa 0%,#1d4ed8 100%)}
 .tabs .tab:nth-child(2){background:linear-gradient(160deg,#34d399 0%,#047857 100%)}
-.tabs .tab:nth-child(3){background:linear-gradient(160deg,#fbbf24 0%,#b45309 100%)}
-.tabs .tab:nth-child(4){background:linear-gradient(160deg,#c084fc 0%,#6d28d9 100%)}
-.tabs .tab:nth-child(5){background:linear-gradient(160deg,#22d3ee 0%,#0e7490 100%)}
+.tabs .tab:nth-child(3){background:linear-gradient(160deg,#c084fc 0%,#6d28d9 100%)}
+.tabs .tab:nth-child(4){background:linear-gradient(160deg,#22d3ee 0%,#0e7490 100%)}
+.tabs .tab:nth-child(5){background:linear-gradient(160deg,#fb7185 0%,#be123c 100%)}
 
 /* Nền nội dung từng tab — pastel dịu cùng tông màu nút tab */
 .tab-pane{
@@ -274,9 +274,9 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
 }
 #tab-overview{background:linear-gradient(170deg,rgba(219,234,254,.65) 0%,rgba(239,246,255,.4) 100%)}
 #tab-gdv{background:linear-gradient(170deg,rgba(209,250,229,.6) 0%,rgba(240,253,244,.4) 100%)}
-#tab-aging{background:linear-gradient(170deg,rgba(254,243,199,.6) 0%,rgba(255,251,235,.4) 100%)}
 #tab-baocao{background:linear-gradient(170deg,rgba(237,233,254,.65) 0%,rgba(245,243,255,.4) 100%)}
 #tab-infographic{background:linear-gradient(170deg,rgba(207,250,254,.6) 0%,rgba(236,254,255,.4) 100%)}
+#tab-cldv{background:linear-gradient(170deg,rgba(255,228,230,.6) 0%,rgba(255,241,242,.4) 100%)}
 @media(max-width:600px){.tab-pane{padding:10px 8px;border-radius:12px}}
 
 /* KPI CARDS — compact (~1/3 cũ), nền màu nổi bật số liệu */
@@ -715,16 +715,16 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
     <div class="tabs">
       <button class="tab active" onclick="switchTab('overview',this)">📊 Tổng quan</button>
       <button class="tab" onclick="switchTab('gdv',this)">👤 Theo GĐV</button>
-      <button class="tab" onclick="switchTab('aging',this)">⏳ Phân loại tồn</button>
       <button class="tab" onclick="switchTab('baocao',this)">📋 Báo cáo XO</button>
-      <button class="tab" onclick="switchTab('infographic',this)">🗺️ Phân tích</button>
+      <button class="tab" onclick="switchTab('infographic',this)">🚨 Tổng hợp cảnh báo</button>
+      <button class="tab" onclick="switchTab('cldv',this)">💡 Đề xuất cải tiến CLDV</button>
     </div>
 
     <div id="tab-overview" class="tab-pane"></div>
     <div id="tab-gdv" class="tab-pane" style="display:none"></div>
-    <div id="tab-aging" class="tab-pane" style="display:none"></div>
     <div id="tab-baocao" class="tab-pane" style="display:none"></div>
     <div id="tab-infographic" class="tab-pane" style="display:none"></div>
+    <div id="tab-cldv" class="tab-pane" style="display:none"></div>
   </div>
 
   <footer>
@@ -1288,7 +1288,7 @@ function renderAll(){
   const data=getFiltered();const s=computeStats(data);
   document.getElementById('filter-info').textContent=`Đang hiển thị ${data.length} / ${RAW.length} hồ sơ`;
   destroyCharts();
-  renderOverview(s);renderGdv(s);renderAging(s);renderBaoCao(s);renderInfographic(s);
+  renderOverview(s);renderGdv(s);renderBaoCao(s);renderInfographic(s);renderCLDV(s);
   // Tải sheet TLBT song song (không block render chính)
   loadTlbtSheet();
 }
@@ -1784,49 +1784,6 @@ function generateAnalysis(s){
   </div>`;
 }
 
-function renderAging(s){
-  const el=document.getElementById('tab-aging');
-  const rows=s.gdvStats.map(g=>`<tr>
-    <td><span class="mono">${g.code}</span></td><td>${g.name}</td>
-    <td class="center" style="color:var(--green)">${g.g30}</td>
-    <td class="center" style="color:var(--amber)">${g.g30_45}</td>
-    <td class="center" style="color:var(--orange)">${g.g45_90}</td>
-    <td class="center" style="color:${g.qua90?'var(--red)':'inherit'};font-weight:${g.qua90?700:400}">${g.qua90}</td>
-    <td class="center">${g.avg||'–'} ngày</td>
-  </tr>`).join('');
-  el.innerHTML=`
-    <div class="kpi-grid">
-      ${kpi(fmtN(s.buckets.b1),'Tồn 1–30 ngày','trong hạn','green')}
-      ${kpi(fmtN(s.buckets.b2),'Tồn 31–45 ngày','sắp hạn','amber')}
-      ${kpi(fmtN(s.buckets.b3),'Tồn 46–90 ngày','quá hạn','orange')}
-      ${kpi(fmtN(s.buckets.b4),'Tồn >90 ngày','nguy hiểm','red')}
-      ${kpi(s.avgDays+' ngày','TB ngày tồn','hồ sơ đang tồn','purple')}
-    </div>
-    <div class="chart-row">
-      <div class="chart-card"><h3>Phân phối tồn theo khoảng ngày</h3><div class="chart-wrap"><canvas id="chart-bar-age"></canvas></div></div>
-      <div class="chart-card"><h3>Tỷ lệ trong hạn vs quá hạn</h3><div class="chart-wrap-pie"><canvas id="chart-donut-age2"></canvas></div></div>
-    </div>
-    <div class="table-card" style="margin-bottom:24px">
-      <h3>Chi tiết tồn theo từng GĐV</h3>
-      <table><thead><tr>
-        <th>Mã GĐV</th><th>Họ tên</th>
-        <th class="center">≤30 ngày</th><th class="center">31–45 ngày</th>
-        <th class="center">46–90 ngày</th><th class="center">>90 ngày</th><th class="center">TB ngày tồn</th>
-      </tr></thead><tbody>${rows}</tbody></table>
-    </div>
-  `;
-  setTimeout(()=>{
-    buildBar('chart-bar-age',['1–30 ngày','31–45 ngày','46–89 ngày','≥90 ngày'],[
-      {label:'Số hồ sơ tồn',
-       data:[s.buckets.b1,s.buckets.b2,s.buckets.b3,s.buckets.b4],
-       backgroundColor:['#10b981','#f59e0b','#f97316','#ef4444']}]);
-    buildDonut('chart-donut-age2',
-      ['Trong hạn ≤45','Quá hạn 46–89 ngày','≥90 ngày'],
-      [s.duoi45,s.buckets.b3,s.buckets.b4],
-      ['#059669','#f97316','#dc2626']);
-  },10);
-}
-
 // TAB 4: BÁO CÁO XO
 function renderBaoCao(s){
   const el=document.getElementById('tab-baocao');
@@ -1989,7 +1946,7 @@ function fmtMBC(v){
 function switchTab(name,btn){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
-  ['overview','gdv','aging','baocao','infographic'].forEach(t=>{
+  ['overview','gdv','baocao','infographic','cldv'].forEach(t=>{
     document.getElementById('tab-'+t).style.display=t===name?'block':'none';
   });
 }
@@ -2175,6 +2132,253 @@ function renderInfographic(s){
       </div>
     </div>
     ${s?generateAnalysis(s):''}`;
+}
+
+// ─── TAB: ĐỀ XUẤT CẢI TIẾN CLDV ─────────────────────────────────────────────
+function renderCLDV(s){
+  const el=document.getElementById('tab-cldv');
+  if(!RAW.length){el.innerHTML='<p style="padding:20px;color:var(--text2)">Không có dữ liệu.</p>';return;}
+  const data=s.rows;
+  const now=new Date();
+  const month=now.getMonth()+1;
+  const year=now.getFullYear();
+
+  // Trạng thái hồ sơ
+  const dangXL=data.filter(r=>!isResolved(r));
+
+  // Ngày bảo lãnh — thử nhiều tên cột
+  const hasBaoLanh=data.some(r=>r['Ngày bảo lãnh']||r['Ngày BL']||r['Ngày cấp BL']);
+  function getNgayBL(r){return parseDate(r['Ngày bảo lãnh']||r['Ngày BL']||r['Ngày cấp BL']||null);}
+  let avgChuKy=0,chuKyCount=0;
+  if(hasBaoLanh){
+    data.forEach(r=>{
+      const mo=parseDate(r['Ngày mở HSBT']);const bl=getNgayBL(r);
+      if(mo&&bl&&bl>=mo){avgChuKy+=Math.round((bl-mo)/86400000);chuKyCount++;}
+    });
+    if(chuKyCount)avgChuKy=Math.round(avgChuKy/chuKyCount*10)/10;
+  }
+
+  // KPI tổng hợp
+  const tyLeDungHan=s.ton>0?Math.round((s.buckets.b1+s.buckets.b2)/s.ton*100):0;
+  const tongUocBT=data.reduce((a,r)=>a+parseMoney(r['Tiền ước/duyệt BT']),0);
+  const tienDaTra=data.reduce((a,r)=>a+parseMoney(r['Tiền BT đã trả cho KH '])+parseMoney(r['Tiền BT đã trả cho GR']),0);
+  const tienTreo=Math.max(tongUocBT-tienDaTra,0);
+
+  // Bảng Trạng thái hồ sơ
+  const ttMap={};
+  data.forEach(r=>{
+    const tt=String(r['Trạng thái hồ sơ']||'Không rõ').trim();
+    if(!ttMap[tt])ttMap[tt]={count:0,tienUoc:0,tienDaTra:0};
+    ttMap[tt].count++;
+    ttMap[tt].tienUoc+=parseMoney(r['Tiền ước/duyệt BT']);
+    ttMap[tt].tienDaTra+=parseMoney(r['Tiền BT đã trả cho KH '])+parseMoney(r['Tiền BT đã trả cho GR']);
+  });
+  const ttRows=Object.entries(ttMap).sort((a,b)=>b[1].count-a[1].count).map(([tt,d])=>`
+    <tr><td>${tt}</td><td class="center"><b>${fmtN(d.count)}</b></td>
+    <td class="center">${data.length?Math.round(d.count/data.length*100):0}%</td>
+    <td class="right" style="font-family:'JetBrains Mono',monospace">${fmtMBC(d.tienUoc)}</td>
+    <td class="right" style="font-family:'JetBrains Mono',monospace;color:var(--green)">${fmtMBC(d.tienDaTra)}</td></tr>`).join('');
+
+  // GĐV năng suất
+  const gdvList=s.gdvStats.filter(g=>g.total>0).sort((a,b)=>b.ton-a.ton);
+  const gdvProdRows=gdvList.map(g=>{
+    const cls=g.wl===3?'hl-red':g.wl===2?'hl-amber':'';
+    const icon=g.wl===3?'🔴':g.wl===2?'🟡':'🟢';
+    return`<tr>
+      <td>${g.name}</td><td class="center">${g.total}</td>
+      <td class="center" style="color:var(--green);font-weight:600">${g.resolved}</td>
+      <td class="center ${cls}">${g.ton}</td>
+      <td class="center" style="color:${g.qua90?'var(--red)':'inherit'};font-weight:${g.qua90?700:400}">${g.qua90}</td>
+      <td class="center">${g.avg||'–'} ngày</td>
+      <td class="center" style="font-size:.72rem">${icon} ${g.wlabel}</td>
+    </tr>`;
+  }).join('');
+
+  // Gara có HS tồn nhiều nhất
+  const garaTonMap={};
+  data.forEach(r=>{
+    const n=parseTon(r['Số ngày tồn']);if(n===null)return;
+    const gr=String(r['Tên garage']||'').trim();if(!gr)return;
+    if(!garaTonMap[gr])garaTonMap[gr]={name:gr,count:0};
+    garaTonMap[gr].count++;
+  });
+  const topGaraTon=Object.values(garaTonMap).sort((a,b)=>b.count-a.count).slice(0,8);
+
+  // Giá trị BT nhóm (HS đang xử lý)
+  const btNho=dangXL.filter(r=>parseMoney(r['Tiền ước/duyệt BT'])<10e6).length;
+  const btTB=dangXL.filter(r=>{const v=parseMoney(r['Tiền ước/duyệt BT']);return v>=10e6&&v<50e6}).length;
+  const btLon=dangXL.filter(r=>parseMoney(r['Tiền ước/duyệt BT'])>=50e6).length;
+
+  // === ĐỀ XUẤT ĐỘNG ===
+  const suggest1=[];
+  if(s.buckets.b4>0)suggest1.push(`<b>Xóa tồn ≥90 ngày trong 14 ngày:</b> có ${fmtN(s.buckets.b4)} hồ sơ vượt ngưỡng — giao đích danh từng GĐV, yêu cầu báo cáo tiến độ hàng ngày và hoàn thành trước ${new Date(now.getTime()+14*86400000).toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit'})}.`);
+  if(s.buckets.b3>0)suggest1.push(`<b>Kiểm soát "cửa sổ vàng" 46–89 ngày:</b> ${fmtN(s.buckets.b3)} HS đang tiến vào vùng nguy hiểm — thiết lập checklist bắt buộc ở mốc 30 ngày để can thiệp trước khi vượt 90 ngày.`);
+  suggest1.push(`<b>Chuẩn hóa quy trình cấp bảo lãnh:</b> ban hành mẫu hồ sơ thống nhất, đặt SLA${hasBaoLanh&&avgChuKy>30?` dưới ${Math.ceil(avgChuKy*0.8)} ngày (rút từ ${avgChuKy} ngày hiện tại)`:' tối đa 30 ngày từ mở HS → cấp bảo lãnh'} cho nghiệp vụ VCX.`);
+
+  const overloaded=s.gdvStats.filter(g=>g.wl>=2);
+  const optimal=s.gdvStats.filter(g=>g.wl===1);
+  const suggest2=[];
+  if(overloaded.length)suggest2.push(`<b>Tái phân bổ tức thời:</b> ${overloaded.map(g=>`${g.name} (${g.ton} HS tồn — Cấp độ ${g.wl})`).join('; ')} đang quá tải — chuyển HS phát sinh mới sang ${optimal.length?optimal.map(g=>g.name).join(', '):'GĐV còn năng lực'}.`);
+  suggest2.push(`<b>Chỉ tiêu tuần minh bạch:</b> mỗi GĐV cam kết số HS đóng/tuần vào sáng thứ Hai, kết quả công bố trong họp nhóm — tạo nhịp giảm tồn liên tục thay vì dồn cuối tháng.`);
+  suggest2.push(`<b>Giảm tồn VCX:</b> chu kỳ VCX phụ thuộc gara sửa chữa — HS VCX tồn >45 ngày cần xác định rõ điểm nghẽn (chứng từ · phê duyệt · chờ sửa chữa) để xử lý đúng nguyên nhân gốc.`);
+
+  const suggest3=[];
+  if(topGaraTon.length)suggest3.push(`<b>SLA với đối tác Gara:</b> <b>${topGaraTon[0].name}</b> (${topGaraTon[0].count} HS tồn) và các gara top — ký cam kết hoàn chứng từ trong 7 ngày; vi phạm 3 lần liên tiếp → xem xét tạm dừng điều phối xe mới.`);
+  if(btLon>0)suggest3.push(`<b>Theo dõi HS giá trị lớn (≥50 triệu đ):</b> có ${btLon} HS đang xử lý — trưởng nhóm trực tiếp phụ trách, chủ động thông báo tiến độ cho khách hàng mỗi 7 ngày.`);
+  suggest3.push(`<b>Thông báo chủ động qua SMS/email:</b> tự động cập nhật tiến độ hồ sơ tại mốc 7, 15, 30 ngày — giảm cuộc gọi hỏi thăm và tăng hài lòng khách hàng.`);
+  suggest3.push(`<b>Khảo sát hài lòng sau đóng HS:</b> gửi form ngắn 3 câu khi hồ sơ được thanh toán — dữ liệu phản hồi thực tế giúp cải tiến quy trình liên tục.`);
+
+  function suggestList(arr,borderColor,bgColor,numBg){
+    return arr.map((sg,i)=>`<li style="font-size:.82rem;line-height:1.7;color:#334155;padding:7px 12px 7px 36px;position:relative;background:#fff;border-radius:6px;border-left:3px solid ${borderColor}"><span style="position:absolute;left:10px;top:7px;width:18px;height:18px;background:${numBg};color:#fff;border-radius:50%;font-size:.62rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center">${i+1}</span>${sg}</li>`).join('');
+  }
+
+  el.innerHTML=`
+    <div style="background:linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#be185d 100%);border-radius:12px;padding:20px 24px;margin-bottom:20px;color:#fff">
+      <div style="font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:4px">ĐỀ XUẤT CẢI TIẾN CHẤT LƯỢNG DỊCH VỤ · PTISOS QUẢNG NINH · T${month}/${year}</div>
+      <div style="font-size:1.1rem;font-weight:700;margin-bottom:3px">Phân tích 3 trục: Chất lượng dịch vụ · Hiệu quả & Năng suất · Quan hệ khách hàng</div>
+      <div style="font-size:.8rem;color:rgba(255,255,255,.65);line-height:1.5;margin-bottom:14px">Từ ${fmtN(data.length)} hồ sơ bồi thường xe cơ giới tại Khu vực Quảng Ninh${hasBaoLanh?' — có dữ liệu Ngày bảo lãnh':''} · Phân tích từ ngày mở HS đến ${hasBaoLanh?'ngày cấp bảo lãnh':'trạng thái hiện tại'}.</div>
+      <div class="kpi-grid" style="margin-bottom:0">
+        ${kpi(fmtN(dangXL.length),'HS đang xử lý','chưa giải quyết','blue')}
+        ${kpi(tyLeDungHan+'%','Đúng hạn ≤45 ngày','trong tổng tồn','green')}
+        ${kpi(fmtMBC(tienTreo),'Tiền BT còn treo','ước – đã chi trả','amber')}
+        ${kpi(s.avgDays+' ngày','TB ngày tồn','hồ sơ đang tồn','purple')}
+      </div>
+    </div>
+
+    <!-- TRỤC 1: CHẤT LƯỢNG DỊCH VỤ -->
+    <div style="background:linear-gradient(135deg,#fff7ed,#fff);border:2px solid #fb923c;border-radius:12px;padding:18px 20px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+        <span style="font-size:1.4rem">🎯</span>
+        <div>
+          <div style="font-size:.72rem;font-weight:700;color:#ea580c;text-transform:uppercase;letter-spacing:.06em">TRỤC 1</div>
+          <div style="font-size:1rem;font-weight:700;color:#1e293b">CHẤT LƯỢNG DỊCH VỤ</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <div style="font-size:.7rem;color:#94a3b8">${hasBaoLanh?'TB chu kỳ từ mở HS → BL':'Tồn quá hạn (>45 ngày)'}</div>
+          <div style="font-size:.88rem;font-weight:700;color:#ea580c">${hasBaoLanh?`${avgChuKy} ngày/HS`:`${fmtN(s.buckets.b3+s.buckets.b4)} HS`}</div>
+        </div>
+      </div>
+      <div style="font-size:.78rem;color:#64748b;margin-bottom:14px;padding-left:44px">Phân tích thời hạn từ <b>ngày nhận hồ sơ</b> đến <b>${hasBaoLanh?'ngày cấp bảo lãnh':'trạng thái xử lý hiện tại'}</b> — chỉ số cốt lõi đo chất lượng phục vụ khách hàng.</div>
+      <div class="chart-row">
+        <div class="chart-card"><h3>Phân phối thời gian tồn hồ sơ</h3><div class="chart-wrap"><canvas id="cldv-c1"></canvas></div></div>
+        <div class="chart-card"><h3>Cơ cấu đúng hạn / quá hạn</h3><div class="chart-wrap-pie"><canvas id="cldv-c2"></canvas></div></div>
+      </div>
+      <div class="table-card" style="margin-bottom:14px">
+        <h3>Phân loại theo Trạng thái Hồ sơ</h3>
+        <table><thead><tr>
+          <th>Trạng thái</th><th class="center">Số HS</th><th class="center">Tỷ lệ</th>
+          <th class="right">Tiền ước BT</th><th class="right">Đã chi trả</th>
+        </tr></thead><tbody>${ttRows}</tbody></table>
+      </div>
+      <div style="background:#fff7ed;border-left:4px solid #ea580c;border-radius:0 8px 8px 0;padding:12px 16px">
+        <div style="font-size:.72rem;font-weight:700;color:#ea580c;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">💡 Đề xuất — Chất lượng dịch vụ</div>
+        <ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px">${suggestList(suggest1,'#f97316','#fff7ed','#ea580c')}</ol>
+      </div>
+    </div>
+
+    <!-- TRỤC 2: HIỆU QUẢ & NĂNG SUẤT -->
+    <div style="background:linear-gradient(135deg,#f0fdf4,#fff);border:2px solid #34d399;border-radius:12px;padding:18px 20px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+        <span style="font-size:1.4rem">⚡</span>
+        <div>
+          <div style="font-size:.72rem;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.06em">TRỤC 2</div>
+          <div style="font-size:1rem;font-weight:700;color:#1e293b">HIỆU QUẢ & NĂNG SUẤT</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <div style="font-size:.7rem;color:#94a3b8">GĐV đang hoạt động</div>
+          <div style="font-size:.88rem;font-weight:700;color:#059669">${gdvList.length} GĐV / ${fmtN(s.total)} HS</div>
+        </div>
+      </div>
+      <div style="font-size:.78rem;color:#64748b;margin-bottom:14px;padding-left:44px">Đánh giá năng suất từng Giám định viên và cơ cấu nghiệp vụ — cơ sở phân bổ nguồn lực tối ưu và xác định người cần hỗ trợ.</div>
+      <div class="chart-row">
+        <div class="chart-card"><h3>Hồ sơ tồn theo từng GĐV</h3><div class="chart-wrap"><canvas id="cldv-c3"></canvas></div></div>
+        <div class="chart-card"><h3>Cơ cấu nghiệp vụ — HS đang xử lý</h3><div class="chart-wrap-pie"><canvas id="cldv-c4"></canvas></div></div>
+      </div>
+      <div class="table-card" style="margin-bottom:14px">
+        <h3>Hiệu suất từng Giám định viên</h3>
+        <table><thead><tr>
+          <th>GĐV</th><th class="center">Tổng HS</th><th class="center">Đã GQ</th>
+          <th class="center">Đang tồn</th><th class="center">≥90 ngày</th>
+          <th class="center">TB tồn</th><th class="center">Mức độ</th>
+        </tr></thead><tbody>${gdvProdRows}</tbody></table>
+      </div>
+      <div style="background:#f0fdf4;border-left:4px solid #34d399;border-radius:0 8px 8px 0;padding:12px 16px">
+        <div style="font-size:.72rem;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">💡 Đề xuất — Hiệu quả & Năng suất</div>
+        <ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px">${suggestList(suggest2,'#34d399','#f0fdf4','#059669')}</ol>
+      </div>
+    </div>
+
+    <!-- TRỤC 3: QUAN HỆ KHÁCH HÀNG -->
+    <div style="background:linear-gradient(135deg,#eff6ff,#fff);border:2px solid #60a5fa;border-radius:12px;padding:18px 20px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+        <span style="font-size:1.4rem">🤝</span>
+        <div>
+          <div style="font-size:.72rem;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:.06em">TRỤC 3</div>
+          <div style="font-size:1rem;font-weight:700;color:#1e293b">QUAN HỆ KHÁCH HÀNG</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <div style="font-size:.7rem;color:#94a3b8">Tiền BT còn treo</div>
+          <div style="font-size:.88rem;font-weight:700;color:#1565C0">${fmtMBC(tienTreo)}</div>
+        </div>
+      </div>
+      <div style="font-size:.78rem;color:#64748b;margin-bottom:14px;padding-left:44px">Phân tích đối tác Gara/Showroom và phân loại giá trị bồi thường — nhận diện điểm nghẽn ảnh hưởng trực tiếp đến trải nghiệm khách hàng.</div>
+      <div class="chart-row">
+        <div class="chart-card"><h3>Top Gara/Showroom có HS tồn nhiều nhất</h3><div class="chart-wrap"><canvas id="cldv-c5"></canvas></div></div>
+        <div class="chart-card"><h3>Cơ cấu HS theo giá trị bồi thường</h3><div class="chart-wrap-pie"><canvas id="cldv-c6"></canvas></div></div>
+      </div>
+      <div style="background:#eff6ff;border-left:4px solid #60a5fa;border-radius:0 8px 8px 0;padding:12px 16px">
+        <div style="font-size:.72rem;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">💡 Đề xuất — Quan hệ khách hàng</div>
+        <ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px">${suggestList(suggest3,'#60a5fa','#eff6ff','#1565C0')}</ol>
+      </div>
+    </div>
+
+    <div style="font-size:.7rem;color:#94a3b8;text-align:center;padding:6px 0">
+      Phân tích tự động · T${month}/${year} · PTISOS Quảng Ninh${!hasBaoLanh?' &nbsp;·&nbsp; <i>Chưa có cột "Ngày bảo lãnh" trong dữ liệu — chu kỳ xử lý dùng Số ngày tồn làm proxy</i>':''}
+    </div>
+  `;
+
+  setTimeout(()=>{
+    // C1: Phân phối thời gian tồn (bar)
+    buildBar('cldv-c1',['1–30 ngày','31–45 ngày','46–89 ngày','≥90 ngày'],
+      [{label:'Số HS tồn',data:[s.buckets.b1,s.buckets.b2,s.buckets.b3,s.buckets.b4],
+        backgroundColor:['#10b981','#f59e0b','#f97316','#ef4444']}]);
+
+    // C2: Đúng hạn vs quá hạn (donut)
+    buildDonut('cldv-c2',
+      ['Trong hạn ≤30','Sắp hạn 31–45','Quá hạn 46–89','≥90 ngày'],
+      [s.buckets.b1,s.buckets.b2,s.buckets.b3,s.buckets.b4],
+      ['#10b981','#f59e0b','#f97316','#ef4444']);
+
+    // C3: Tồn theo GĐV — màu theo mức độ
+    const tonGdv=gdvList.filter(g=>g.ton>0);
+    if(tonGdv.length){
+      const wlColors=tonGdv.map(g=>g.wl===3?'#ef4444':g.wl===2?'#f97316':'#10b981');
+      buildBar('cldv-c3',tonGdv.map(g=>g.name.split(' ').pop()),
+        [{label:'HS đang tồn',data:tonGdv.map(g=>g.ton),backgroundColor:wlColors}]);
+    }
+
+    // C4: VCX vs TNDS trong HS đang xử lý
+    const vcxXL=dangXL.filter(r=>String(r['Mã nghiệp vụ']||'').startsWith('XO.4')).length;
+    const tndsXL=dangXL.filter(r=>String(r['Mã nghiệp vụ']||'').startsWith('XO.1')).length;
+    const khacXL=dangXL.length-vcxXL-tndsXL;
+    const nvL=[],nvD=[],nvC=[];
+    if(vcxXL>0){nvL.push('VCX (Vật chất xe)');nvD.push(vcxXL);nvC.push('#60a5fa');}
+    if(tndsXL>0){nvL.push('TNDS (Dân sự)');nvD.push(tndsXL);nvC.push('#6d28d9');}
+    if(khacXL>0){nvL.push('Nghiệp vụ khác');nvD.push(khacXL);nvC.push('#94a3b8');}
+    if(nvD.length)buildDonut('cldv-c4',nvL,nvD,nvC);
+
+    // C5: Top gara có HS tồn (bar)
+    if(topGaraTon.length)
+      buildBar('cldv-c5',topGaraTon.map(g=>g.name.length>18?g.name.substring(0,17)+'…':g.name),
+        [{label:'Số HS tồn',data:topGaraTon.map(g=>g.count)}]);
+
+    // C6: Giá trị bồi thường (donut)
+    const btL=[],btD=[],btC=[];
+    if(btNho>0){btL.push('<10 triệu');btD.push(btNho);btC.push('#34d399');}
+    if(btTB>0){btL.push('10–50 triệu');btD.push(btTB);btC.push('#f59e0b');}
+    if(btLon>0){btL.push('≥50 triệu');btD.push(btLon);btC.push('#ef4444');}
+    if(btD.length)buildDonut('cldv-c6',btL,btD,btC);
+  },10);
 }
 
 // ─── CHARTS ──────────────────────────────────────────────────────────────────
