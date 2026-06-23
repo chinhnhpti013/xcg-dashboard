@@ -2209,31 +2209,62 @@ function renderCLDV(s){
   const btTB=dangXL.filter(r=>{const v=parseMoney(r['Tiền ước/duyệt BT']);return v>=10e6&&v<50e6}).length;
   const btLon=dangXL.filter(r=>parseMoney(r['Tiền ước/duyệt BT'])>=50e6).length;
 
-  // === NỘI DUNG ĐỀ XUẤT ===
+  // === SỐ LIỆU CỤ THỂ CHO ĐỀ XUẤT ===
+  const soTon=s.ton;                                  // tổng HS đang tồn
+  const so90=s.buckets.b4;                            // ≥90 ngày
+  const so4589=s.buckets.b3;                          // 46–89 ngày
+  const soQuaHan=s.buckets.b3+s.buckets.b4;           // >45 ngày
+  const tyLeQuaHan=soTon>0?Math.round(soQuaHan/soTon*100):0;
+  const tyLeGQ=data.length>0?Math.round(s.resolved/data.length*100):0;
+  const btNhoPct=dangXL.length>0?Math.round(btNho/dangXL.length*100):0;
+  const tbHsGdv=gdvList.length>0?Math.round(data.length/gdvList.length):0;
+  // Cân bằng tải: GĐV tồn nhiều nhất vs ít nhất (chỉ tính người còn tồn)
+  const tonGdvSorted=gdvList.filter(g=>g.ton>0).sort((a,b)=>b.ton-a.ton);
+  const gdvMax=tonGdvSorted[0]||null;
+  const gdvMin=tonGdvSorted.length>1?tonGdvSorted[tonGdvSorted.length-1]:null;
+  const chenhLan=gdvMax&&gdvMin&&gdvMin.ton>0?(gdvMax.ton/gdvMin.ton).toFixed(1):null;
+  const soGdvCo90=gdvList.filter(g=>g.qua90>0).length;
+  const garaTop=topGaraTon[0]||null;
+  const lastName=g=>g?g.name.split(' ').pop():'';
+  // Mục tiêu định lượng kỳ tới
+  const mtTuan90=so90>0?Math.max(Math.ceil(so90*0.25),1):0;       // tuần: đóng ≥25% nhóm ≥90 ngày
+  const mtThangQuaHan=Math.ceil(soQuaHan*0.3);                    // tháng: giảm 30% tồn >45 ngày
+  const mtThangQuaHanConLai=Math.max(soQuaHan-mtThangQuaHan,0);
+  const mtThangGQ=Math.min(tyLeGQ+5,100);                        // tháng: +5 điểm tỷ lệ GQ
+  const mtQuyAvg=Math.max(Math.round(s.avgDays*0.8),1);          // quý: TB tồn giảm ~20%, luôn thấp hơn hiện tại
+  const mtQuyTreo=Math.round(tienTreo*0.6);                      // quý: giảm ~40% tiền treo
+  const mtQuyQuaHanPct=Math.max(Math.round(tyLeQuaHan*0.7),0);   // quý: tỷ lệ quá hạn giảm ~30%, luôn thấp hơn hiện tại
+  // Helper tô số liệu nổi bật theo tông màu từng trục
+  const hl=(v,c)=>`<span style="font-weight:800;color:${c}">${v}</span>`;
+  const h1=v=>hl(v,'#c2410c'); // Trục 1 — cam
+  const h2=v=>hl(v,'#047857'); // Trục 2 — xanh lá
+  const h3=v=>hl(v,'#1565C0'); // Trục 3 — xanh dương
+
+  // === NỘI DUNG ĐỀ XUẤT (gắn số liệu thực tế) ===
   const suggest1=[
-    `<b>Chuẩn hóa quy trình giám định:</b> ban hành checklist giám định hiện trường thống nhất (ảnh tổn thất, biên bản, xác minh nguyên nhân) để mọi GĐV làm đúng và đủ ngay từ đầu, giảm hồ sơ phải bổ sung.`,
-    `<b>Nâng chất lượng hồ sơ đầu vào:</b> hướng dẫn khách hàng/gara chuẩn bị đúng giấy tờ ngay từ khâu khai báo, tránh trả đi trả lại nhiều lần.`,
-    `<b>Kiểm soát chất lượng (QC) nội bộ:</b> rà soát ngẫu nhiên hồ sơ đã duyệt để phát hiện lỗi định mức, lỗi áp dụng điều khoản, từ đó đào tạo lại điểm yếu lặp lại.`,
-    `<b>Minh bạch định giá tổn thất:</b> áp dụng biểu giá vật tư/công sửa chữa nhất quán giữa các GĐV và gara, giảm tranh cãi và cảm giác "mỗi người một giá".`,
-    `<b>Số hóa lưu trữ:</b> lưu hồ sơ điện tử có thể tra cứu nhanh, phục vụ kiểm tra, đối soát và giải trình khi cần.`,
+    `<b>Chuẩn hóa quy trình giám định:</b> hiện có ${h1(fmtN(so90))} HS tồn ≥90 ngày và ${h1(fmtN(soQuaHan))} HS quá hạn (>45 ngày, chiếm ${h1(tyLeQuaHan+'%')} hồ sơ đang tồn) — ban hành checklist giám định hiện trường thống nhất (ảnh tổn thất, biên bản, xác minh nguyên nhân) để mọi GĐV làm đúng và đủ ngay từ đầu, giảm hồ sơ phải bổ sung.`,
+    `<b>Nâng chất lượng hồ sơ đầu vào:</b> ${h1(fmtN(dangXL.length))} HS đang xử lý là nguồn rủi ro phát sinh tồn — hướng dẫn khách hàng/gara chuẩn bị đúng giấy tờ ngay từ khâu khai báo, tránh trả đi trả lại nhiều lần.`,
+    `<b>Kiểm soát chất lượng (QC) nội bộ:</b> rà soát ngẫu nhiên trong ${h1(fmtN(s.resolved))} HS đã giải quyết (tỷ lệ GQ ${h1(tyLeGQ+'%')}) để phát hiện lỗi định mức, lỗi áp dụng điều khoản, từ đó đào tạo lại điểm yếu lặp lại.`,
+    `<b>Minh bạch định giá tổn thất:</b> tổng giá trị ước/duyệt BT đang quản lý ${h1(fmtMBC(tongUocBT))} — áp dụng biểu giá vật tư/công sửa chữa nhất quán giữa các GĐV và gara, giảm tranh cãi và cảm giác "mỗi người một giá".`,
+    `<b>Số hóa lưu trữ:</b> toàn bộ ${h1(fmtN(data.length))} hồ sơ cần được lưu điện tử, tra cứu nhanh, phục vụ kiểm tra, đối soát và giải trình khi cần.`,
   ];
 
   const suggest2=[
-    `<b>Rút ngắn thời gian xử lý (TAT):</b> đặt mốc thời gian cho từng khâu (tiếp nhận → giám định → duyệt giá → bồi thường) và theo dõi bằng dashboard để phát hiện điểm nghẽn.`,
-    `<b>Phân loại hồ sơ theo độ phức tạp:</b> hồ sơ đơn giản, giá trị nhỏ xử lý nhanh theo luồng riêng (fast-track); hồ sơ lớn/nghi vấn mới đưa vào quy trình kỹ.`,
-    `<b>Tự động hóa văn bản và báo cáo:</b> dùng công cụ tạo biên bản, ghép ảnh, báo cáo tự động để GĐV tập trung vào nghiệp vụ thay vì soạn thảo thủ công.`,
-    `<b>Cân bằng tải công việc:</b> phân bổ hồ sơ theo năng lực và khối lượng tồn của từng GĐV, tránh người quá tải, người nhàn rỗi.`,
-    `<b>Theo dõi tồn đọng (aging):</b> cảnh báo sớm các hồ sơ quá hạn để ưu tiên xử lý, không để dồn cuối kỳ.`,
-    `<b>Đo lường năng suất:</b> thống kê số hồ sơ/GĐV, thời gian trung bình, tỷ lệ hồ sơ phải làm lại — làm cơ sở cải tiến và đánh giá.`,
+    `<b>Rút ngắn thời gian xử lý (TAT):</b> TB ngày tồn hiện ${h2(s.avgDays+' ngày')}/HS — đặt mốc thời gian (SLA) cho từng khâu (tiếp nhận → giám định → duyệt giá → bồi thường) và theo dõi bằng dashboard để phát hiện điểm nghẽn.`,
+    `<b>Phân loại hồ sơ theo độ phức tạp:</b> ${h2(fmtN(btNho))} HS giá trị <10 triệu (chiếm ${h2(btNhoPct+'%')} HS đang xử lý) có thể đưa vào luồng nhanh (fast-track); ${h2(fmtN(btLon))} HS ≥50 triệu mới đưa vào quy trình kỹ.`,
+    `<b>Tự động hóa văn bản và báo cáo:</b> dùng công cụ tạo biên bản, ghép ảnh, báo cáo tự động để ${h2(gdvList.length+' GĐV')} tập trung vào nghiệp vụ thay vì soạn thảo thủ công.`,
+    `<b>Cân bằng tải công việc:</b> ${gdvMax&&gdvMin&&chenhLan?`GĐV tồn nhiều nhất (${lastName(gdvMax)}) đang giữ ${h2(gdvMax.ton+' HS')}, gấp ${h2(chenhLan+' lần')} người thấp nhất (${lastName(gdvMin)}, ${gdvMin.ton} HS) — `:``}phân bổ hồ sơ theo năng lực và khối lượng tồn, tránh người quá tải, người nhàn rỗi.`,
+    `<b>Theo dõi tồn đọng (aging):</b> ${h2(fmtN(so90))} HS ≥90 ngày và ${h2(fmtN(so4589))} HS 46–89 ngày cần cảnh báo sớm để ưu tiên xử lý, không để dồn cuối kỳ.`,
+    `<b>Đo lường năng suất:</b> bình quân ${h2(fmtN(tbHsGdv)+' HS/GĐV')} (${gdvList.length} GĐV / ${fmtN(data.length)} HS) — thống kê số hồ sơ, thời gian trung bình, tỷ lệ hồ sơ phải làm lại làm cơ sở cải tiến và đánh giá.`,
   ];
 
   const suggest3=[
-    `<b>Chủ động cập nhật tiến độ:</b> thông báo cho khách hàng tại các mốc quan trọng (đã giám định, đã duyệt giá, sắp chi trả) thay vì để khách hàng tự liên hệ hỏi.`,
-    `<b>Một đầu mối liên hệ:</b> mỗi hồ sơ có người phụ trách rõ ràng để khách hàng không bị "đẩy qua đẩy lại".`,
-    `<b>Giải thích minh bạch khi từ chối/giảm trừ:</b> nêu rõ căn cứ hợp đồng và lý do, kèm hướng xử lý tiếp theo để giảm khiếu nại.`,
-    `<b>Rút ngắn thời gian chi trả:</b> đây là yếu tố ảnh hưởng lớn nhất đến cảm nhận của khách hàng về dịch vụ.`,
-    `<b>Thu thập phản hồi sau bồi thường:</b> khảo sát mức độ hài lòng để phát hiện vấn đề và cải tiến liên tục.`,
-    `<b>Đào tạo kỹ năng giao tiếp cho GĐV:</b> đặc biệt khi xử lý khách hàng đang căng thẳng sau tai nạn, giữ thái độ chuyên nghiệp và đồng cảm.`,
+    `<b>Chủ động cập nhật tiến độ:</b> ${h3(fmtN(dangXL.length))} HS đang xử lý cần được thông báo tại các mốc quan trọng (đã giám định, đã duyệt giá, sắp chi trả) thay vì để khách hàng tự liên hệ hỏi.`,
+    `<b>Một đầu mối liên hệ:</b> ${garaTop?`riêng đối tác "${garaTop.name}" đang có ${h3(garaTop.count+' HS')} tồn — `:``}mỗi hồ sơ cần người phụ trách rõ ràng để khách hàng không bị "đẩy qua đẩy lại".`,
+    `<b>Giải thích minh bạch khi từ chối/giảm trừ:</b> ${h3(fmtN(so90))} HS tồn ≥90 ngày là nhóm dễ phát sinh khiếu nại nhất — nêu rõ căn cứ hợp đồng và lý do, kèm hướng xử lý tiếp theo.`,
+    `<b>Rút ngắn thời gian chi trả:</b> tiền BT còn treo ${h3(fmtMBC(tienTreo))} (ước – đã chi trả) — đây là yếu tố ảnh hưởng lớn nhất đến cảm nhận của khách hàng về dịch vụ.`,
+    `<b>Thu thập phản hồi sau bồi thường:</b> ${h3(fmtN(s.resolved))} HS đã hoàn tất là tệp khảo sát mức độ hài lòng để phát hiện vấn đề và cải tiến liên tục.`,
+    `<b>Đào tạo kỹ năng giao tiếp cho GĐV:</b> ${soGdvCo90>0?`${h3(soGdvCo90+' GĐV')} đang có HS tồn ≥90 ngày, áp lực tiếp xúc khách hàng căng thẳng cao — `:``}đào tạo ${gdvList.length} GĐV giữ thái độ chuyên nghiệp và đồng cảm khi xử lý khách hàng sau tai nạn.`,
   ];
 
   function suggestList(arr,borderColor,bgColor,numBg){
@@ -2337,6 +2368,68 @@ function renderCLDV(s){
       <div style="background:#eff6ff;border-left:4px solid #60a5fa;border-radius:0 8px 8px 0;padding:12px 16px">
         <div style="font-size:.72rem;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">💡 Đề xuất — Quan hệ khách hàng</div>
         <ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px">${suggestList(suggest3,'#60a5fa','#eff6ff','#1565C0')}</ol>
+      </div>
+    </div>
+
+    <!-- KẾT LUẬN & MỤC TIÊU KẾ HOẠCH KỲ TỚI -->
+    <div style="background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 45%,#4c1d95 100%);border-radius:14px;padding:22px 24px;margin-bottom:16px;color:#fff;box-shadow:0 6px 28px rgba(30,27,75,.25)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <span style="font-size:1.5rem">🎯</span>
+        <div>
+          <div style="font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55)">KẾT LUẬN &amp; ĐỊNH HƯỚNG</div>
+          <div style="font-size:1.12rem;font-weight:800">Mục tiêu kế hoạch kỳ tới</div>
+        </div>
+      </div>
+      <div style="font-size:.82rem;line-height:1.65;color:rgba(255,255,255,.82);margin-bottom:18px;padding-left:44px">
+        Trên cơ sở phân tích ${fmtN(data.length)} hồ sơ với ${hl(fmtN(soTon)+' HS đang tồn','#fca5a5')}, trong đó ${hl(fmtN(so90)+' HS ≥90 ngày','#fca5a5')} và tiền BT còn treo ${hl(fmtMBC(tienTreo),'#fcd34d')}, định hướng cải tiến tập trung vào <b>3 trục: Chất lượng dịch vụ · Hiệu quả &amp; Năng suất · Quan hệ khách hàng</b>, cụ thể hóa thành lộ trình theo Tuần — Tháng — Quý dưới đây.
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+
+        <!-- TUẦN -->
+        <div style="background:rgba(255,255,255,.07);border:1px solid rgba(251,113,133,.5);border-radius:12px;padding:16px 18px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <span style="background:linear-gradient(135deg,#fb7185,#be123c);color:#fff;font-size:.62rem;font-weight:800;padding:3px 10px;border-radius:20px;letter-spacing:.05em">TUẦN</span>
+            <span style="font-size:.78rem;font-weight:700;color:#fecdd3">Xử lý nóng · Chặn tồn mới</span>
+          </div>
+          <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:.78rem;line-height:1.55;color:rgba(255,255,255,.88)">
+            <li style="padding-left:18px;position:relative"><span style="position:absolute;left:0;color:#fb7185">▸</span>Ưu tiên đóng nhóm già nhất: xử lý dứt điểm ít nhất ${hl(fmtN(mtTuan90)+' HS','#fda4af')} trong ${fmtN(so90)} HS tồn ≥90 ngày.</li>
+            <li style="padding-left:18px;position:relative"><span style="position:absolute;left:0;color:#fb7185">▸</span>Mỗi GĐV rà soát danh sách tồn, cam kết đóng ${hl('≥1–2 HS','#fda4af')} quá hạn/tuần.</li>
+            ${soGdvCo90>0?`<li style="padding-left:18px;position:relative"><span style="position:absolute;left:0;color:#fb7185">▸</span>${hl(soGdvCo90+' GĐV','#fda4af')} có HS ≥90 ngày báo cáo nguyên nhân &amp; kế hoạch xử lý.</li>`:``}
+            <li style="padding-left:18px;position:relative"><span style="position:absolute;left:0;color:#fb7185">▸</span>Rà soát ${hl(fmtN(so4589)+' HS','#fda4af')} tồn 46–89 ngày, xử lý sớm trước khi chuyển sang nhóm ≥90 ngày.</li>
+          </ul>
+        </div>
+
+        <!-- THÁNG -->
+        <div style="background:rgba(255,255,255,.07);border:1px solid rgba(52,211,153,.5);border-radius:12px;padding:16px 18px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <span style="background:linear-gradient(135deg,#34d399,#047857);color:#fff;font-size:.62rem;font-weight:800;padding:3px 10px;border-radius:20px;letter-spacing:.05em">THÁNG</span>
+            <span style="font-size:.78rem;font-weight:700;color:#a7f3d0">Giảm tồn · Cân bằng tải</span>
+          </div>
+          <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:.78rem;line-height:1.55;color:rgba(255,255,255,.88)">
+            <li style="padding-left:18px;position:relative"><span style="position:absolute;left:0;color:#34d399">▸</span>Giảm tồn quá hạn >45 ngày từ ${fmtN(soQuaHan)} HS xuống còn ${hl('≤'+fmtN(mtThangQuaHanConLai)+' HS','#6ee7b7')} (giảm ${fmtN(mtThangQuaHan)}).</li>
+            <li style="padding-left:18px;position:relative"><span style="position:absolute;left:0;color:#34d399">▸</span>Nâng tỷ lệ giải quyết từ ${tyLeGQ}% lên ${hl('≥'+mtThangGQ+'%','#6ee7b7')}.</li>
+            ${gdvMax&&chenhLan?`<li style="padding-left:18px;position:relative"><span style="position:absolute;left:0;color:#34d399">▸</span>Cân bằng tải: kéo chênh lệch tồn giữa GĐV cao nhất (${gdvMax.ton} HS) và thấp nhất về ${hl('≤2 lần','#6ee7b7')} (hiện ${chenhLan} lần).</li>`:``}
+            <li style="padding-left:18px;position:relative"><span style="position:absolute;left:0;color:#34d399">▸</span>Triển khai luồng fast-track cho ${hl(fmtN(btNho)+' HS','#6ee7b7')} giá trị nhỏ (<10 triệu).</li>
+          </ul>
+        </div>
+
+        <!-- QUÝ -->
+        <div style="background:rgba(255,255,255,.07);border:1px solid rgba(96,165,250,.5);border-radius:12px;padding:16px 18px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <span style="background:linear-gradient(135deg,#60a5fa,#1d4ed8);color:#fff;font-size:.62rem;font-weight:800;padding:3px 10px;border-radius:20px;letter-spacing:.05em">QUÝ</span>
+            <span style="font-size:.78rem;font-weight:700;color:#bfdbfe">Chuẩn hóa · Bền vững</span>
+          </div>
+          <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:.78rem;line-height:1.55;color:rgba(255,255,255,.88)">
+            <li style="padding-left:18px;position:relative"><span style="position:absolute;left:0;color:#60a5fa">▸</span>Đưa TB ngày tồn về ${hl('≤'+mtQuyAvg+' ngày','#93c5fd')} (hiện ${s.avgDays} ngày).</li>
+            <li style="padding-left:18px;position:relative"><span style="position:absolute;left:0;color:#60a5fa">▸</span>Giảm tiền BT còn treo ~40%: từ ${fmtMBC(tienTreo)} xuống ${hl('≤'+fmtMBC(mtQuyTreo),'#93c5fd')}.</li>
+            <li style="padding-left:18px;position:relative"><span style="position:absolute;left:0;color:#60a5fa">▸</span>Xử lý dứt điểm toàn bộ ${hl(fmtN(so90)+' HS','#93c5fd')} tồn ≥90 ngày, đưa nhóm rủi ro cao nhất về ${hl('0 HS','#93c5fd')}.</li>
+            <li style="padding-left:18px;position:relative"><span style="position:absolute;left:0;color:#60a5fa">▸</span>Hạ tỷ lệ tồn quá hạn (>45 ngày) từ ${tyLeQuaHan}% xuống ${hl('≤'+mtQuyQuaHanPct+'%','#93c5fd')} tổng hồ sơ đang tồn.</li>
+          </ul>
+        </div>
+
+      </div>
+      <div style="margin-top:16px;padding:11px 16px;background:rgba(255,255,255,.08);border-radius:8px;border-left:3px solid #fbbf24;font-size:.8rem;line-height:1.6;color:rgba(255,255,255,.9)">
+        <b style="color:#fcd34d">Cam kết kỳ tới:</b> Mọi chỉ tiêu trên đều đo lường được qua dashboard này — rà soát tiến độ ${hl('hằng tuần','#fcd34d')} (nhóm ≥90 ngày), ${hl('hằng tháng','#fcd34d')} (tồn quá hạn &amp; cân bằng tải) và ${hl('cuối quý','#fcd34d')} (TB ngày tồn, tiền treo, mức độ chuẩn hóa quy trình).
       </div>
     </div>
 
