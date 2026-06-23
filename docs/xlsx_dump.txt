@@ -1,0 +1,9 @@
+﻿=== Sheet: Sheet1 ===
+(None, 'TỶ LỆ BỒI THƯỜNG XO THEO LOẠI HÌNH NGHIỆP VỤ (SỐ LIỆU THEO NĂM NGHIỆP VỤ)', None, None, None, None, None)
+(None, 'Mã NV', 'Tên nghiệp vụ', 'D.thu năm nghiệp vụ 2026 (đồng)', 'TLBT năm nghiệp vụ 2026 (%)', 'D.thu năm nghiệp vụ cùng kỳ (đồng)', 'TLBT năm nghiệp vụ cùng kỳ (%)')
+(None, 'XO.1', 'BH TNDS đối với NT3 & HK', '1.947.128.594', '26,67%', '1.721.935.474', '-5,34%')
+(None, 'XO.2', 'BH TNDS của CX đối với HHTX', None, 0, None, None)
+(None, 'XO.3', 'BH TNDS của CX đối với TN LPX&NNTX', '78.392.743', 0, '63.217.645', None)
+(None, 'XO.4', 'Bảo hiểm vật chất xe ô tô', '5.696.305.962', '61,47%', '5.487.252.883', '45,05%')
+(None, 'XO.5', 'BH trợ cấp nằm viện do TN cho NNTX', None, None, None, None)
+(None, 'XO', None, '7.721.827.299', '52,07%', '7.272.406.002', '32,73%')
