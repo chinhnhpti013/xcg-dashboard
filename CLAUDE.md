@@ -44,6 +44,8 @@ Cột quan trọng:
 | `Mã nghiệp vụ` | `XO.1.x` (TNDS), `XO.4.x` (VCX) |
 | `Tiền ước/duyệt BT` | Số tiền bồi thường ước tính / đã duyệt |
 | `Biển số xe` | Biển kiểm soát xe |
+| `Tên garage (thường gọi)` hoặc `Tên garage (ĐKKD)` | Tên gara/showroom sửa chữa — từ 06/2026 cột `Tên garage` cũ đã tách thành 2 cột này; báo cáo ưu tiên dùng `(thường gọi)`, fallback `(ĐKKD)` |
+| `Tiền BT đã trả cho KH` | Không còn khoảng trắng cuối tên cột (khác với file cũ) — code có fallback đọc cả 2 dạng |
 
 ## Danh sách Giám định viên
 
@@ -216,33 +218,35 @@ Mỗi tab có màu gradient riêng, hiệu ứng nổi/nhấn kiểu nút 3D v�
 
 ### BC1 — Thống kê Doanh thu SC các Gara/Showroom (PS năm hiện tại)
 
-Tham chiếu Query: `select P, Count(AX), sum(AX), sum(BC) Where Y >= date 'năm-01-01' group by P order by sum(AX) DESC limit 10`
+Tham chiếu Query: `select [Tên garage (thường gọi)], Count([Tiền ước/duyệt BT]), sum([Tiền ước/duyệt BT]), sum([Tiền BT đã trả cho GR]) Where [Ngày mở HSBT] >= date 'năm-01-01' group by [Tên garage (thường gọi)] order by sum([Tiền ước/duyệt BT]) DESC limit 10`
+
+> ⚠️ Vị trí cột Excel (A/B/C...) không cố định giữa các lần xuất file — mọi truy xuất dữ liệu trong code PHẢI dùng tên cột (header), không dùng chỉ số/chữ cái cột. Bảng dưới chỉ để tham chiếu tên cột, không phải vị trí.
 
 | Cột | Nguồn | Logic |
 |-----|-------|-------|
-| Tên Gara/SH | Cột P = `Tên garage` | Group by |
-| Số vụ phát sinh | Cột AX = `Tiền ước/duyệt BT` | Count |
-| Tiền SC ước BT | Cột AX = `Tiền ước/duyệt BT` | Sum |
-| Tiền SC đã BT | Cột BC = `Tiền BT đã trả cho GR` | Sum |
+| Tên Gara/SH | `Tên garage (thường gọi)` (fallback `Tên garage (ĐKKD)`) | Group by |
+| Số vụ phát sinh | `Tiền ước/duyệt BT` | Count |
+| Tiền SC ước BT | `Tiền ước/duyệt BT` | Sum |
+| Tiền SC đã BT | `Tiền BT đã trả cho GR` | Sum |
 
-Điều kiện lọc: `Ngày mở HSBT` (cột Y) ≥ 01/01/năm hiện tại · Sắp xếp giảm dần theo tổng tiền ước BT · **Top 30** · Khung cố định `max-height:480px` + scroll dọc, thead sticky
+Điều kiện lọc: `Ngày mở HSBT` ≥ 01/01/năm hiện tại · Sắp xếp giảm dần theo tổng tiền ước BT · **Top 30** · Khung cố định `max-height:480px` + scroll dọc, thead sticky
 
 ### BC2 — Danh sách chi tiết HS tồn ≥ 90 ngày
 
-Tham chiếu Query: `Select C, D, E, N, P, AN, AP, AX, BH, BI WHERE BI>=90 Order by BI DESC`
+Tham chiếu Query: `Select [GĐV thụ lý], [Số HSBT], [Biển số xe], [Mã nghiệp vụ], [Tên garage (thường gọi)], [Mã check], [Mã validate], [Tiền ước/duyệt BT], [Trạng thái hồ sơ], [Số ngày tồn] WHERE [Số ngày tồn]>=90 Order by [Số ngày tồn] DESC`
 
-| Cột Excel | Tên cột | Ghi chú |
-|-----------|---------|---------|
-| C (col 3) | GĐV thụ lý | |
-| D (col 4) | Số HSBT | |
-| E (col 5) | Biển số xe | |
-| N (col 14) | Mã nghiệp vụ | |
-| P (col 16) | Tên garage | |
-| AN (col 40) | Mã check | |
-| AP (col 42) | Mã validate | |
-| AX (col 50) | Tiền ước/duyệt BT | |
-| BH (col 60) | Trạng thái hồ sơ | |
-| BI (col 61) | Số ngày tồn | Điều kiện ≥ 90 |
+| Tên cột | Ghi chú |
+|---------|---------|
+| GĐV thụ lý | dùng qua `gdvKey(r)` |
+| Số HSBT | |
+| Biển số xe | |
+| Mã nghiệp vụ | |
+| Tên garage (thường gọi) | fallback `Tên garage (ĐKKD)` |
+| Mã check | |
+| Mã validate | |
+| Tiền ước/duyệt BT | |
+| Trạng thái hồ sơ | |
+| Số ngày tồn | Điều kiện ≥ 90 |
 
 Tô màu: 🔴 ≥ 180 ngày · 🟡 120–179 ngày · Sắp xếp ngày tồn giảm dần · Header đỏ
 
