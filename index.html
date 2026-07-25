@@ -417,12 +417,26 @@ table.gdv td.hl-green{color:#059669}
 /* ── TLBT section responsive layout ── */
 .tlbt-body{
   display:grid;
-  grid-template-columns:1fr 1.4fr;
-  gap:16px;padding:16px;align-items:start;
+  grid-template-columns:1fr 1.35fr;
+  gap:18px;padding:18px;align-items:stretch;
 }
-.tlbt-table-wrap{overflow-x:auto;}
-.tlbt-table{min-width:320px;width:100%;}
-.tlbt-chart-card{margin:0;}
+/* Khung bảng: cùng kiểu card với chart bên cạnh */
+.tlbt-table-card{
+  background:#FAFAF5;border:1px solid var(--border);border-radius:var(--radius);
+  padding:18px 20px;box-shadow:0 4px 24px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.04);
+  overflow:hidden;display:flex;flex-direction:column;min-width:0;
+}
+.tlbt-table-card h3{
+  font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:14px;
+  padding-bottom:10px;border-bottom:2px solid var(--claude-light);
+}
+.tlbt-table-wrap{overflow-x:auto;flex:1;display:flex;align-items:stretch}
+.tlbt-table{min-width:320px;width:100%;height:100%;font-size:.8rem}
+.tlbt-table th,.tlbt-table td{padding:10px 11px;line-height:1.5}
+.tlbt-table thead th{font-size:.66rem;line-height:1.45;letter-spacing:.03em;padding:11px 11px}
+.tlbt-table tbody td{font-size:.8rem}
+.tlbt-chart-card{margin:0;display:flex;flex-direction:column;min-width:0}
+.tlbt-chart-card .chart-wrap{flex:1;min-height:260px}
 
 footer{
   text-align:center;padding:20px 24px;color:var(--text3);font-size:.75rem;
@@ -567,15 +581,21 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
   .chart-wrap{height:220px}
   .chart-wrap-pie{height:260px}
   /* TLBT — tablet: xếp dọc, chart cao hơn */
-  .tlbt-body{grid-template-columns:1fr}
+  .tlbt-body{grid-template-columns:1fr;gap:14px;padding:14px}
+  .tlbt-table-card{padding:14px 14px}
+  .tlbt-table{height:auto}
+  .tlbt-table th,.tlbt-table td{padding:8px 9px}
   .tlbt-chart-card{min-height:260px}
 }
 
 /* TLBT — điện thoại ≤600px: xếp dọc hoàn toàn */
 @media(max-width:600px){
   .tlbt-body{grid-template-columns:1fr;gap:12px;padding:10px}
-  .tlbt-table{font-size:.7rem}
-  .tlbt-table th,.tlbt-table td{padding:6px 6px;font-size:.65rem}
+  .tlbt-table-card{padding:12px 11px}
+  .tlbt-table-card h3{font-size:.74rem;margin-bottom:10px;padding-bottom:8px}
+  .tlbt-table{font-size:.72rem;height:auto}
+  .tlbt-table th,.tlbt-table td{padding:7px 7px;font-size:.7rem}
+  .tlbt-table thead th{font-size:.6rem}
   .tlbt-chart-card{min-height:220px}
   .tlbt-chart-card h3{font-size:.72rem}
 }
@@ -1372,19 +1392,22 @@ function buildNvBtSection(curYear){
           <div class="period">Năm nghiệp vụ ${cy} &nbsp;·&nbsp; Nguồn: Sheet <em>ty-le-bt</em> · Google Drive</div>
         </div>
         <div class="tlbt-body">
-          <div class="tlbt-table-wrap">
-            <table class="gdv tlbt-table">
-              <thead>
-                <tr>
-                  <th style="width:36px">Stt</th>
-                  <th style="min-width:52px">Mã NV</th>
-                  <th style="text-align:left">Tên nghiệp vụ</th>
-                  <th class="lv3" style="min-width:110px">D.thu NV (Đ)</th>
-                  <th class="lv3" style="min-width:72px">TLBT (%)</th>
-                </tr>
-              </thead>
-              <tbody>${tableRows}</tbody>
-            </table>
+          <div class="tlbt-table-card">
+            <h3>Chi tiết doanh thu &amp; TLBT theo mã nghiệp vụ</h3>
+            <div class="tlbt-table-wrap">
+              <table class="gdv tlbt-table">
+                <thead>
+                  <tr>
+                    <th style="width:40px">Stt</th>
+                    <th style="min-width:58px">Mã NV</th>
+                    <th style="text-align:left">Tên nghiệp vụ</th>
+                    <th class="lv3" style="min-width:118px">D.thu NV (Đ)</th>
+                    <th class="lv3" style="min-width:80px">TLBT (%)</th>
+                  </tr>
+                </thead>
+                <tbody>${tableRows}</tbody>
+              </table>
+            </div>
           </div>
           <div class="chart-card tlbt-chart-card">
             <h3>Doanh thu &amp; Tỷ lệ bồi thường năm NV ${cy}</h3>
