@@ -63,16 +63,17 @@ Cột quan trọng:
 
 | Tab | ID | Mô tả |
 |-----|----|-------|
-| Tổng quan | `tab-overview` | KPI tổng hợp + biểu đồ |
+| Tổng quan | `tab-overview` | KPI tổng hợp + biểu đồ + bảng TLBT theo nghiệp vụ + Infographic theo địa bàn (hàm `renderInfographic(s)`, nay trả về chuỗi HTML và được nối vào cuối `renderOverview(s)` thay vì render tab riêng) + khối "Đánh giá Tổng quan" (`generateAnalysis(s)`) ở cuối cùng |
 | Theo GĐV | `tab-gdv` | Bảng tổng hợp hồ sơ tồn theo GĐV — kiểu Excel, 4 hàng header |
 | Báo cáo XO | `tab-baocao` | BC1 Top 30 Gara/Showroom doanh thu SC + BC2 Danh sách HS tồn ≥90 ngày + BC3 tồn 46–89 ngày |
-| Tổng hợp cảnh báo | `tab-infographic` | Infographic theo địa bàn + khối "Đánh giá Tổng quan" (`generateAnalysis(s)`) ở cuối |
 | Đề xuất cải tiến CLDV | `tab-cldv` | Phân tích 3 trục: Chất lượng dịch vụ · Hiệu quả & Năng suất · Quan hệ khách hàng; hàm `renderCLDV(s)` |
+| Tra cứu tiến trình | `tab-search` | Tra cứu hồ sơ theo Số HSBT/Biển kiểm soát (khớp một phần, OR) kết hợp lọc GĐV thụ lý/Trạng thái hồ sơ (dropdown, AND) — mọi tiêu chí đều tuỳ chọn, chỉ cần 1 trong 4; bảng kết quả 17 cột (gồm GĐV thụ lý + 16 cột mốc thời gian/tiền/trạng thái); hàm `renderSearch()` (khởi tạo UI 1 lần, cờ `searchTabInit`) + `buildSearchFilterOptions()` (build lại dropdown GĐV mỗi lần renderAll, giữ lựa chọn hiện tại; dropdown Trạng thái hồ sơ dùng danh sách cố định `SEARCH_STATUS_LIST`) + `doSearchHSBT()` (đọc `RAW` toàn bộ, không phụ thuộc filter bar) |
 
 > Tab "Phân loại tồn" (`tab-aging`) đã bị xóa (06/2026) — nội dung phân phối thời gian tồn đã được tích hợp vào tab Đề xuất cải tiến CLDV (Trục 1). `warnRows` trong `computeStats()` vẫn giữ nguyên.
-> Tab "Cảnh báo" (`tab-warnings`) đã bị xóa (06/2026) — các bảng HS tồn >90 ngày và GĐV nguy hiểm đã có trong tab Báo cáo XO và Tổng hợp cảnh báo.
+> Tab "Cảnh báo" (`tab-warnings`) đã bị xóa (06/2026) — các bảng HS tồn >90 ngày và GĐV nguy hiểm đã có trong tab Báo cáo XO và tab Tổng quan.
+> Tab "Tổng hợp cảnh báo" (`tab-infographic`) đã bị xóa (09/2026) — báo cáo "BÁO CÁO TIẾN ĐỘ GIẢI QUYẾT HỒ SƠ TỒN ĐỌNG PTI SOS" (Infographic theo địa bàn + Đánh giá Tổng quan) đã chuyển sang cuối tab Tổng quan. Thứ tự nút tab hiện tại: Tổng quan → Theo GĐV → Báo cáo XO → Đề xuất cải tiến CLDV → Tra cứu tiến trình (CSS `.tabs .tab:nth-child(n)` đã đánh số lại theo thứ tự mới).
 
-## Cấu hình Địa bàn (dùng cho tab Infographic)
+## Cấu hình Địa bàn (dùng cho khối Infographic trong tab Tổng quan)
 
 ```js
 const DIABAN_MAP = {

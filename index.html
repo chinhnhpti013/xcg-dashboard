@@ -264,8 +264,8 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
 .tabs .tab:nth-child(1){background:linear-gradient(160deg,#60a5fa 0%,#1d4ed8 100%)}
 .tabs .tab:nth-child(2){background:linear-gradient(160deg,#34d399 0%,#047857 100%)}
 .tabs .tab:nth-child(3){background:linear-gradient(160deg,#c084fc 0%,#6d28d9 100%)}
-.tabs .tab:nth-child(4){background:linear-gradient(160deg,#22d3ee 0%,#0e7490 100%)}
-.tabs .tab:nth-child(5){background:linear-gradient(160deg,#fb7185 0%,#be123c 100%)}
+.tabs .tab:nth-child(4){background:linear-gradient(160deg,#fb7185 0%,#be123c 100%)}
+.tabs .tab:nth-child(5){background:linear-gradient(160deg,#fbbf24 0%,#b45309 100%)}
 
 /* Nền nội dung từng tab — pastel dịu cùng tông màu nút tab */
 .tab-pane{
@@ -276,9 +276,21 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
 #tab-overview{background:linear-gradient(170deg,rgba(219,234,254,.65) 0%,rgba(239,246,255,.4) 100%)}
 #tab-gdv{background:linear-gradient(170deg,rgba(209,250,229,.6) 0%,rgba(240,253,244,.4) 100%)}
 #tab-baocao{background:linear-gradient(170deg,rgba(237,233,254,.65) 0%,rgba(245,243,255,.4) 100%)}
-#tab-infographic{background:linear-gradient(170deg,rgba(207,250,254,.6) 0%,rgba(236,254,255,.4) 100%)}
 #tab-cldv{background:linear-gradient(170deg,rgba(255,228,230,.6) 0%,rgba(255,241,242,.4) 100%)}
+#tab-search{background:linear-gradient(170deg,rgba(254,243,199,.6) 0%,rgba(255,251,235,.4) 100%)}
 @media(max-width:600px){.tab-pane{padding:10px 8px;border-radius:12px}}
+
+/* Tra cứu tiến trình HS */
+.search-box{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:0 4px 24px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.04);margin-bottom:20px}
+.search-box .search-row{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
+.search-field{display:flex;flex-direction:column;gap:5px;flex:1;min-width:200px}
+.search-field label{font-size:.72rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.04em}
+.search-field input,.search-field select{border:1.5px solid #cbd5e1;border-radius:8px;padding:9px 12px;font-size:.86rem;font-family:'Be Vietnam Pro',sans-serif;transition:border-color .15s;background:#fff;color:var(--text)}
+.search-field input:focus,.search-field select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(21,101,192,.14)}
+.btn-search{background:linear-gradient(135deg,var(--blue),var(--blue-mid));color:#fff;border:none;border-radius:8px;padding:10px 28px;font-size:.86rem;font-weight:700;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.16);transition:transform .08s,box-shadow .08s;white-space:nowrap}
+.btn-search:hover{filter:brightness(1.08)}
+.btn-search:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.16)}
+.search-hint{font-size:.72rem;color:var(--text2);margin-top:10px}
 
 /* KPI CARDS — compact (~1/3 cũ), nền màu nổi bật số liệu */
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:8px;margin-bottom:20px}
@@ -734,15 +746,15 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
       <button class="tab active" onclick="switchTab('overview',this)">📊 Tổng quan</button>
       <button class="tab" onclick="switchTab('gdv',this)">👤 Theo GĐV</button>
       <button class="tab" onclick="switchTab('baocao',this)">📋 Báo cáo XO</button>
-      <button class="tab" onclick="switchTab('infographic',this)">🚨 Tổng hợp cảnh báo</button>
       <button class="tab" onclick="switchTab('cldv',this)">💡 Đề xuất cải tiến CLDV</button>
+      <button class="tab" onclick="switchTab('search',this)">🔍 Tra cứu tiến trình</button>
     </div>
 
     <div id="tab-overview" class="tab-pane"></div>
     <div id="tab-gdv" class="tab-pane" style="display:none"></div>
     <div id="tab-baocao" class="tab-pane" style="display:none"></div>
-    <div id="tab-infographic" class="tab-pane" style="display:none"></div>
     <div id="tab-cldv" class="tab-pane" style="display:none"></div>
+    <div id="tab-search" class="tab-pane" style="display:none"></div>
   </div>
 
   <footer>
@@ -1045,6 +1057,7 @@ function parseDate(v){
 }
 function fmtN(v){return new Intl.NumberFormat('vi-VN').format(Math.round(v))}
 function fmtM(v){if(!v)return'–';if(v>=1e9)return(v/1e9).toFixed(1)+' tỷ';if(v>=1e6)return(v/1e6).toFixed(1)+' tr';return fmtN(v)+'đ'}
+function fmtDate(v){const d=parseDate(v);return d?d.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}):'–'}
 function pct(a,b){return b>0?Math.round(a/b*1000)/10:0}
 function fmtPct(v){return v+'%'}
 
@@ -1311,7 +1324,7 @@ function renderAll(){
   const data=getFiltered();const s=computeStats(data);
   document.getElementById('filter-info').textContent=`Đang hiển thị ${data.length} / ${RAW.length} hồ sơ`;
   destroyCharts();
-  renderOverview(s);renderGdv(s);renderBaoCao(s);renderInfographic(s);renderCLDV(s);
+  renderOverview(s);renderGdv(s);renderBaoCao(s);renderCLDV(s);renderSearch();
   // Tải sheet TLBT song song (không block render chính)
   loadTlbtSheet();
 }
@@ -1347,6 +1360,7 @@ function renderOverview(s){
     </div>
   `;
   el.innerHTML+=buildNvBtSection(curYear);
+  el.innerHTML+=renderInfographic(s);
   setTimeout(()=>{
     buildBar('chart-bar-main',s.gdvStats.map(g=>g.code),[
       {label:'Tổng tiếp nhận',data:s.gdvStats.map(g=>g.total),backgroundColor:'#90caf9'},
@@ -1968,11 +1982,141 @@ function fmtMBC(v){
   return new Intl.NumberFormat('vi-VN').format(Math.round(v));
 }
 
+// TAB 6: TRA CỨU TIẾN TRÌNH GIẢI QUYẾT HỒ SƠ
+let searchTabInit=false;
+const SEARCH_DATE_COLS=[
+  'Ngày tai nạn','Ngày mở HSBT','Ngày trình duyệt giá','Ngày check duyệt giá',
+  'Ngày validate duyệt giá','Ngày bảo lãnh','Ngày trình ĐNTT','Ngày validate ĐNTT',
+  'Ngày duyệt bồi thường','Ngày trả tiền GR'
+];
+const SEARCH_STATUS_LIST=[
+  'Đã thanh toán','Giám định chi tiết','Trình duyệt giá','Đã bảo lãnh',
+  'Check duyệt giá','Check đề nghị thanh toán','Đã duyệt duyệt giá',
+  'Chờ duyệt đề nghị thanh toán','Chưa giải quyết'
+];
+function renderSearch(){
+  if(!searchTabInit){
+    searchTabInit=true;
+    const el=document.getElementById('tab-search');
+    el.innerHTML=`
+      <div class="search-box">
+        <div class="search-row">
+          <div class="search-field">
+            <label>Số HSBT</label>
+            <input type="text" id="search-hsbt" placeholder="Nhập số hồ sơ bồi thường…"/>
+          </div>
+          <div class="search-field">
+            <label>Biển kiểm soát</label>
+            <input type="text" id="search-bks" placeholder="Nhập biển số xe…"/>
+          </div>
+          <div class="search-field">
+            <label>GĐV thụ lý</label>
+            <select id="search-gdv"><option value="ALL">Tất cả GĐV</option></select>
+          </div>
+          <div class="search-field">
+            <label>Trạng thái hồ sơ</label>
+            <select id="search-trangthai"><option value="ALL">Tất cả trạng thái</option>${SEARCH_STATUS_LIST.map(t=>`<option value="${t}">${t}</option>`).join('')}</select>
+          </div>
+          <button class="btn-search" id="search-btn" onclick="doSearchHSBT()">🔍 Tìm kiếm</button>
+        </div>
+        <div class="search-hint">Nhập Số HSBT hoặc Biển kiểm soát (khớp một phần) và/hoặc chọn GĐV thụ lý, Trạng thái hồ sơ để thu hẹp kết quả, rồi nhấn Tìm kiếm. Một biển kiểm soát có thể trả về nhiều hồ sơ.</div>
+      </div>
+      <div id="search-result"></div>
+    `;
+    ['search-hsbt','search-bks'].forEach(id=>{
+      document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')doSearchHSBT();});
+    });
+  }
+  buildSearchFilterOptions();
+}
+function buildSearchFilterOptions(){
+  const selG=document.getElementById('search-gdv');
+  const curG=selG.value;
+  while(selG.options.length>1)selG.remove(1);
+  [...new Set(RAW.map(r=>gdvKey(r)).filter(Boolean))].forEach(g=>{
+    const o=document.createElement('option');o.value=g;
+    o.textContent=g+(GDV_NAMES[g]?' – '+GDV_NAMES[g]:'');selG.appendChild(o);
+  });
+  if([...selG.options].some(o=>o.value===curG))selG.value=curG;
+}
+function normPlate(v){return String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'')}
+function doSearchHSBT(){
+  const qHsbt=document.getElementById('search-hsbt').value.trim().toUpperCase();
+  const qBksRaw=document.getElementById('search-bks').value.trim();
+  const qBks=normPlate(qBksRaw);
+  const qGdv=document.getElementById('search-gdv').value;
+  const qTt=document.getElementById('search-trangthai').value;
+  const box=document.getElementById('search-result');
+  if(!qHsbt&&!qBks&&qGdv==='ALL'&&qTt==='ALL'){
+    box.innerHTML=`<div class="gdv-report-wrap"><div style="padding:24px;text-align:center;color:var(--text2)">Vui lòng nhập Số HSBT/Biển kiểm soát hoặc chọn GĐV thụ lý/Trạng thái hồ sơ để tìm kiếm.</div></div>`;
+    return;
+  }
+  const found=RAW.filter(r=>{
+    const hsbt=String(r['Số HSBT']||'').trim().toUpperCase();
+    const bks=normPlate(r['Biển số xe']);
+    const mHsbt=qHsbt&&hsbt.includes(qHsbt);
+    const mBks=qBks&&bks.includes(qBks);
+    if((qHsbt||qBks)&&!(mHsbt||mBks))return false;
+    if(qGdv!=='ALL'&&gdvKey(r)!==qGdv)return false;
+    if(qTt!=='ALL'&&String(r['Trạng thái hồ sơ']||'').trim()!==qTt)return false;
+    return true;
+  }).sort((a,b)=>{
+    const da=parseDate(a['Ngày mở HSBT']),db=parseDate(b['Ngày mở HSBT']);
+    return(db?db.getTime():0)-(da?da.getTime():0);
+  });
+  if(!found.length){
+    box.innerHTML=`<div class="gdv-report-wrap"><div style="padding:24px;text-align:center;color:var(--text2)">Không tìm thấy hồ sơ nào khớp với thông tin đã nhập.</div></div>`;
+    return;
+  }
+  const header=`<tr>
+    <th style="width:36px">Stt</th>
+    <th class="lv2" style="width:90px">GĐV thụ lý</th>
+    <th class="lv2" style="min-width:150px">Số HSBT</th>
+    <th class="lv2" style="width:95px">Biển số xe</th>
+    ${SEARCH_DATE_COLS.map(c=>`<th class="lv2" style="width:100px">${c}</th>`).join('')}
+    <th class="lv2" style="width:130px">Tiền ước/duyệt BT</th>
+    <th class="lv2" style="width:110px">Trạng thái HS</th>
+    <th class="lv3" style="width:80px">Số ngày<br/>tồn</th>
+  </tr>`;
+  const rows=found.map((r,i)=>{
+    const ngayTon=parseFloat(String(r['Số ngày tồn']||'').replace(/,/g,''))||0;
+    const cls=ngayTon>=180?'hl-red':ngayTon>=120?'hl-amber':'';
+    return`<tr>
+      <td style="text-align:center;color:var(--text2);font-size:.72rem">${i+1}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.74rem">${gdvKey(r)||''}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.74rem" class="left">${r['Số HSBT']||''}</td>
+      <td style="font-weight:700">${r['Biển số xe']||''}</td>
+      ${SEARCH_DATE_COLS.map(c=>`<td style="font-size:.72rem">${fmtDate(r[c])}</td>`).join('')}
+      <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:.74rem">${fmtMBC(parseMoney(r['Tiền ước/duyệt BT']))}</td>
+      <td style="font-size:.74rem">${r['Trạng thái hồ sơ']||''}</td>
+      <td class="${cls}" style="text-align:center;font-weight:700">${fmtN(ngayTon)}</td>
+    </tr>`;
+  }).join('');
+  box.innerHTML=`
+    <div class="gdv-report-wrap">
+      <div class="gdv-report-header" style="background:linear-gradient(135deg,#b45309,#fbbf24)">
+        <div class="title">KẾT QUẢ TRA CỨU TIẾN TRÌNH GIẢI QUYẾT HỒ SƠ</div>
+        <div class="period">Tìm thấy <b>${found.length}</b> hồ sơ${qHsbt?` · Số HSBT chứa "${qHsbt}"`:''}${qBks?` · Biển kiểm soát chứa "${qBksRaw}"`:''}${qGdv!=='ALL'?` · GĐV: ${qGdv}`:''}${qTt!=='ALL'?` · Trạng thái: ${qTt}`:''}</div>
+      </div>
+      <div class="gdv-table-outer" style="max-height:560px;overflow-y:auto">
+        <table class="gdv" style="min-width:1600px">
+          <thead style="position:sticky;top:0;z-index:2">${header}</thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div class="gdv-report-footer">
+        <span style="color:var(--red);font-weight:700">■</span> ≥ 180 ngày tồn &nbsp;
+        <span style="color:var(--amber);font-weight:700">■</span> 120–179 ngày tồn
+      </div>
+    </div>
+  `;
+}
+
 // ─── TAB SWITCH ──────────────────────────────────────────────────────────────
 function switchTab(name,btn){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
-  ['overview','gdv','baocao','infographic','cldv'].forEach(t=>{
+  ['overview','gdv','baocao','cldv','search'].forEach(t=>{
     document.getElementById('tab-'+t).style.display=t===name?'block':'none';
   });
 }
@@ -2017,8 +2161,7 @@ function computeDiabanStats(){
 }
 
 function renderInfographic(s){
-  const el=document.getElementById('tab-infographic');
-  if(!RAW.length){el.innerHTML='<p style="padding:20px;color:var(--text2)">Không có dữ liệu.</p>';return;}
+  if(!RAW.length)return'';
   const now=new Date();
   const dateStr='(Dữ liệu đến '+now.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'})+')';
   const {result,curYear,curMonth,prevYear}=computeDiabanStats();
@@ -2085,8 +2228,8 @@ function renderInfographic(s){
     `<b>${best.db}</b> có tỷ lệ giải quyết tốt nhất (<b>${best.tyGQ}%</b>).`:'';
   if(stable.length>0)cmpNote+=`<br/>Địa bàn ổn định (🟢 Cấp độ 1): <b>${stable.map(d=>d.db).join(', ')}</b>.`;
 
-  el.innerHTML=`
-    <div class="info-card">
+  return`
+    <div class="info-card" style="margin-top:24px">
       <div class="info-header-ig">
         <div class="info-title-ig">BÁO CÁO TIẾN ĐỘ GIẢI QUYẾT HỒ SƠ TỒN ĐỌNG PTI SOS <span>${dateStr}</span></div>
         <div class="info-subtitle-ig">Tổng hợp và phân tích tình hình giải quyết hồ sơ tồn đọng tại <b>Khu vực Quảng Ninh</b>, nhấn mạnh các địa bàn đang ở mức cảnh báo cao để lãnh đạo có phương án điều chỉnh.</div>
