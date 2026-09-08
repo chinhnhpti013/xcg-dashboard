@@ -1989,11 +1989,6 @@ const SEARCH_DATE_COLS=[
   'Ngày validate duyệt giá','Ngày bảo lãnh','Ngày trình ĐNTT','Ngày validate ĐNTT',
   'Ngày duyệt bồi thường','Ngày trả tiền GR'
 ];
-const SEARCH_STATUS_LIST=[
-  'Đã thanh toán','Giám định chi tiết','Trình duyệt giá','Đã bảo lãnh',
-  'Check duyệt giá','Check đề nghị thanh toán','Đã duyệt duyệt giá',
-  'Chờ duyệt đề nghị thanh toán','Chưa giải quyết'
-];
 function renderSearch(){
   if(!searchTabInit){
     searchTabInit=true;
@@ -2015,7 +2010,7 @@ function renderSearch(){
           </div>
           <div class="search-field">
             <label>Trạng thái hồ sơ</label>
-            <select id="search-trangthai"><option value="ALL">Tất cả trạng thái</option>${SEARCH_STATUS_LIST.map(t=>`<option value="${t}">${t}</option>`).join('')}</select>
+            <select id="search-trangthai"><option value="ALL">Tất cả trạng thái</option></select>
           </div>
           <button class="btn-search" id="search-btn" onclick="doSearchHSBT()">🔍 Tìm kiếm</button>
         </div>
@@ -2038,6 +2033,14 @@ function buildSearchFilterOptions(){
     o.textContent=g+(GDV_NAMES[g]?' – '+GDV_NAMES[g]:'');selG.appendChild(o);
   });
   if([...selG.options].some(o=>o.value===curG))selG.value=curG;
+
+  const selT=document.getElementById('search-trangthai');
+  const curT=selT.value;
+  while(selT.options.length>1)selT.remove(1);
+  [...new Set(RAW.map(r=>String(r['Trạng thái hồ sơ']||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'vi')).forEach(t=>{
+    const o=document.createElement('option');o.value=t;o.textContent=t;selT.appendChild(o);
+  });
+  if([...selT.options].some(o=>o.value===curT))selT.value=curT;
 }
 function normPlate(v){return String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'')}
 function doSearchHSBT(){
