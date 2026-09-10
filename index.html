@@ -228,12 +228,12 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
 .tab:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,0.22),0 2px 6px rgba(0,0,0,0.1)}
 .tab.active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,0.22),0 2px 6px rgba(0,0,0,0.1);filter:brightness(1.08)}
 /* Màu riêng từng tab */
-.tabs .tab:nth-child(1){background:linear-gradient(160deg,#60a5fa 0%,#1d4ed8 100%)}
-.tabs .tab:nth-child(2){background:linear-gradient(160deg,#34d399 0%,#047857 100%)}
-.tabs .tab:nth-child(3){background:linear-gradient(160deg,#c084fc 0%,#6d28d9 100%)}
-.tabs .tab:nth-child(4){background:linear-gradient(160deg,#fb7185 0%,#be123c 100%)}
-.tabs .tab:nth-child(5){background:linear-gradient(160deg,#fbbf24 0%,#b45309 100%)}
-.tabs .tab:nth-child(6){background:linear-gradient(160deg,#22d3ee 0%,#0e7490 100%)}
+.tabs .tab:nth-child(1){background:linear-gradient(160deg,#22d3ee 0%,#0e7490 100%)} /* Dashboard động */
+.tabs .tab:nth-child(2){background:linear-gradient(160deg,#60a5fa 0%,#1d4ed8 100%)} /* Tổng quan */
+.tabs .tab:nth-child(3){background:linear-gradient(160deg,#34d399 0%,#047857 100%)} /* Theo GĐV */
+.tabs .tab:nth-child(4){background:linear-gradient(160deg,#c084fc 0%,#6d28d9 100%)} /* Báo cáo XO */
+.tabs .tab:nth-child(5){background:linear-gradient(160deg,#fb7185 0%,#be123c 100%)} /* CLDV */
+.tabs .tab:nth-child(6){background:linear-gradient(160deg,#fbbf24 0%,#b45309 100%)} /* Tra cứu */
 
 /* Thanh tab dính ngay dưới topbar khi cuộn (top = chiều cao topbar 64px, z-index < 100 để trượt
    xuống dưới topbar). Chỉ bật từ 601px trở lên: topbar mobile dùng height:auto + flex-wrap nên
@@ -716,20 +716,20 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
   <div class="content">
     <!-- Tabs -->
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('overview',this)">📊 Tổng quan</button>
+      <button class="tab active" onclick="switchTab('dashboard',this)">🎯 Dashboard động</button>
+      <button class="tab" onclick="switchTab('overview',this)">📊 Tổng quan</button>
       <button class="tab" onclick="switchTab('gdv',this)">👤 Theo GĐV</button>
       <button class="tab" onclick="switchTab('baocao',this)">📋 Báo cáo XO</button>
       <button class="tab" onclick="switchTab('cldv',this)">💡 Đề xuất cải tiến CLDV</button>
       <button class="tab" onclick="switchTab('search',this)">🔍 Tra cứu tiến trình</button>
-      <button class="tab" onclick="switchTab('dashboard',this)">🎯 Dashboard động</button>
     </div>
 
-    <div id="tab-overview" class="tab-pane"></div>
+    <div id="tab-dashboard" class="tab-pane"></div>
+    <div id="tab-overview" class="tab-pane" style="display:none"></div>
     <div id="tab-gdv" class="tab-pane" style="display:none"></div>
     <div id="tab-baocao" class="tab-pane" style="display:none"></div>
     <div id="tab-cldv" class="tab-pane" style="display:none"></div>
     <div id="tab-search" class="tab-pane" style="display:none"></div>
-    <div id="tab-dashboard" class="tab-pane" style="display:none"></div>
   </div>
 
   <footer>
@@ -1267,7 +1267,7 @@ function renderAll(){
   const s=computeStats(RAW);
   document.getElementById('record-count').textContent=`📊 ${fmtN(RAW.length)} hồ sơ`;
   destroyCharts();
-  renderOverview(s);renderGdv(s);renderBaoCao(s);renderCLDV(s);renderSearch();renderDashboard(s);
+  renderDashboard(s);renderOverview(s);renderGdv(s);renderBaoCao(s);renderCLDV(s);renderSearch();
   // Tải sheet TLBT song song (không block render chính)
   loadTlbtSheet();
 }
@@ -2126,7 +2126,7 @@ function renderDashboard(s){
 function switchTab(name,btn){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
-  ['overview','gdv','baocao','cldv','search','dashboard'].forEach(t=>{
+  ['dashboard','overview','gdv','baocao','cldv','search'].forEach(t=>{
     document.getElementById('tab-'+t).style.display=t===name?'block':'none';
   });
 }

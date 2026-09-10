@@ -73,7 +73,8 @@ Cột quan trọng:
 > Tab "Phân loại tồn" (`tab-aging`) đã bị xóa (06/2026) — nội dung phân phối thời gian tồn đã được tích hợp vào tab Đề xuất cải tiến CLDV (Trục 1). `warnRows` trong `computeStats()` vẫn giữ nguyên.
 > Tab "Cảnh báo" (`tab-warnings`) đã bị xóa (06/2026) — các bảng HS tồn >90 ngày và GĐV nguy hiểm đã có trong tab Báo cáo XO và tab Tổng quan.
 > Khối "Đánh giá Tổng quan" (`generateAnalysis(s)`) đã bị xóa hoàn toàn (09/2026) theo yêu cầu — tab Tổng quan nay kết thúc ở khối Infographic theo địa bàn. `renderInfographic()` không còn nhận tham số `s`.
-> Tab "Tổng hợp cảnh báo" (`tab-infographic`) đã bị xóa (09/2026) — báo cáo "BÁO CÁO TIẾN ĐỘ GIẢI QUYẾT HỒ SƠ TỒN ĐỌNG PTI SOS" (Infographic theo địa bàn) đã chuyển sang cuối tab Tổng quan. Thứ tự nút tab hiện tại: Tổng quan → Theo GĐV → Báo cáo XO → Đề xuất cải tiến CLDV → Tra cứu tiến trình → Dashboard động (CSS `.tabs .tab:nth-child(n)` đã đánh số lại theo thứ tự mới).
+> Tab "Tổng hợp cảnh báo" (`tab-infographic`) đã bị xóa (09/2026) — báo cáo "BÁO CÁO TIẾN ĐỘ GIẢI QUYẾT HỒ SƠ TỒN ĐỌNG PTI SOS" (Infographic theo địa bàn) đã chuyển sang cuối tab Tổng quan. **Thứ tự nút tab hiện tại (09/2026)**: **Dashboard động** → Tổng quan → Theo GĐV → Báo cáo XO → Đề xuất cải tiến CLDV → Tra cứu tiến trình. Dashboard động là tab **mặc định mở khi vào trang** (`class="tab active"` + `#tab-dashboard` không có `display:none`).
+> ⚠️ Khi đổi thứ tự tab phải sửa đồng bộ **4 chỗ**: (1) thứ tự `<button class="tab">`, (2) thứ tự `<div id="tab-...">` kèm `style="display:none"` (đúng 1 pane hiện, 1 nút `active`, và 2 cái phải cùng trỏ 1 tab), (3) CSS `.tabs .tab:nth-child(n)` — đánh số theo **vị trí**, không theo tab, nên phải gán lại màu để mỗi tab giữ đúng màu cũ, (4) mảng trong `switchTab()`.
 
 ### Tiêu chí nhóm của tab Dashboard động
 
@@ -165,15 +166,14 @@ Dùng `localStorage` với 3 key:
 
 Mỗi tab có màu gradient riêng, hiệu ứng nổi/nhấn kiểu nút 3D vật lý:
 
-| Tab | Màu gradient |
-|-----|-------------|
-| 📊 Tổng quan | `#60a5fa → #1d4ed8` (xanh dương) |
-| 👤 Theo GĐV | `#34d399 → #047857` (xanh lá) |
-| 📋 Báo cáo XO | `#c084fc → #6d28d9` (tím) |
-| 🚨 Tổng hợp cảnh báo | `#22d3ee → #0e7490` (cyan) |
-| 💡 Đề xuất cải tiến CLDV | `#fb7185 → #be123c` (hồng đỏ) |
-| 🔍 Tra cứu tiến trình | `#fbbf24 → #b45309` (vàng cam) |
-| 🎯 Dashboard động | `#22d3ee → #0e7490` (cyan) |
+| # | Tab | Màu gradient |
+|---|-----|-------------|
+| 1 | 🎯 Dashboard động | `#22d3ee → #0e7490` (cyan) |
+| 2 | 📊 Tổng quan | `#60a5fa → #1d4ed8` (xanh dương) |
+| 3 | 👤 Theo GĐV | `#34d399 → #047857` (xanh lá) |
+| 4 | 📋 Báo cáo XO | `#c084fc → #6d28d9` (tím) |
+| 5 | 💡 Đề xuất cải tiến CLDV | `#fb7185 → #be123c` (hồng đỏ) |
+| 6 | 🔍 Tra cứu tiến trình | `#fbbf24 → #b45309` (vàng cam) |
 
 **Nền nội dung tab (`.tab-pane`)**: mỗi tab có nền gradient pastel dịu cùng tông màu nút tab (xanh dương / xanh lá / tím / cyan / hồng nhạt), bo góc 16px, viền trắng mờ.
 
