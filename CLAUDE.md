@@ -63,15 +63,32 @@ Cột quan trọng:
 
 | Tab | ID | Mô tả |
 |-----|----|-------|
-| Tổng quan | `tab-overview` | KPI tổng hợp + biểu đồ + bảng TLBT theo nghiệp vụ + Infographic theo địa bàn (hàm `renderInfographic(s)`, nay trả về chuỗi HTML và được nối vào cuối `renderOverview(s)` thay vì render tab riêng) + khối "Đánh giá Tổng quan" (`generateAnalysis(s)`) ở cuối cùng |
+| Tổng quan | `tab-overview` | KPI tổng hợp + biểu đồ + bảng TLBT theo nghiệp vụ + Infographic theo địa bàn (hàm `renderInfographic()`, trả về chuỗi HTML và được nối vào cuối `renderOverview(s)` thay vì render tab riêng) |
 | Theo GĐV | `tab-gdv` | Bảng tổng hợp hồ sơ tồn theo GĐV — kiểu Excel, 4 hàng header |
 | Báo cáo XO | `tab-baocao` | BC1 Top 30 Gara/Showroom doanh thu SC + BC2 Danh sách HS tồn ≥90 ngày + BC3 tồn 46–89 ngày |
 | Đề xuất cải tiến CLDV | `tab-cldv` | Phân tích 3 trục: Chất lượng dịch vụ · Hiệu quả & Năng suất · Quan hệ khách hàng; hàm `renderCLDV(s)` |
+| Dashboard động | `tab-dashboard` | Dashboard đa chiều: thanh chọn "Xem theo" **6 tiêu chí** (Giám định viên / Địa bàn / Nghiệp vụ / Hãng xe / Gara-Showroom / Trạng thái hồ sơ) → 3 biểu đồ và bảng chi tiết tính lại theo tiêu chí nhóm đã chọn. **Không có hàng KPI cố định** — đã gỡ (09/2026) vì các số đó không đổi khi bấm chuyển tiêu chí và đã hiển thị ở tab Tổng quan; tab này chỉ chứa nội dung thực sự thay đổi theo lựa chọn. Hàm `renderDashboard(s)` (dùng `s.rows`), `setDashDim(dim)` (đổi tiêu chí, re-render chỉ tab này), `computeDashGroups(data,dim)` → `groupRowsByDim(data,dim)` → `dimKeyOf(r,dim)` + `computeGroupStat(gd)`. `computeGroupStat` dùng đúng công thức đã chuẩn hoá: `tyLeGQ = daGQ/tongCanGQ`, `tyLeTon = tongTon/(hsps/curMonth)`, cấp độ cảnh báo <80% / 80–130% / >130% — đã đối chiếu khớp 100% với `gdvStats` trong `computeStats()` |
 | Tra cứu tiến trình | `tab-search` | Tra cứu hồ sơ theo Số HSBT/Biển kiểm soát (khớp một phần, OR) kết hợp lọc GĐV thụ lý/Trạng thái hồ sơ (dropdown, AND) — mọi tiêu chí đều tuỳ chọn, chỉ cần 1 trong 4; bảng kết quả 17 cột (gồm GĐV thụ lý + 16 cột mốc thời gian/tiền/trạng thái); hàm `renderSearch()` (khởi tạo UI 1 lần, cờ `searchTabInit`) + `buildSearchFilterOptions()` (build lại cả 2 dropdown GĐV và Trạng thái hồ sơ mỗi lần renderAll, động theo giá trị thực tế có trong `RAW` — tức theo đúng dữ liệu Google Drive/Dulieu.xlsx đang tải, không hardcode danh sách; giữ lựa chọn hiện tại) + `doSearchHSBT()` (đọc `RAW` toàn bộ, không phụ thuộc filter bar) |
 
 > Tab "Phân loại tồn" (`tab-aging`) đã bị xóa (06/2026) — nội dung phân phối thời gian tồn đã được tích hợp vào tab Đề xuất cải tiến CLDV (Trục 1). `warnRows` trong `computeStats()` vẫn giữ nguyên.
 > Tab "Cảnh báo" (`tab-warnings`) đã bị xóa (06/2026) — các bảng HS tồn >90 ngày và GĐV nguy hiểm đã có trong tab Báo cáo XO và tab Tổng quan.
-> Tab "Tổng hợp cảnh báo" (`tab-infographic`) đã bị xóa (09/2026) — báo cáo "BÁO CÁO TIẾN ĐỘ GIẢI QUYẾT HỒ SƠ TỒN ĐỌNG PTI SOS" (Infographic theo địa bàn + Đánh giá Tổng quan) đã chuyển sang cuối tab Tổng quan. Thứ tự nút tab hiện tại: Tổng quan → Theo GĐV → Báo cáo XO → Đề xuất cải tiến CLDV → Tra cứu tiến trình (CSS `.tabs .tab:nth-child(n)` đã đánh số lại theo thứ tự mới).
+> Khối "Đánh giá Tổng quan" (`generateAnalysis(s)`) đã bị xóa hoàn toàn (09/2026) theo yêu cầu — tab Tổng quan nay kết thúc ở khối Infographic theo địa bàn. `renderInfographic()` không còn nhận tham số `s`.
+> Tab "Tổng hợp cảnh báo" (`tab-infographic`) đã bị xóa (09/2026) — báo cáo "BÁO CÁO TIẾN ĐỘ GIẢI QUYẾT HỒ SƠ TỒN ĐỌNG PTI SOS" (Infographic theo địa bàn) đã chuyển sang cuối tab Tổng quan. Thứ tự nút tab hiện tại: Tổng quan → Theo GĐV → Báo cáo XO → Đề xuất cải tiến CLDV → Tra cứu tiến trình → Dashboard động (CSS `.tabs .tab:nth-child(n)` đã đánh số lại theo thứ tự mới).
+
+### Tiêu chí nhóm của tab Dashboard động
+
+| dim | Nguồn cột | Giới hạn nhóm (`DASH_TOP_N`) |
+|-----|-----------|------------------------------|
+| `gdv` | `gdvKey(r)` | không — theo thứ tự `GDV_NAMES` |
+| `diaban` | `DIABAN_MAP` | không — theo thứ tự `DIABAN_MAP` |
+| `nv` | `Mã nghiệp vụ` → TNDS/VCX/Khác | không |
+| `hangxe` | `Hãng xe` (~40 giá trị) | **12** + nhóm "Khác (N hãng xe)" |
+| `garage` | `Tên garage (thường gọi)`, fallback `(ĐKKD)` (~118 giá trị) | **12** + nhóm "Khác (N gara/showroom)" |
+| `trangthai` | `Trạng thái hồ sơ` (14 giá trị) | không |
+
+- Các dim không có thứ tự chuẩn được xếp theo **số hồ sơ giảm dần**; phần đuôi vượt ngưỡng gộp vào nhóm "Khác" nên **tổng các nhóm luôn khớp tổng toàn cục** (đã có test bất biến).
+- `normDimVal(v)`: giá trị rỗng hoặc `"-"` trong file nguồn → gom về nhóm `"(Không xác định)"` (dữ liệu thật có 27 HS trạng thái `-` và 44 HS gara `-`).
+- Mỗi nhóm có `label` (đầy đủ, dùng cho bảng) và `short` (cắt ≤22 ký tự, dùng cho nhãn biểu đồ) — tên gara/GĐV dài sẽ phá layout chart nếu dùng `label`.
 
 ## Cấu hình Địa bàn (dùng cho khối Infographic trong tab Tổng quan)
 
@@ -155,10 +172,21 @@ Mỗi tab có màu gradient riêng, hiệu ứng nổi/nhấn kiểu nút 3D v�
 | 📋 Báo cáo XO | `#c084fc → #6d28d9` (tím) |
 | 🚨 Tổng hợp cảnh báo | `#22d3ee → #0e7490` (cyan) |
 | 💡 Đề xuất cải tiến CLDV | `#fb7185 → #be123c` (hồng đỏ) |
+| 🔍 Tra cứu tiến trình | `#fbbf24 → #b45309` (vàng cam) |
+| 🎯 Dashboard động | `#22d3ee → #0e7490` (cyan) |
 
 **Nền nội dung tab (`.tab-pane`)**: mỗi tab có nền gradient pastel dịu cùng tông màu nút tab (xanh dương / xanh lá / tím / cyan / hồng nhạt), bo góc 16px, viền trắng mờ.
 
-**Filter bar**: nền gradient đậm `#312e81 → #4c1d95 → #6d28d9` (indigo→tím), label chữ trắng, select nền trắng với viền accent riêng từng bộ lọc (`#filter-gdv` xanh lá, `#filter-nv` xanh dương, `#filter-tt` vàng), `filter-info` dạng pill trắng mờ.
+**Thanh tab dính dưới header (09/2026)**: `.tabs` có `position:sticky; top:64px; z-index:90` — chỉ bật trong `@media(min-width:601px)`.
+- `top:64px` = đúng `height` cố định của `.topbar`; **nếu đổi chiều cao topbar phải sửa đồng thời giá trị này**.
+- `z-index:90` < `.topbar` (100) để thanh tab trượt xuống *dưới* topbar, không đè lên.
+- Nền khi sticky nâng lên `rgba(255,255,255,.9)` (mặc định `.55`) để nội dung cuộn phía sau không lộ qua.
+- **Không bật sticky ở mobile ≤600px**: topbar mobile dùng `height:auto` + `flex-wrap:wrap` nên chiều cao thay đổi, chốt cứng `top` sẽ lệch/che mất thanh tab.
+- Lưu ý: không thêm `overflow` (hidden/auto/scroll) cho `body`, `#dashboard` hay `.content` — sẽ làm hỏng `position:sticky` của thanh tab.
+
+**Khoảng cách dọc (09/2026)**: đã thu hẹp để nhường không gian cho vùng dữ liệu — `.content` padding-top `24px → 10px` (tablet `8px`, mobile `6px`), `.tabs` margin-bottom `24px → 12px` (mobile `8px`).
+
+**Thanh lọc chung đã bị xoá (09/2026)** — 3 bộ lọc GĐV / Nghiệp vụ / Trạng thái cùng `getFiltered()`, `buildGdvFilter()` và toàn bộ CSS `.filter-bar` đã gỡ bỏ. `renderAll()` nay tính thẳng `computeStats(RAW)`; muốn lọc/cắt lát dữ liệu thì dùng tab **Dashboard động** (6 tiêu chí nhóm) hoặc tab **Tra cứu tiến trình**. Số hồ sơ hiển thị ở pill `#record-count` (class `.topbar-count`) trong khối `.topbar-right` của topbar, cạnh nút "↩ Tải file khác".
 
 - Trạng thái mặc định: `transform: translateY(-3px)`, `box-shadow: 0 6px 0 rgba(0,0,0,0.22)`
 - Hover: `translateY(-5px)`, shadow `8px`

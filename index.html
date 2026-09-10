@@ -198,53 +198,20 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
 .btn-refresh:hover{background:rgba(66,133,244,.38)}
 .btn-refresh:disabled{opacity:.5;cursor:not-allowed}
 
-.content{padding:24px 28px;max-width:1400px;margin:0 auto}
+/* padding-top nhỏ để thanh tab nằm sát topbar, nhường không gian cho vùng dữ liệu */
+.content{padding:10px 28px 24px;max-width:1400px;margin:0 auto}
 
-/* FILTER BAR — nền đậm làm nổi bật chức năng lọc */
-.filter-bar{
-  background:linear-gradient(135deg,#312e81 0%,#4c1d95 55%,#6d28d9 100%);
-  border:1px solid rgba(255,255,255,.18);border-radius:var(--radius);
-  padding:14px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:20px;
-  box-shadow:0 6px 22px rgba(76,29,149,.32),inset 0 1px 0 rgba(255,255,255,.15);
-}
-.filter-bar label{
-  font-size:.78rem;font-weight:700;color:rgba(255,255,255,.92);white-space:nowrap;
-  text-shadow:0 1px 2px rgba(0,0,0,.3);
-}
-.filter-bar select{
-  padding:7px 32px 7px 12px;border:1.5px solid rgba(255,255,255,.4);border-radius:var(--radius-sm);
-  font-size:.82rem;font-family:'Be Vietnam Pro',sans-serif;
-  color:#1e1b4b;font-weight:600;cursor:pointer;outline:none;
-  appearance:none;-webkit-appearance:none;
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236366f1' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center,
-    linear-gradient(160deg,#ffffff 0%,#eef2ff 100%);
-  box-shadow:0 3px 10px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.9);
-  transition:border-color .18s,box-shadow .18s,transform .12s;
-}
-/* Mỗi bộ lọc một màu accent riêng */
-#filter-gdv{border-color:#6ee7b7}
-#filter-nv{border-color:#93c5fd}
-#filter-tt{border-color:#fcd34d}
-.filter-bar select:hover{
-  box-shadow:0 5px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.9);
-  transform:translateY(-1px);
-}
-.filter-bar select:focus{
-  border-color:#fff;
-  box-shadow:0 0 0 3px rgba(255,255,255,.3),0 5px 16px rgba(0,0,0,.25);
-  transform:translateY(-1px);
-}
-.filter-sep{width:1px;height:28px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.4),transparent)}
-.filter-info{
-  font-size:.78rem;font-weight:700;margin-left:auto;
+/* Khối bên phải topbar: số hồ sơ đang hiển thị + nút tải file khác */
+.topbar-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.topbar-count{
+  font-size:.78rem;font-weight:700;white-space:nowrap;
   color:#fff;background:rgba(255,255,255,.16);
-  padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.35);
+  padding:5px 13px;border-radius:20px;border:1px solid rgba(255,255,255,.35);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.2);
 }
 
 /* TABS — 3D Press Button */
-.tabs{display:flex;gap:8px;margin-bottom:24px;background:rgba(255,255,255,0.55);
+.tabs{display:flex;gap:8px;margin-bottom:12px;background:rgba(255,255,255,0.55);
   border:1px solid rgba(255,255,255,0.8);border-radius:14px;padding:8px;width:fit-content;max-width:100%;
   backdrop-filter:blur(10px);box-shadow:0 2px 12px rgba(0,0,0,.08)}
 .tab{
@@ -266,6 +233,19 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
 .tabs .tab:nth-child(3){background:linear-gradient(160deg,#c084fc 0%,#6d28d9 100%)}
 .tabs .tab:nth-child(4){background:linear-gradient(160deg,#fb7185 0%,#be123c 100%)}
 .tabs .tab:nth-child(5){background:linear-gradient(160deg,#fbbf24 0%,#b45309 100%)}
+.tabs .tab:nth-child(6){background:linear-gradient(160deg,#22d3ee 0%,#0e7490 100%)}
+
+/* Thanh tab dính ngay dưới topbar khi cuộn (top = chiều cao topbar 64px, z-index < 100 để trượt
+   xuống dưới topbar). Chỉ bật từ 601px trở lên: topbar mobile dùng height:auto + flex-wrap nên
+   chiều cao thay đổi, chốt cứng top sẽ lệch. Nền đục hơn mức mặc định để nội dung cuộn phía sau
+   không lộ qua thanh tab. */
+@media(min-width:601px){
+  .tabs{
+    position:sticky;top:64px;z-index:90;
+    background:rgba(255,255,255,.9);
+    box-shadow:0 4px 16px rgba(0,0,0,.12);
+  }
+}
 
 /* Nền nội dung từng tab — pastel dịu cùng tông màu nút tab */
 .tab-pane{
@@ -278,6 +258,7 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
 #tab-baocao{background:linear-gradient(170deg,rgba(237,233,254,.65) 0%,rgba(245,243,255,.4) 100%)}
 #tab-cldv{background:linear-gradient(170deg,rgba(255,228,230,.6) 0%,rgba(255,241,242,.4) 100%)}
 #tab-search{background:linear-gradient(170deg,rgba(254,243,199,.6) 0%,rgba(255,251,235,.4) 100%)}
+#tab-dashboard{background:linear-gradient(170deg,rgba(207,250,254,.6) 0%,rgba(236,254,255,.4) 100%)}
 @media(max-width:600px){.tab-pane{padding:10px 8px;border-radius:12px}}
 
 /* Tra cứu tiến trình HS */
@@ -291,6 +272,20 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
 .btn-search:hover{filter:brightness(1.08)}
 .btn-search:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.16)}
 .search-hint{font-size:.72rem;color:var(--text2);margin-top:10px}
+
+/* DASHBOARD ĐỘNG — thanh chọn tiêu chí nhóm (segmented control) */
+.dash-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:18px}
+.dash-toolbar-label{font-size:.78rem;font-weight:700;color:var(--text2)}
+.dash-seg{display:inline-flex;background:#fff;border:1px solid var(--border);border-radius:9px;padding:3px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.dash-seg button{border:none;background:transparent;padding:7px 16px;font-size:.8rem;font-weight:600;
+  font-family:'Be Vietnam Pro',sans-serif;color:var(--text2);border-radius:6px;cursor:pointer;transition:all .15s}
+.dash-seg button:hover{color:var(--text)}
+.dash-seg button.active{background:linear-gradient(135deg,#22d3ee,#0e7490);color:#fff;box-shadow:0 2px 6px rgba(14,116,144,.35)}
+.dash-info{
+  font-size:.75rem;font-weight:600;color:#0e7490;white-space:nowrap;
+  background:rgba(255,255,255,.75);border:1px solid rgba(14,116,144,.25);
+  padding:5px 12px;border-radius:20px;
+}
 
 /* KPI CARDS — compact (~1/3 cũ), nền màu nổi bật số liệu */
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:8px;margin-bottom:20px}
@@ -504,7 +499,7 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
 /* ── RESPONSIVE MOBILE ≤600px ── */
 @media(max-width:600px){
   /* Content */
-  .content{padding:10px 8px}
+  .content{padding:6px 8px 10px}
 
   /* Topbar */
   .topbar{height:auto;min-height:50px;padding:8px 10px;gap:6px;flex-wrap:wrap}
@@ -516,16 +511,12 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
   .btn-label-full{display:none}
   .btn-label-short{display:inline!important}
 
-  /* Filter bar */
-  .filter-bar{gap:7px 10px;padding:9px 10px}
-  .filter-bar label{font-size:.7rem}
-  .filter-bar select{font-size:.76rem;padding:5px 24px 5px 8px;flex:1;min-width:80px}
-  .filter-sep{display:none}
-  .filter-info{margin-left:0;font-size:.7rem;text-align:center;width:100%}
+  .topbar-right{gap:6px}
+  .topbar-count{font-size:.66rem;padding:3px 9px}
 
   /* Tabs — cuộn ngang, ẩn scrollbar */
   .tabs{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;
-    scrollbar-width:none;flex-wrap:nowrap;border-radius:10px;padding:5px;gap:4px}
+    scrollbar-width:none;flex-wrap:nowrap;border-radius:10px;padding:5px;gap:4px;margin-bottom:8px}
   .tabs::-webkit-scrollbar{display:none}
   .tab{padding:6px 9px;font-size:.68rem;flex-shrink:0}
 
@@ -585,7 +576,7 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
 
 /* ── RESPONSIVE TABLET 601–900px ── */
 @media(min-width:601px) and (max-width:900px){
-  .content{padding:16px 14px}
+  .content{padding:8px 14px 16px}
   .tab{padding:7px 13px;font-size:.76rem}
   .kpi-val{font-size:1rem}
   .kpi-grid{grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
@@ -692,7 +683,7 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
   </div>
 
   <div class="features">
-    <div class="feat"><div class="feat-dot"></div>Filter theo GĐV &amp; nghiệp vụ</div>
+    <div class="feat"><div class="feat-dot"></div>Dashboard động 6 tiêu chí</div>
     <div class="feat"><div class="feat-dot"></div>Biểu đồ Chart.js động</div>
     <div class="feat"><div class="feat-dot"></div>Cảnh báo hồ sơ tồn &gt;90 ngày</div>
     <div class="feat"><div class="feat-dot"></div>Báo cáo XO đầy đủ 2 loại</div>
@@ -716,31 +707,13 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
         <span id="file-date-badge"></span>
       </div>
     </div>
-    <button class="btn-reset" onclick="resetApp()"><span class="btn-label-full">↩ Tải file khác</span><span class="btn-label-short" style="display:none">↩</span></button>
+    <div class="topbar-right">
+      <span class="topbar-count" id="record-count"></span>
+      <button class="btn-reset" onclick="resetApp()"><span class="btn-label-full">↩ Tải file khác</span><span class="btn-label-short" style="display:none">↩</span></button>
+    </div>
   </div>
 
   <div class="content">
-    <!-- Filter bar -->
-    <div class="filter-bar">
-      <label>Giám định viên:</label>
-      <select id="filter-gdv"><option value="ALL">Tất cả GĐV</option></select>
-      <div class="filter-sep"></div>
-      <label>Nghiệp vụ:</label>
-      <select id="filter-nv">
-        <option value="ALL">Tất cả</option>
-        <option value="TNDS">TNDS (XO.1…)</option>
-        <option value="VCX">VCX (XO.4…)</option>
-      </select>
-      <div class="filter-sep"></div>
-      <label>Trạng thái:</label>
-      <select id="filter-tt">
-        <option value="ALL">Tất cả</option>
-        <option value="processing">Đang xử lý</option>
-        <option value="resolved">Đã giải quyết</option>
-      </select>
-      <span class="filter-info" id="filter-info"></span>
-    </div>
-
     <!-- Tabs -->
     <div class="tabs">
       <button class="tab active" onclick="switchTab('overview',this)">📊 Tổng quan</button>
@@ -748,6 +721,7 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
       <button class="tab" onclick="switchTab('baocao',this)">📋 Báo cáo XO</button>
       <button class="tab" onclick="switchTab('cldv',this)">💡 Đề xuất cải tiến CLDV</button>
       <button class="tab" onclick="switchTab('search',this)">🔍 Tra cứu tiến trình</button>
+      <button class="tab" onclick="switchTab('dashboard',this)">🎯 Dashboard động</button>
     </div>
 
     <div id="tab-overview" class="tab-pane"></div>
@@ -755,6 +729,7 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
     <div id="tab-baocao" class="tab-pane" style="display:none"></div>
     <div id="tab-cldv" class="tab-pane" style="display:none"></div>
     <div id="tab-search" class="tab-pane" style="display:none"></div>
+    <div id="tab-dashboard" class="tab-pane" style="display:none"></div>
   </div>
 
   <footer>
@@ -913,7 +888,7 @@ function _processGvizData(data){
       else localStorage.removeItem('pti_gdrive_id');
     }catch(e){}
     document.getElementById('topbar-file').textContent='Google Drive — Dulieu.xlsx';
-    buildGdvFilter();renderAll();show('dashboard');
+    renderAll();show('dashboard');
     // Hiện nút Làm mới (chỉ dành cho nguồn Drive) và reset trạng thái
     const rb=document.getElementById('btn-refresh');
     if(rb){rb.style.display='inline-block';rb.disabled=false;rb.textContent='🔄 Làm mới';}
@@ -999,7 +974,7 @@ function loadFile(file){
         RAW=XLSX.utils.sheet_to_json(ws,{defval:''});
         // Lưu phiên vào localStorage
         try{localStorage.setItem(LS_KEY,JSON.stringify(RAW));localStorage.setItem(LS_FILE,file.name);localStorage.setItem(LS_FDATE,file.lastModified);}catch(e){}
-        buildGdvFilter();renderAll();show('dashboard');
+        renderAll();show('dashboard');
         showFileDateBadge(file.lastModified,false);
         document.getElementById('footer-date').textContent=
           new Date().toLocaleDateString('vi-VN',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'});
@@ -1061,41 +1036,9 @@ function fmtDate(v){const d=parseDate(v);return d?d.toLocaleDateString('vi-VN',{
 function pct(a,b){return b>0?Math.round(a/b*1000)/10:0}
 function fmtPct(v){return v+'%'}
 
-// ─── FILTER ──────────────────────────────────────────────────────────────────
-function getFiltered(){
-  const gdv=document.getElementById('filter-gdv').value;
-  const nv=document.getElementById('filter-nv').value;
-  const tt=document.getElementById('filter-tt').value;
-  return RAW.filter(r=>{
-    const gdvCol=gdvKey(r);
-    const nvCol=String(r['Mã nghiệp vụ']||'').trim();
-    const ttCol=String(r['Trạng thái hồ sơ']||'').trim();
-    const resolved=ttCol==='Đã thanh toán'||ttCol==='Đã hủy';
-    if(gdv!=='ALL'&&gdvCol!==gdv)return false;
-    if(nv==='TNDS'&&!nvCol.startsWith('XO.1'))return false;
-    if(nv==='VCX'&&!nvCol.startsWith('XO.4'))return false;
-    if(tt==='resolved'&&!resolved)return false;
-    if(tt==='processing'&&resolved)return false;
-    return true;
-  });
-}
-
 function gdvKey(r){
   return String(r['GĐV thụ lý']||r['Mã GĐV']||'').trim();
 }
-
-function buildGdvFilter(){
-  const sel=document.getElementById('filter-gdv');
-  while(sel.options.length>1)sel.remove(1);
-  const gdvs=[...new Set(RAW.map(r=>gdvKey(r)).filter(Boolean))];
-  gdvs.forEach(g=>{
-    const o=document.createElement('option');o.value=g;
-    o.textContent=g+(GDV_NAMES[g]?' – '+GDV_NAMES[g]:'');sel.appendChild(o);
-  });
-}
-
-['filter-gdv','filter-nv','filter-tt'].forEach(id=>
-  document.getElementById(id).addEventListener('change',renderAll));
 
 // ─── STATS ───────────────────────────────────────────────────────────────────
 function isResolved(r){const t=String(r['Trạng thái hồ sơ']||'');return t==='Đã thanh toán'||t==='Đã hủy'}
@@ -1321,10 +1264,10 @@ function _buildDualNvBtChart(canvasId,labels,dthuData,tlbtData,cy){
 
 // ─── RENDER ──────────────────────────────────────────────────────────────────
 function renderAll(){
-  const data=getFiltered();const s=computeStats(data);
-  document.getElementById('filter-info').textContent=`Đang hiển thị ${data.length} / ${RAW.length} hồ sơ`;
+  const s=computeStats(RAW);
+  document.getElementById('record-count').textContent=`📊 ${fmtN(RAW.length)} hồ sơ`;
   destroyCharts();
-  renderOverview(s);renderGdv(s);renderBaoCao(s);renderCLDV(s);renderSearch();
+  renderOverview(s);renderGdv(s);renderBaoCao(s);renderCLDV(s);renderSearch();renderDashboard(s);
   // Tải sheet TLBT song song (không block render chính)
   loadTlbtSheet();
 }
@@ -1360,7 +1303,7 @@ function renderOverview(s){
     </div>
   `;
   el.innerHTML+=buildNvBtSection(curYear);
-  el.innerHTML+=renderInfographic(s);
+  el.innerHTML+=renderInfographic();
   setTimeout(()=>{
     buildBar('chart-bar-main',s.gdvStats.map(g=>g.code),[
       {label:'Tổng tiếp nhận',data:s.gdvStats.map(g=>g.total),backgroundColor:'#90caf9'},
@@ -1710,119 +1653,6 @@ function renderGdv(s){
   },10);
 }
 
-// TAB 3: PHÂN TÍCH TỒN — Đánh giá tổng quan: ngắn gọn, tập trung giải pháp giảm tồn quá hạn
-function generateAnalysis(s){
-  const now=new Date();
-  const month=now.getMonth()+1;
-  const year=now.getFullYear();
-
-  const tyLeGQ=s.tyLe;
-  const tongTon=s.ton;
-  const quaHan=s.buckets.b3+s.buckets.b4; // tồn quá 45 ngày
-  const tyLeQuaHan=tongTon>0?Math.round(quaHan/tongTon*100):0;
-  const pctB1=tongTon>0?Math.round(s.buckets.b1/tongTon*100):0;
-  const pctB2=tongTon>0?Math.round(s.buckets.b2/tongTon*100):0;
-  const pctB3=tongTon>0?Math.round(s.buckets.b3/tongTon*100):0;
-  const pctB4=tongTon>0?Math.round(s.buckets.b4/tongTon*100):0;
-
-  let mucDo,iconTQ,bgTQ;
-  if(tyLeGQ>=65&&pctB4<15){mucDo='TÍCH CỰC';iconTQ='✅';bgTQ='linear-gradient(135deg,#064e3b,#059669)';}
-  else if(tyLeGQ>=45&&pctB4<30){mucDo='TRUNG BÌNH — CẦN THEO DÕI';iconTQ='⚠️';bgTQ='linear-gradient(135deg,#78350f,#d97706)';}
-  else{mucDo='ĐÁNG LO NGẠI — CẦN XỬ LÝ NGAY';iconTQ='🔴';bgTQ='linear-gradient(135deg,#7f1d1d,#dc2626)';}
-
-  const gdvCap3=s.gdvStats.filter(g=>g.wl===3);
-  const gdvCap1=s.gdvStats.filter(g=>g.wl===1);
-  const gdvQua90=s.gdvStats.filter(g=>g.qua90>0).sort((a,b)=>b.qua90-a.qua90);
-  const deadline=new Date(now.getTime()+14*86400000).toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit'});
-
-  const num=(n,c='#1565C0')=>`<b style="color:${c}">${fmtN(n)}</b>`;
-  const pct=(n,c='#1565C0')=>`<b style="color:${c}">${n}%</b>`;
-
-  // I. Nhận định chính — đi thẳng vào con số quyết định
-  const nhanDinh=[];
-  nhanDinh.push(`Tỷ lệ giải quyết ${pct(tyLeGQ,tyLeGQ>=65?'#059669':tyLeGQ>=45?'#d97706':'#dc2626')} trên ${num(s.total)} hồ sơ. Còn ${num(s.processing,'#d97706')} HS đang xử lý, trong đó ${num(tongTon,'#7c3aed')} HS có ngày tồn — bình quân <b style="color:#7c3aed">${s.avgDays} ngày</b>/hồ sơ.`);
-  nhanDinh.push(`Tồn quá hạn &gt;45 ngày: ${num(quaHan,'#ea580c')} HS, chiếm ${pct(tyLeQuaHan,'#ea580c')} tổng tồn. Riêng nhóm ≥90 ngày còn ${num(s.buckets.b4,'#dc2626')} HS — chỉ số quyết định xếp loại đơn vị, phải kéo về <b style="color:#dc2626">0</b>.`);
-  if(gdvQua90.length) nhanDinh.push(`Toàn bộ HS ≥90 ngày tập trung ở ${gdvQua90.length} GĐV: ${gdvQua90.map(g=>`<b>${g.name}</b> (${g.qua90} HS)`).join(', ')} — xử lý đúng người, đúng hồ sơ sẽ loại bỏ phần lớn rủi ro hiện tại.`);
-  if(gdvCap3.length) nhanDinh.push(`${gdvCap3.length} GĐV vượt ngưỡng tải Cấp độ 3 (tồn/PS tháng &gt;130%): ${gdvCap3.map(g=>`<b style="color:#dc2626">${g.name}</b>`).join(', ')} — nếu không san tải, tồn quá hạn sẽ tiếp tục phát sinh từ đây.`);
-
-  // II. Giải pháp — tập trung giảm hồ sơ tồn quá hạn, có mục tiêu & thời hạn
-  const giaiphap=[];
-  if(s.buckets.b4>0) giaiphap.push(`<b>Chiến dịch "xóa tồn ≥90 ngày" trong 14 ngày (hạn ${deadline}):</b> giao đích danh ${s.buckets.b4} hồ sơ (danh sách chi tiết tại tab Báo cáo XO — mục 2) cho từng GĐV kèm deadline từng hồ sơ. Phân loại ngay theo nguyên nhân tắc (chờ chứng từ gara · chờ khách hàng · chờ phê duyệt · tranh chấp) và xử lý theo nhóm nguyên nhân thay vì từng hồ sơ rời rạc.`);
-  if(s.buckets.b3>0) giaiphap.push(`<b>Chặn leo thang nhóm 46–89 ngày (${s.buckets.b3} HS — "cửa sổ vàng"):</b> đây là nguồn sinh tồn ≥90 ngày kế tiếp. Mục tiêu giải quyết tối thiểu 50% trong 30 ngày; ưu tiên trước các HS đã quá 75 ngày vì chỉ còn ~2 tuần trước khi vượt ngưỡng.`);
-  giaiphap.push(`<b>Chốt chặn sớm tại mốc 30 và 45 ngày:</b> sáng thứ 2 hàng tuần, trưởng nhóm rà danh sách HS vừa chạm mốc — GĐV nêu rõ vướng mắc và bước xử lý kế tiếp. Không để hồ sơ "trôi" qua 45 ngày mà chưa có hành động cụ thể.`);
-  if(gdvCap3.length&&gdvCap1.length) giaiphap.push(`<b>San tải tức thời:</b> chuyển bớt HS phát sinh mới từ ${gdvCap3.map(g=>g.name).join(', ')} (Cấp độ 3) sang ${gdvCap1.map(g=>g.name).join(', ')} (Cấp độ 1) để nhóm quá tải dồn toàn lực đóng tồn cũ.`);
-  giaiphap.push(`<b>Xử lý nguyên nhân gốc từ Gara/đối tác:</b> phần lớn tồn kéo dài do chậm chứng từ quyết toán. Chốt SLA 7 ngày trả chứng từ với các gara có nhiều HS tồn nhất (tham chiếu BC1 tab Báo cáo XO); gara vi phạm lặp lại cân nhắc giảm điều phối xe mới.`);
-  giaiphap.push(`<b>Gắn chỉ tiêu tuần cho từng GĐV:</b> mỗi GĐV đăng ký số HS quá hạn sẽ đóng trong tuần, kết quả công bố nội bộ sáng thứ 2 — tạo nhịp giảm tồn liên tục thay vì dồn về cuối tháng.`);
-
-  // III. GĐV cần ưu tiên — chỉ nêu người có vấn đề, một dòng/người
-  const gdvUuTien=s.gdvStats.filter(g=>g.wl>=2||g.qua90>0);
-  const gdvDetails=gdvUuTien.length?gdvUuTien.map(g=>{
-    const icon=g.wl===3?'🔴':g.wl===2?'🟡':'🟠';
-    const hanhDong=g.wl===3?'san tải + lãnh đạo rà từng hồ sơ tồn':g.wl===2?'theo dõi sát, không để phát sinh quá hạn mới':'tập trung đóng dứt điểm HS ≥90 ngày';
-    return`<li style="margin-bottom:6px;padding:7px 12px;background:${g.wl===3?'#fff5f5':g.wl===2?'#fffbeb':'#fff7ed'};border-left:3px solid ${g.wl===3?'#dc2626':g.wl===2?'#d97706':'#ea580c'};border-radius:0 6px 6px 0;font-size:.82rem;line-height:1.6;color:#334155">${icon} <b>${g.name}</b> <span style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#64748b">(${g.code})</span>: tồn ${g.tongTon} HS (≥90 ngày: <b style="color:#dc2626">${g.qua90}</b> · 46–89: ${g.g45_90}) · tồn/PS tháng ${g.tyLeTon}% → <b>${hanhDong}</b>.</li>`;
-  }).join('')
-  :`<li style="padding:7px 12px;background:#f0fdf4;border-left:3px solid #059669;border-radius:0 6px 6px 0;font-size:.82rem;color:#166534">🟢 Không có GĐV nào ở mức cảnh báo — duy trì nhịp xử lý hiện tại.</li>`;
-
-  const ketluan=`Mục tiêu đến hết tháng ${month}/${year}: đưa tồn ≥90 ngày từ ${fmtN(s.buckets.b4)} HS về <b>0</b>, giảm tối thiểu 50% nhóm 46–89 ngày (${fmtN(s.buckets.b3)} HS) và giữ tỷ lệ tồn quá hạn dưới 15% tổng tồn. ${gdvQua90.length?`Ưu tiên nguồn lực vào ${gdvQua90.map(g=>g.name).join(', ')} — nơi tập trung toàn bộ hồ sơ rủi ro cao nhất.`:''}`;
-
-  return`
-  <div style="background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:24px;box-shadow:0 4px 24px rgba(0,0,0,.08)">
-    <div style="background:${bgTQ};padding:18px 24px;display:flex;align-items:center;gap:14px">
-      <div style="font-size:2rem;line-height:1">${iconTQ}</div>
-      <div>
-        <div style="font-size:.68rem;font-weight:700;color:rgba(255,255,255,.65);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Đánh giá Tổng quan — Tháng ${month}/${year}</div>
-        <div style="font-size:1.05rem;font-weight:700;color:#fff">${mucDo}</div>
-      </div>
-      <div style="margin-left:auto;text-align:right">
-        <div style="font-size:.7rem;color:rgba(255,255,255,.6)">Tỷ lệ giải quyết</div>
-        <div style="font-size:1.8rem;font-weight:800;color:#fff;line-height:1">${tyLeGQ}%</div>
-      </div>
-    </div>
-    <div style="padding:20px 24px;display:flex;flex-direction:column;gap:18px">
-
-      <div>
-        <div style="font-size:.75rem;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">📋 I. NHẬN ĐỊNH CHÍNH</div>
-        <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px">${nhanDinh.map(n=>`<li style="font-size:.83rem;line-height:1.7;color:#334155;padding:6px 12px 6px 32px;position:relative;background:#f8fafc;border-radius:7px"><span style="position:absolute;left:12px;top:7px;color:#1565C0;font-weight:800">▸</span>${n}</li>`).join('')}</ul>
-      </div>
-
-      <hr style="border:none;border-top:1px solid #e2e8f0;margin:0"/>
-
-      <div>
-        <div style="font-size:.75rem;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">⏳ II. CƠ CẤU HỒ SƠ TỒN</div>
-        <div class="analysis-buckets" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px">
-          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px;text-align:center"><div style="font-size:1.25rem;font-weight:800;color:#059669">${fmtN(s.buckets.b1)}</div><div style="font-size:.68rem;color:#166534;font-weight:600">1–30 ngày</div><div style="font-size:.65rem;color:#6b7280;margin-top:2px">chiếm ${pctB1}%</div></div>
-          <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px;text-align:center"><div style="font-size:1.25rem;font-weight:800;color:#d97706">${fmtN(s.buckets.b2)}</div><div style="font-size:.68rem;color:#92400e;font-weight:600">31–45 ngày</div><div style="font-size:.65rem;color:#6b7280;margin-top:2px">chiếm ${pctB2}%</div></div>
-          <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:10px;text-align:center"><div style="font-size:1.25rem;font-weight:800;color:#ea580c">${fmtN(s.buckets.b3)}</div><div style="font-size:.68rem;color:#c2410c;font-weight:600">46–89 ngày</div><div style="font-size:.65rem;color:#6b7280;margin-top:2px">chiếm ${pctB3}%</div></div>
-          <div style="background:#fff5f5;border:1px solid #fecaca;border-radius:8px;padding:10px;text-align:center"><div style="font-size:1.25rem;font-weight:800;color:#dc2626">${fmtN(s.buckets.b4)}</div><div style="font-size:.68rem;color:#991b1b;font-weight:600">≥90 ngày</div><div style="font-size:.65rem;color:#6b7280;margin-top:2px">chiếm ${pctB4}%</div></div>
-        </div>
-        <p style="font-size:.82rem;line-height:1.7;color:#334155;margin:0">${pctB1>=50?`Cơ cấu tương đối lành mạnh: ${pctB1}% tồn còn trong vùng an toàn 1–30 ngày.`:`Chỉ ${pctB1}% tồn nằm trong vùng an toàn 1–30 ngày — cơ cấu đang già hóa.`} Trọng tâm là ${num(quaHan,'#ea580c')} HS quá hạn &gt;45 ngày: nhóm 46–89 ngày là "cửa sổ vàng" còn cứu được, nhóm ≥90 ngày phải đóng dứt điểm.</p>
-      </div>
-
-      <hr style="border:none;border-top:1px solid #e2e8f0;margin:0"/>
-
-      <div>
-        <div style="font-size:.75rem;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">🎯 III. GIẢI PHÁP GIẢM HỒ SƠ TỒN QUÁ HẠN</div>
-        <ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px">${giaiphap.map((g,i)=>`<li style="font-size:.83rem;line-height:1.75;color:#334155;padding:8px 12px 8px 40px;position:relative;background:${i===0?'#fff5f5':'#eff6ff'};border-radius:7px;border-left:3px solid ${i===0?'#dc2626':'#1565C0'}"><span style="position:absolute;left:10px;top:8px;width:20px;height:20px;background:${i===0?'#dc2626':'#1565C0'};color:#fff;border-radius:50%;font-size:.65rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center">${i+1}</span>${g}</li>`).join('')}</ol>
-      </div>
-
-      <hr style="border:none;border-top:1px solid #e2e8f0;margin:0"/>
-
-      <div>
-        <div style="font-size:.75rem;font-weight:700;color:#0891b2;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">👤 IV. GĐV CẦN ƯU TIÊN HỖ TRỢ</div>
-        <ul style="margin:0;padding:0;list-style:none">${gdvDetails}</ul>
-      </div>
-
-      <hr style="border:none;border-top:1px solid #e2e8f0;margin:0"/>
-
-      <div style="background:linear-gradient(135deg,#f8fafc,#eff6ff);border:1px solid #bfdbfe;border-radius:10px;padding:14px 18px">
-        <div style="font-size:.72rem;font-weight:700;color:#1565C0;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">📌 MỤC TIÊU KỲ TỚI</div>
-        <p style="font-size:.84rem;line-height:1.8;color:#1e3a5f;margin:0;font-style:italic">${ketluan}</p>
-        <div style="font-size:.68rem;color:#94a3b8;margin-top:8px;text-align:right">Phân tích tự động · Dữ liệu tháng ${month}/${year} · PTISOS Quảng Ninh</div>
-      </div>
-
-    </div>
-  </div>`;
-}
 
 // TAB 4: BÁO CÁO XO
 function renderBaoCao(s){
@@ -2115,11 +1945,188 @@ function doSearchHSBT(){
   `;
 }
 
+// ─── TAB 6: DASHBOARD ĐỘNG ───────────────────────────────────────────────────
+let DASH_DIM='gdv';
+let _dashLastS=null;
+const DASH_DIM_LABEL={gdv:'Giám định viên',diaban:'Địa bàn',nv:'Nghiệp vụ',
+  hangxe:'Hãng xe',garage:'Gara/Showroom',trangthai:'Trạng thái hồ sơ'};
+// Số nhóm tối đa hiển thị — phần đuôi gộp vào "Khác" (null = hiện tất cả).
+// Hãng xe (~40 giá trị) và Gara (~118 giá trị) phải giới hạn thì biểu đồ mới đọc được.
+const DASH_TOP_N={gdv:null,diaban:null,nv:null,hangxe:12,garage:12,trangthai:null};
+
+function computeGroupStat(gd){
+  const now=new Date();
+  const curYear=now.getFullYear(),curMonth=now.getMonth()+1;
+  const prevYearEnd=new Date(curYear-1,11,31);
+  const curYearStart=new Date(curYear,0,1);
+  const gr=gd.filter(isResolved);
+  const gt=gd.filter(r=>parseTon(r['Số ngày tồn'])!==null);
+  const g45=gt.filter(r=>parseTon(r['Số ngày tồn'])>45);
+  const g90=gt.filter(r=>parseTon(r['Số ngày tồn'])>=90);
+  const b1=gt.filter(r=>{const n=parseTon(r['Số ngày tồn']);return n>=1&&n<=30}).length;
+  const b2=gt.filter(r=>{const n=parseTon(r['Số ngày tồn']);return n>30&&n<=45}).length;
+  const b3=gt.filter(r=>{const n=parseTon(r['Số ngày tồn']);return n>45&&n<90}).length;
+  const b4=gt.filter(r=>parseTon(r['Số ngày tồn'])>=90).length;
+  const tonNamTruoc=gd.filter(r=>{const d=parseDate(r['Ngày mở HSBT']);return d&&d<=prevYearEnd}).length;
+  const hsps=gd.filter(r=>{const d=parseDate(r['Ngày mở HSBT']);return d&&d>=curYearStart}).length;
+  const tongCanGQ=tonNamTruoc+hsps;
+  const daGQ=gr.length;
+  const tongTon=gt.length;
+  const hspsTBThang=curMonth>0?hsps/curMonth:0;
+  const tyLeTon=hspsTBThang>0?Math.round(tongTon/hspsTBThang*1000)/10:0;
+  let wl=1,wlabel='Cấp độ 1',wcolor='green';
+  if(tyLeTon>130){wl=3;wlabel='Cấp độ 3';wcolor='red'}
+  else if(tyLeTon>=80){wl=2;wlabel='Cấp độ 2';wcolor='amber'}
+  const tyLeGQ=tongCanGQ>0?Math.round(daGQ/tongCanGQ*1000)/10:0;
+  const bt=gd.reduce((s,r)=>s+parseMoney(r['Tiền ước/duyệt BT']),0);
+  const daTra=gd.reduce((s,r)=>s+parseMoney(r['Tiền BT đã trả cho KH']||r['Tiền BT đã trả cho KH '])+parseMoney(r['Tiền BT đã trả cho GR']),0);
+  const tyLeGiaiNgan=bt>0?Math.round(daTra/bt*1000)/10:0;
+  return{total:gd.length,daGQ,tongCanGQ,tongTon,qua45:g45.length,qua90:g90.length,
+    b1,b2,b3,b4,tyLeGQ,tyLeTon,wl,wlabel,wcolor,bt,daTra,tyLeGiaiNgan};
+}
+
+// Giá trị rỗng hoặc "-" trong file nguồn → gom về một nhóm duy nhất
+function normDimVal(v){const s=String(v||'').trim();return(!s||s==='-')?'(Không xác định)':s}
+
+function dimKeyOf(r,dim){
+  if(dim==='nv'){
+    const nv=String(r['Mã nghiệp vụ']||'').trim();
+    return nv.startsWith('XO.1')?'TNDS':nv.startsWith('XO.4')?'VCX':'Khác';
+  }
+  if(dim==='diaban'){
+    const g=gdvKey(r);
+    return Object.keys(DIABAN_MAP).find(db=>DIABAN_MAP[db].includes(g))||'Khác';
+  }
+  if(dim==='hangxe')return normDimVal(r['Hãng xe']);
+  if(dim==='garage')return normDimVal(r['Tên garage (thường gọi)']||r['Tên garage (ĐKKD)']);
+  if(dim==='trangthai')return normDimVal(r['Trạng thái hồ sơ']);
+  return gdvKey(r)||'—';
+}
+
+function groupRowsByDim(data,dim){
+  const map={};
+  data.forEach(r=>{
+    const k=dimKeyOf(r,dim);
+    (map[k]=map[k]||[]).push(r);
+  });
+  return map;
+}
+
+function computeDashGroups(data,dim){
+  const map=groupRowsByDim(data,dim);
+  // Thứ tự cố định cho các tiêu chí có danh sách chuẩn; các tiêu chí động xếp theo số HS giảm dần
+  let order=[];
+  if(dim==='gdv')order=Object.keys(GDV_NAMES);
+  else if(dim==='diaban')order=Object.keys(DIABAN_MAP);
+  else if(dim==='nv')order=['TNDS','VCX'];
+  order=order.filter(k=>map[k]);
+  Object.keys(map).filter(k=>!order.includes(k))
+    .sort((a,b)=>map[b].length-map[a].length)
+    .forEach(k=>order.push(k));
+
+  // Gộp đuôi vào "Khác" khi số nhóm vượt ngưỡng (chỉ gộp khi thực sự rút gọn được)
+  const cap=DASH_TOP_N[dim];
+  if(cap&&order.length>cap+1){
+    const tail=order.slice(cap);
+    order=order.slice(0,cap);
+    const khac=`Khác (${tail.length} ${DASH_DIM_LABEL[dim].toLowerCase()})`;
+    map[khac]=tail.reduce((acc,k)=>acc.concat(map[k]),[]);
+    order.push(khac);
+  }
+
+  return order.map(k=>{
+    const label=dim==='gdv'?(k+(GDV_NAMES[k]?' – '+GDV_NAMES[k]:'')):k;
+    return{key:k,label,short:label.length>22?label.slice(0,21)+'…':label,...computeGroupStat(map[k])};
+  });
+}
+
+function setDashDim(dim){
+  DASH_DIM=dim;
+  if(_dashLastS)renderDashboard(_dashLastS);
+}
+
+function renderDashboard(s){
+  _dashLastS=s;
+  const el=document.getElementById('tab-dashboard');
+  if(!el)return;
+  // Huỷ chart cũ khi đổi tiêu chí nhóm (renderAll không chạy lại trong trường hợp này)
+  ['chart-dash-bucket','chart-dash-ratio','chart-dash-money'].forEach(id=>{
+    if(CHARTS[id]){try{CHARTS[id].destroy()}catch{}delete CHARTS[id];}
+  });
+  const groups=computeDashGroups(s.rows,DASH_DIM);
+  const labels=groups.map(g=>g.short);
+
+  el.innerHTML=`
+    <div class="dash-toolbar">
+      <span class="dash-toolbar-label">Xem theo:</span>
+      <div class="dash-seg">
+        <button class="${DASH_DIM==='gdv'?'active':''}" onclick="setDashDim('gdv')">👤 Giám định viên</button>
+        <button class="${DASH_DIM==='diaban'?'active':''}" onclick="setDashDim('diaban')">📍 Địa bàn</button>
+        <button class="${DASH_DIM==='nv'?'active':''}" onclick="setDashDim('nv')">🚗 Nghiệp vụ</button>
+        <button class="${DASH_DIM==='hangxe'?'active':''}" onclick="setDashDim('hangxe')">🏭 Hãng xe</button>
+        <button class="${DASH_DIM==='garage'?'active':''}" onclick="setDashDim('garage')">🔧 Gara/Showroom</button>
+        <button class="${DASH_DIM==='trangthai'?'active':''}" onclick="setDashDim('trangthai')">📌 Trạng thái HS</button>
+      </div>
+      <span class="dash-info">${fmtN(s.rows.length)} hồ sơ · nhóm theo ${DASH_DIM_LABEL[DASH_DIM]}${DASH_TOP_N[DASH_DIM]?` · Top ${DASH_TOP_N[DASH_DIM]}, phần còn lại gộp "Khác"`:''}</span>
+    </div>
+
+    <div class="chart-row">
+      <div class="chart-card"><h3>Phân bổ hồ sơ tồn theo bucket ngày — theo ${DASH_DIM_LABEL[DASH_DIM]}</h3><div class="chart-wrap"><canvas id="chart-dash-bucket"></canvas></div></div>
+      <div class="chart-card"><h3>Tỷ lệ giải quyết &amp; Tỷ lệ tồn/PS trung bình tháng (%)</h3><div class="chart-wrap"><canvas id="chart-dash-ratio"></canvas></div></div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-card"><h3>Cơ cấu tiền ước/duyệt BT theo ${DASH_DIM_LABEL[DASH_DIM]}</h3><div class="chart-wrap-pie"><canvas id="chart-dash-money"></canvas></div></div>
+      <div class="table-card">
+        <h3>Bảng chi tiết theo ${DASH_DIM_LABEL[DASH_DIM]}</h3>
+        <div style="overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th>${DASH_DIM_LABEL[DASH_DIM]}</th><th class="right">Cần GQ</th><th class="right">Đã GQ</th>
+            <th class="right">Tỷ lệ GQ</th><th class="right">Đang tồn</th><th class="right">Tồn &gt;45</th><th class="right">Tồn ≥90</th>
+            <th class="right">Tỷ lệ giải ngân</th><th class="center">Cảnh báo</th>
+          </tr></thead>
+          <tbody>
+            ${groups.map(g=>`<tr>
+              <td>${g.label}</td>
+              <td class="right mono">${fmtN(g.tongCanGQ)}</td>
+              <td class="right mono">${fmtN(g.daGQ)}</td>
+              <td class="right mono">${g.tyLeGQ}%</td>
+              <td class="right mono">${fmtN(g.tongTon)}</td>
+              <td class="right mono">${fmtN(g.qua45)}</td>
+              <td class="right mono">${fmtN(g.qua90)}</td>
+              <td class="right mono">${g.tyLeGiaiNgan}%</td>
+              <td class="center">${badge(g.wlabel,g.wcolor)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+  `;
+
+  setTimeout(()=>{
+    buildBar('chart-dash-bucket',labels,[
+      {label:'1–30 ngày',data:groups.map(g=>g.b1)},
+      {label:'31–45 ngày',data:groups.map(g=>g.b2)},
+      {label:'46–89 ngày',data:groups.map(g=>g.b3)},
+      {label:'≥90 ngày',data:groups.map(g=>g.b4)}
+    ]);
+    buildBar('chart-dash-ratio',labels,[
+      {label:'Tỷ lệ GQ (%)',data:groups.map(g=>g.tyLeGQ)},
+      {label:'Tỷ lệ tồn/PS TB tháng (%)',data:groups.map(g=>g.tyLeTon)}
+    ]);
+    if(groups.some(g=>g.bt>0)){
+      const moneyColors=groups.map((g,i)=>GRAD_PALETTE[i%GRAD_PALETTE.length].top);
+      buildDonut('chart-dash-money',labels,groups.map(g=>g.bt),moneyColors);
+    }
+  },10);
+}
+
 // ─── TAB SWITCH ──────────────────────────────────────────────────────────────
 function switchTab(name,btn){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
-  ['overview','gdv','baocao','cldv','search'].forEach(t=>{
+  ['overview','gdv','baocao','cldv','search','dashboard'].forEach(t=>{
     document.getElementById('tab-'+t).style.display=t===name?'block':'none';
   });
 }
@@ -2163,7 +2170,7 @@ function computeDiabanStats(){
   return{result,curYear,curMonth,prevYear:curYear-1};
 }
 
-function renderInfographic(s){
+function renderInfographic(){
   if(!RAW.length)return'';
   const now=new Date();
   const dateStr='(Dữ liệu đến '+now.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'})+')';
@@ -2302,8 +2309,7 @@ function renderInfographic(s){
         <span><b>PTISOS</b> · Dữ liệu xử lý offline trong trình duyệt</span>
         <span>🟢 Cấp độ 1: &lt;80% &nbsp; 🟡 Cấp độ 2: 80–130% &nbsp; 🔴 Cấp độ 3: &gt;130%</span>
       </div>
-    </div>
-    ${s?generateAnalysis(s):''}`;
+    </div>`;
 }
 
 // ─── TAB: ĐỀ XUẤT CẢI TIẾN CLDV ─────────────────────────────────────────────
