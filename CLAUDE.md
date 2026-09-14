@@ -67,7 +67,7 @@ Cột quan trọng:
 | Theo GĐV | `tab-gdv` | Bảng tổng hợp hồ sơ tồn theo GĐV — kiểu Excel, 4 hàng header |
 | Báo cáo XO | `tab-baocao` | BC1 Top 30 Gara/Showroom doanh thu SC + BC2 Danh sách HS tồn ≥90 ngày + BC3 tồn 46–89 ngày |
 | Đề xuất cải tiến CLDV | `tab-cldv` | Phân tích 3 trục: Chất lượng dịch vụ · Hiệu quả & Năng suất · Quan hệ khách hàng; hàm `renderCLDV(s)` |
-| Dashboard động | `tab-dashboard` | Dashboard đa chiều: thanh chọn "Xem theo" **6 tiêu chí** (Giám định viên / Địa bàn / Nghiệp vụ / Hãng xe / Gara-Showroom / Trạng thái hồ sơ) → 3 biểu đồ và bảng chi tiết tính lại theo tiêu chí nhóm đã chọn. **Không có hàng KPI cố định** — đã gỡ (09/2026) vì các số đó không đổi khi bấm chuyển tiêu chí và đã hiển thị ở tab Tổng quan; tab này chỉ chứa nội dung thực sự thay đổi theo lựa chọn. Hàm `renderDashboard(s)` (dùng `s.rows`), `setDashDim(dim)` (đổi tiêu chí, re-render chỉ tab này), `computeDashGroups(data,dim)` → `groupRowsByDim(data,dim)` → `dimKeyOf(r,dim)` + `computeGroupStat(gd)`. `computeGroupStat` dùng đúng công thức đã chuẩn hoá: `tyLeGQ = daGQ/tongCanGQ`, `tyLeTon = tongTon/(hsps/curMonth)`, cấp độ cảnh báo <80% / 80–130% / >130% — đã đối chiếu khớp 100% với `gdvStats` trong `computeStats()`. Bảng chi tiết do `dashDetailTable(groups)` sinh, **2 bộ cột khác nhau** (xem mục dưới) |
+| Dashboard động | `tab-dashboard` | Dashboard đa chiều: thanh chọn "Xem theo" **7 tiêu chí** (Giám định viên / Địa bàn / Nghiệp vụ / Hãng xe / Gara-Showroom / Trạng thái hồ sơ / Số tiền bình quân/vụ) → 3 biểu đồ và bảng chi tiết tính lại theo tiêu chí nhóm đã chọn. **Không có hàng KPI cố định** — đã gỡ (09/2026) vì các số đó không đổi khi bấm chuyển tiêu chí và đã hiển thị ở tab Tổng quan; tab này chỉ chứa nội dung thực sự thay đổi theo lựa chọn. Hàm `renderDashboard(s)` (dùng `s.rows`), `setDashDim(dim)` (đổi tiêu chí, re-render chỉ tab này), `computeDashGroups(data,dim)` → `groupRowsByDim(data,dim)` → `dimKeyOf(r,dim)` + `computeGroupStat(gd)`. `computeGroupStat` dùng đúng công thức đã chuẩn hoá: `tyLeGQ = daGQ/tongCanGQ`, `tyLeTon = tongTon/(hsps/curMonth)`, cấp độ cảnh báo <80% / 80–130% / >130% — đã đối chiếu khớp 100% với `gdvStats` trong `computeStats()`. Bảng chi tiết do `dashDetailTable(groups)` sinh, **3 bộ cột khác nhau** (xem mục dưới) |
 | Tra cứu tiến trình | `tab-search` | Tra cứu hồ sơ theo Số HSBT/Biển kiểm soát (khớp một phần, OR) kết hợp lọc GĐV thụ lý/Trạng thái hồ sơ (dropdown, AND) — mọi tiêu chí đều tuỳ chọn, chỉ cần 1 trong 4; bảng kết quả 17 cột (gồm GĐV thụ lý + 16 cột mốc thời gian/tiền/trạng thái); hàm `renderSearch()` (khởi tạo UI 1 lần, cờ `searchTabInit`) + `buildSearchFilterOptions()` (build lại cả 2 dropdown GĐV và Trạng thái hồ sơ mỗi lần renderAll, động theo giá trị thực tế có trong `RAW` — tức theo đúng dữ liệu Google Drive/Dulieu.xlsx đang tải, không hardcode danh sách; giữ lựa chọn hiện tại) + `doSearchHSBT()` (đọc `RAW` toàn bộ, không phụ thuộc filter bar) |
 
 > Tab "Phân loại tồn" (`tab-aging`) đã bị xóa (06/2026) — nội dung phân phối thời gian tồn đã được tích hợp vào tab Đề xuất cải tiến CLDV (Trục 1). `warnRows` trong `computeStats()` vẫn giữ nguyên.
@@ -86,22 +86,34 @@ Cột quan trọng:
 | `hangxe` | `Hãng xe` (~40 giá trị) | **12** + nhóm "Khác (N hãng xe)" |
 | `garage` | `Tên garage (thường gọi)`, fallback `(ĐKKD)` (~118 giá trị) | **12** + nhóm "Khác (N gara/showroom)" |
 | `trangthai` | `Trạng thái hồ sơ` (14 giá trị) | không |
+| `mucTien` | `Tiền ước/duyệt BT` → 4 khoảng tiền + nhóm chưa ước (`MONEY_BUCKETS`) | không — theo thứ tự `MONEY_BUCKETS` |
 
+- `MONEY_BUCKETS` (dim `mucTien`, nút "💰 Số tiền bình quân/vụ"): Dưới 10 triệu · Từ 10 đến dưới 50 triệu · Từ 50 đến dưới 100 triệu · Từ 100 triệu trở lên · **Chưa có số tiền ước** (`na:true`, luôn xếp cuối). Ranh giới `min <= m < max`; `moneyBucketKey` đưa mọi giá trị **không > 0** (0, trống, `-`, chữ, số âm) về `MONEY_NA_KEY` **trước khi** dò khoảng — cố ý tách khỏi nhóm "Dưới 10 triệu" để bình quân/vụ của nhóm này không bị kéo tụt. Mỗi bucket có `short` riêng (`< 10 tr`, `10 – <50 tr`, `Chưa ước BT`, …) cho nhãn biểu đồ.
+- Bảng `mucTien` có 2 mức bình quân, không được nhầm: hàng **TỔNG** hiển thị `bqEst = t.bt / (t.total − nhóm NA)` (chỉ HS đã có tiền ước), còn `bqTong = t.bt / t.total` chỉ xuất hiện trong dòng chú thích dưới bảng để đối chiếu.
+- ⚠️ `computeDashGroups(data, dim, forTable)` được gọi **2 lần** mỗi lần render: `groups` (không truyền `forTable`) cho biểu đồ và `tableGroups` (`forTable=true`) cho bảng. Với `hangxe`/`garage` hai kết quả **cố ý khác nhau**: biểu đồ giữ Top 12 theo số HS (nhãn cột mới đọc được), bảng liệt kê mọi nhóm có tổng `Tiền ước/duyệt BT` ≥ `DASH_TABLE_MIN_BT` (100 triệu) xếp theo **tiền giảm dần**, phần dưới ngưỡng gộp hàng "Khác (N … dưới 100 triệu)". Dữ liệu 07/2026: hãng xe 13/40 nhóm (95,5% tiền), gara 27/118 nhóm (80,1% tiền). Chênh lệch này được ghi ở tiêu đề bảng và pill `.dash-info` — đừng "sửa" cho hai bên giống nhau.
+- Nhóm gộp cuối có cờ `isKhac` + `khacCount` (số nhóm đã gộp) để bảng tô xám nghiêng và viết chú thích.
 - Các dim không có thứ tự chuẩn được xếp theo **số hồ sơ giảm dần**; phần đuôi vượt ngưỡng gộp vào nhóm "Khác" nên **tổng các nhóm luôn khớp tổng toàn cục** (đã có test bất biến).
 - `normDimVal(v)`: giá trị rỗng hoặc `"-"` trong file nguồn → gom về nhóm `"(Không xác định)"` (dữ liệu thật có 27 HS trạng thái `-` và 44 HS gara `-`).
 - Mỗi nhóm có `label` (đầy đủ, dùng cho bảng) và `short` (cắt ≤22 ký tự, dùng cho nhãn biểu đồ) — tên gara/GĐV dài sẽ phá layout chart nếu dùng `label`.
 
-#### Hai bộ cột của bảng chi tiết Dashboard động (`dashDetailTable(groups)`)
+#### Ba bộ cột của bảng chi tiết Dashboard động (`dashDetailTable(groups)`)
 
 | dim | Bộ cột |
 |-----|--------|
+| `mucTien` | Mức tiền · **Tổng số vụ** (`total`) · Tỷ trọng số vụ · **Tổng Tiền ước/duyệt BT** (`bt`) · Tỷ trọng tiền · **Số tiền bình quân/vụ** (`bqVu = bt/total`, format `fmtMBC`, tô màu `--claude`) · Đã GQ · Chưa GQ · Tỷ lệ GQ (`tyLeGQVu`) — kèm hàng `tfoot` **TỔNG** (bình quân tổng tính lại từ tổng tiền / tổng số vụ, không cộng trung bình các nhóm) |
 | `hangxe`, `garage` | Hãng xe / Gara-Showroom · **Tổng số vụ phát sinh** (`total`) · **Tổng Tiền ước/duyệt BT** (`bt`, format `fmtMBC`) · **Đã giải quyết** (`daGQ`) · **Chưa giải quyết** (`chuaGQ`) · **Tỷ lệ giải quyết** (`tyLeGQVu`) — kèm hàng `tfoot` **TỔNG** |
 | `gdv`, `diaban`, `nv`, `trangthai` | Cần GQ · Đã GQ · Tỷ lệ GQ · Đang tồn · Tồn >45 · Tồn ≥90 · Tỷ lệ giải ngân · Cảnh báo (bộ cột tiến độ tồn, giữ nguyên) |
 
 - ⚠️ Hai công thức tỷ lệ giải quyết **khác mẫu số, cùng tồn tại trong `computeGroupStat`**, không được trộn lẫn:
   - `tyLeGQ = daGQ / tongCanGQ` — chuẩn báo cáo tiến độ (tồn năm trước + PS năm nay), dùng cho GĐV/Địa bàn/Nghiệp vụ/Trạng thái.
-  - `tyLeGQVu = daGQ / total`, `chuaGQ = total − daGQ` — góc nhìn theo số vụ phát sinh của nhóm, dùng cho Hãng xe/Gara để 3 cột Đã GQ + Chưa GQ + Tổng số vụ luôn khớp nhau.
+  - `tyLeGQVu = daGQ / total`, `chuaGQ = total − daGQ` — góc nhìn theo số vụ phát sinh của nhóm, dùng cho Hãng xe/Gara/Mức tiền để 3 cột Đã GQ + Chưa GQ + Tổng số vụ luôn khớp nhau.
 - Với `hangxe`/`garage`, biểu đồ thứ 2 cũng đổi theo (`vuMode` trong `renderDashboard`): 2 cột **Đã giải quyết / Chưa giải quyết (số vụ)** thay cho cặp Tỷ lệ GQ % / Tỷ lệ tồn/PS % — để chart không lệch nghĩa với bảng.
+- **Chiều cao bảng chi tiết** = đúng chiều cao `.chart-card` cùng hàng, do `syncDashTableHeight()` gán `style.height` sau khi vẽ chart (và khi `switchTab('dashboard')`, khi `resize` — debounce 120ms). Điều kiện để đo đúng: `#tab-dashboard .chart-row{align-items:start}` (không có nó, grid kéo giãn 2 ô bằng nhau → đo ra chiều cao đã bị bảng đẩy lên), và hàm **thoát sớm khi tab đang `display:none`** (offsetHeight = 0 → bảng cao 0px). Màn hình ≤800px `.chart-row` xếp dọc nên dùng chiều cao cố định 420px.
+- Bảng cuộn trong `.dash-table-scroll` (`flex:1;min-height:0;overflow:auto`), `thead` sticky top + `tfoot` sticky bottom, scrollbar tuỳ biến màu cyan cùng tông tab. Table trong khung này dùng `border-collapse:separate` — bắt buộc, vì `collapse` làm mất viền ô khi sticky.
+- **Không đặt dòng chú thích dưới bảng** (đã gỡ 09/2026) — mỗi dòng chú thích ăn mất ~2 dòng danh mục. Thông tin phụ đặt ở: tiêu đề `<h3>` (ngưỡng lọc của Hãng xe/Gara), pill `.dash-info`, hoặc `title=` tooltip của ô (vd bình quân/vụ tính cả HS chưa ước).
+- **Co dòng tự động**: `fitDashRows(card)` chọn mức thấp nhất trong `DASH_DENSE` = `dash-dense-1/2/3` (giảm dần padding → font → line-height + badge) sao cho khung hiện được `target = min(số dòng, DASH_MIN_ROWS=10)`. Bảng ít mục cũng được co để **hiện đủ không phải cuộn**. `dashVisibleRows()` trừ chiều cao `thead`/`tfoot` sticky và 4px biên khi tính.
+- ⚠️ `syncDashTableHeight()` phải chạy **lại sau `document.fonts.ready`** (cờ `_dashFontsBound`): lần render đầu webfont Be Vietnam Pro chưa tải xong, `tr.offsetHeight` đo hụt → chọn nhầm mức co quá nhẹ (đo thật: 11,26 dòng lúc chưa có font nhưng chỉ hiện 9 dòng sau khi font vào).
+- Với `mucTien` (`moneyMode` trong `renderDashboard`), **cả 2 chart đầu đổi**: chart 1 = **Tổng số vụ theo mức tiền** (thay biểu đồ bucket ngày), chart 2 = **Số tiền bình quân/vụ (triệu đồng)**. Không gộp số vụ và số tiền vào cùng một chart — hai đại lượng lệch bậc độ lớn sẽ làm cột bẹp. Chart donut thứ 3 (cơ cấu tiền ước/duyệt BT) giữ nguyên.
 
 ## Cấu hình Địa bàn (dùng cho khối Infographic trong tab Tổng quan)
 
@@ -198,7 +210,7 @@ Mỗi tab có màu gradient riêng, hiệu ứng nổi/nhấn kiểu nút 3D v�
 
 **Khoảng cách dọc (09/2026)**: đã thu hẹp để nhường không gian cho vùng dữ liệu — `.content` padding-top `24px → 10px` (tablet `8px`, mobile `6px`), `.tabs` margin-bottom `24px → 12px` (mobile `8px`).
 
-**Thanh lọc chung đã bị xoá (09/2026)** — 3 bộ lọc GĐV / Nghiệp vụ / Trạng thái cùng `getFiltered()`, `buildGdvFilter()` và toàn bộ CSS `.filter-bar` đã gỡ bỏ. `renderAll()` nay tính thẳng `computeStats(RAW)`; muốn lọc/cắt lát dữ liệu thì dùng tab **Dashboard động** (6 tiêu chí nhóm) hoặc tab **Tra cứu tiến trình**. Số hồ sơ hiển thị ở pill `#record-count` (class `.topbar-count`) trong khối `.topbar-right` của topbar, cạnh nút "↩ Tải file khác".
+**Thanh lọc chung đã bị xoá (09/2026)** — 3 bộ lọc GĐV / Nghiệp vụ / Trạng thái cùng `getFiltered()`, `buildGdvFilter()` và toàn bộ CSS `.filter-bar` đã gỡ bỏ. `renderAll()` nay tính thẳng `computeStats(RAW)`; muốn lọc/cắt lát dữ liệu thì dùng tab **Dashboard động** (7 tiêu chí nhóm) hoặc tab **Tra cứu tiến trình**. Số hồ sơ hiển thị ở pill `#record-count` (class `.topbar-count`) trong khối `.topbar-right` của topbar, cạnh nút "↩ Tải file khác".
 
 - Trạng thái mặc định: `transform: translateY(-3px)`, `box-shadow: 0 6px 0 rgba(0,0,0,0.22)`
 - Hover: `translateY(-5px)`, shadow `8px`

@@ -326,6 +326,35 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
   padding:18px 20px;margin-bottom:20px;overflow-x:auto}
 .table-card h3{font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:14px;
   padding-bottom:10px;border-bottom:1px solid var(--surface2)}
+/* Dashboard động — bảng chi tiết cao bằng chart cạnh bên, phần dư cuộn trong khung.
+   align-items:start để chart-card giữ chiều cao tự nhiên (JS đọc số đó gán cho bảng). */
+#tab-dashboard .chart-row{align-items:start}
+.dash-table-card{display:flex;flex-direction:column;overflow:hidden}
+.dash-table-card>h3{flex:none}
+.dash-table-scroll{
+  flex:1 1 auto;min-height:0;overflow:auto;
+  scrollbar-width:thin;scrollbar-color:#0e7490 var(--surface2);
+}
+/* border-collapse:separate để viền ô không biến mất khi thead/tfoot sticky */
+.dash-table-scroll table{border-collapse:separate;border-spacing:0}
+.dash-table-scroll thead th{position:sticky;top:0;z-index:3;box-shadow:inset 0 -1px 0 var(--border)}
+.dash-table-scroll tfoot td{position:sticky;bottom:0;z-index:2;background:#f1f5f9;
+  box-shadow:inset 0 1px 0 var(--border)}
+.dash-table-scroll::-webkit-scrollbar{width:11px;height:11px}
+.dash-table-scroll::-webkit-scrollbar-track{background:var(--surface2);border-radius:8px}
+.dash-table-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#22d3ee,#0e7490);
+  border-radius:8px;border:2px solid var(--surface2)}
+.dash-table-scroll::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#0891b2,#155e75)}
+/* 3 mức co dòng — fitDashRows() chọn mức thấp nhất đủ hiện DASH_MIN_ROWS dòng */
+.dash-table-scroll.dash-dense-1 th,.dash-table-scroll.dash-dense-1 td{padding:6px 10px}
+.dash-table-scroll.dash-dense-2 table{font-size:.77rem}
+.dash-table-scroll.dash-dense-2 th,.dash-table-scroll.dash-dense-2 td{padding:4px 8px}
+.dash-table-scroll.dash-dense-2 .badge{padding:2px 7px;font-size:.62rem}
+.dash-table-scroll.dash-dense-3 table{font-size:.72rem}
+.dash-table-scroll.dash-dense-3 th{padding:3px 7px;font-size:.6rem}
+.dash-table-scroll.dash-dense-3 td{padding:2px 7px;line-height:1.3}
+.dash-table-scroll.dash-dense-3 .badge{padding:1px 6px;font-size:.58rem}
+
 table{width:100%;border-collapse:collapse;font-size:.81rem}
 th{background:var(--surface2);padding:9px 12px;text-align:left;font-size:.7rem;font-weight:700;
   text-transform:uppercase;letter-spacing:.04em;color:var(--text2);white-space:nowrap}
@@ -1949,10 +1978,30 @@ function doSearchHSBT(){
 let DASH_DIM='gdv';
 let _dashLastS=null;
 const DASH_DIM_LABEL={gdv:'Giám định viên',diaban:'Địa bàn',nv:'Nghiệp vụ',
-  hangxe:'Hãng xe',garage:'Gara/Showroom',trangthai:'Trạng thái hồ sơ'};
+  hangxe:'Hãng xe',garage:'Gara/Showroom',trangthai:'Trạng thái hồ sơ',
+  mucTien:'Mức tiền ước/duyệt BT'};
 // Số nhóm tối đa hiển thị — phần đuôi gộp vào "Khác" (null = hiện tất cả).
 // Hãng xe (~40 giá trị) và Gara (~118 giá trị) phải giới hạn thì biểu đồ mới đọc được.
-const DASH_TOP_N={gdv:null,diaban:null,nv:null,hangxe:12,garage:12,trangthai:null};
+const DASH_TOP_N={gdv:null,diaban:null,nv:null,hangxe:12,garage:12,trangthai:null,mucTien:null};
+
+// Khoảng tiền ước/duyệt BT của từng hồ sơ (dim "mucTien").
+// Ranh giới: <10tr · 10–<50tr · 50–<100tr · ≥100tr; hồ sơ chưa có số tiền ước
+// (0 / trống / không hợp lệ / âm) tách thành nhóm riêng `na` xếp cuối, để không
+// kéo tụt bình quân của nhóm "Dưới 10 triệu".
+const MONEY_BUCKETS=[
+  {key:'Dưới 10 triệu',            short:'< 10 tr',     min:0,     max:10e6},
+  {key:'Từ 10 đến dưới 50 triệu',  short:'10 – <50 tr', min:10e6,  max:50e6},
+  {key:'Từ 50 đến dưới 100 triệu', short:'50 – <100 tr',min:50e6,  max:100e6},
+  {key:'Từ 100 triệu trở lên',     short:'≥ 100 tr',    min:100e6, max:Infinity},
+  {key:'Chưa có số tiền ước',      short:'Chưa ước BT', na:true}
+];
+const MONEY_NA_KEY=MONEY_BUCKETS.find(b=>b.na).key;
+function moneyBucketKey(v){
+  const m=parseMoney(v);
+  if(!(m>0))return MONEY_NA_KEY;
+  const b=MONEY_BUCKETS.find(x=>!x.na&&m>=x.min&&m<x.max);
+  return b?b.key:MONEY_NA_KEY;
+}
 
 function computeGroupStat(gd){
   const now=new Date();
@@ -1985,8 +2034,9 @@ function computeGroupStat(gd){
   // mẫu số là toàn bộ hồ sơ của nhóm, không phải tongCanGQ
   const chuaGQ=gd.length-daGQ;
   const tyLeGQVu=gd.length>0?Math.round(daGQ/gd.length*1000)/10:0;
+  const bqVu=gd.length>0?bt/gd.length:0;   // số tiền ước/duyệt BT bình quân mỗi vụ
   return{total:gd.length,daGQ,chuaGQ,tyLeGQVu,tongCanGQ,tongTon,qua45:g45.length,qua90:g90.length,
-    b1,b2,b3,b4,tyLeGQ,tyLeTon,wl,wlabel,wcolor,bt,daTra,tyLeGiaiNgan};
+    b1,b2,b3,b4,tyLeGQ,tyLeTon,wl,wlabel,wcolor,bt,daTra,tyLeGiaiNgan,bqVu};
 }
 
 // Giá trị rỗng hoặc "-" trong file nguồn → gom về một nhóm duy nhất
@@ -2004,6 +2054,7 @@ function dimKeyOf(r,dim){
   if(dim==='hangxe')return normDimVal(r['Hãng xe']);
   if(dim==='garage')return normDimVal(r['Tên garage (thường gọi)']||r['Tên garage (ĐKKD)']);
   if(dim==='trangthai')return normDimVal(r['Trạng thái hồ sơ']);
+  if(dim==='mucTien')return moneyBucketKey(r['Tiền ước/duyệt BT']);
   return gdvKey(r)||'—';
 }
 
@@ -2016,31 +2067,53 @@ function groupRowsByDim(data,dim){
   return map;
 }
 
-function computeDashGroups(data,dim){
+// Bảng chi tiết Hãng xe / Gara-Showroom chỉ liệt kê riêng nhóm đạt ngưỡng tiền này,
+// phần còn lại gộp 1 hàng "Khác" — biểu đồ vẫn dùng Top N để nhãn cột còn đọc được.
+const DASH_TABLE_MIN_BT=100e6;
+function dimHasMoneyTable(dim){return dim==='hangxe'||dim==='garage'}
+
+// forTable=true → dùng ngưỡng tiền cho Hãng xe/Gara; ngược lại dùng Top N cho biểu đồ
+function computeDashGroups(data,dim,forTable){
   const map=groupRowsByDim(data,dim);
+  const btOf=k=>map[k].reduce((s,r)=>s+parseMoney(r['Tiền ước/duyệt BT']),0);
+  const moneyMode=!!forTable&&dimHasMoneyTable(dim);
   // Thứ tự cố định cho các tiêu chí có danh sách chuẩn; các tiêu chí động xếp theo số HS giảm dần
+  // (riêng bảng Hãng xe/Gara xếp theo tổng tiền ước/duyệt BT giảm dần cho khớp tiêu chí lọc)
   let order=[];
   if(dim==='gdv')order=Object.keys(GDV_NAMES);
   else if(dim==='diaban')order=Object.keys(DIABAN_MAP);
   else if(dim==='nv')order=['TNDS','VCX'];
+  else if(dim==='mucTien')order=MONEY_BUCKETS.map(b=>b.key);
   order=order.filter(k=>map[k]);
   Object.keys(map).filter(k=>!order.includes(k))
-    .sort((a,b)=>map[b].length-map[a].length)
+    .sort(moneyMode?(a,b)=>btOf(b)-btOf(a):(a,b)=>map[b].length-map[a].length)
     .forEach(k=>order.push(k));
 
-  // Gộp đuôi vào "Khác" khi số nhóm vượt ngưỡng (chỉ gộp khi thực sự rút gọn được)
-  const cap=DASH_TOP_N[dim];
-  if(cap&&order.length>cap+1){
-    const tail=order.slice(cap);
-    order=order.slice(0,cap);
-    const khac=`Khác (${tail.length} ${DASH_DIM_LABEL[dim].toLowerCase()})`;
+  // Gộp đuôi vào "Khác" — theo ngưỡng tiền (bảng Hãng xe/Gara) hoặc theo Top N (còn lại)
+  let tail=[],khac='';
+  if(moneyMode){
+    tail=order.filter(k=>btOf(k)<DASH_TABLE_MIN_BT);
+    order=order.filter(k=>btOf(k)>=DASH_TABLE_MIN_BT);
+    khac=`Khác (${tail.length} ${DASH_DIM_LABEL[dim].toLowerCase()} dưới 100 triệu)`;
+  }else{
+    const cap=DASH_TOP_N[dim];
+    if(cap&&order.length>cap+1){
+      tail=order.slice(cap);
+      order=order.slice(0,cap);
+      khac=`Khác (${tail.length} ${DASH_DIM_LABEL[dim].toLowerCase()})`;
+    }
+  }
+  if(tail.length){
     map[khac]=tail.reduce((acc,k)=>acc.concat(map[k]),[]);
     order.push(khac);
   }
 
   return order.map(k=>{
     const label=dim==='gdv'?(k+(GDV_NAMES[k]?' – '+GDV_NAMES[k]:'')):k;
-    return{key:k,label,short:label.length>22?label.slice(0,21)+'…':label,...computeGroupStat(map[k])};
+    const mb=dim==='mucTien'?MONEY_BUCKETS.find(b=>b.key===k):null;
+    const short=mb?mb.short:(label.length>22?label.slice(0,21)+'…':label);
+    return{key:k,label,short,isKhac:!!khac&&k===khac,khacCount:(!!khac&&k===khac)?tail.length:0,
+      ...computeGroupStat(map[k])};
   });
 }
 
@@ -2049,19 +2122,124 @@ function setDashDim(dim){
   if(_dashLastS)renderDashboard(_dashLastS);
 }
 
+// Bảng nhiều mục thì co dòng lại cho đến khi khung hiện được ít nhất chừng này dòng
+const DASH_MIN_ROWS=10;
+const DASH_DENSE=['dash-dense-1','dash-dense-2','dash-dense-3'];
+
+// Số dòng dữ liệu nhìn thấy trong khung (thead/tfoot sticky nên phải trừ ra)
+function dashVisibleRows(scroll){
+  const tr=scroll.querySelector('tbody tr');
+  if(!tr||!tr.offsetHeight)return DASH_MIN_ROWS;
+  const head=scroll.querySelector('thead'),foot=scroll.querySelector('tfoot');
+  const avail=scroll.clientHeight-(head?head.offsetHeight:0)-(foot?foot.offsetHeight:0)-4;
+  return avail/tr.offsetHeight;
+}
+
+// Chọn mức co dòng thấp nhất (giữ chữ to nhất có thể) mà vẫn đủ DASH_MIN_ROWS dòng
+function fitDashRows(card){
+  const scroll=card.querySelector('.dash-table-scroll');
+  if(!scroll)return;
+  DASH_DENSE.forEach(c=>scroll.classList.remove(c));
+  const nRows=scroll.querySelectorAll('tbody tr').length;
+  if(!nRows)return;
+  const target=Math.min(nRows,DASH_MIN_ROWS);   // dưới 10 mục thì cố hiện đủ hết, khỏi cuộn
+  for(const cls of DASH_DENSE){
+    if(dashVisibleRows(scroll)>=target)return;
+    DASH_DENSE.forEach(c=>scroll.classList.remove(c));
+    scroll.classList.add(cls);
+  }
+}
+
+// Ép bảng chi tiết cao đúng bằng chart-card cùng hàng để 2 khối cân nhau;
+// phần vượt khung do .dash-table-scroll cuộn. ≤800px .chart-row xếp dọc → dùng chiều cao cố định.
+let _dashResizeBound=false,_dashFontsBound=false;
+function syncDashTableHeight(){
+  const pane=document.getElementById('tab-dashboard');
+  if(!pane||pane.style.display==='none')return;   // tab đang ẩn → offsetHeight = 0, đo lại khi mở tab
+  const card=pane.querySelector('.dash-table-card');
+  if(!card)return;
+  const chart=card.parentElement.querySelector('.chart-card');
+  const h=(window.innerWidth<=800||!chart)?420:chart.offsetHeight;
+  card.style.height=h+'px';
+  fitDashRows(card);
+  if(!_dashResizeBound){
+    _dashResizeBound=true;
+    let tid=null;
+    window.addEventListener('resize',()=>{clearTimeout(tid);tid=setTimeout(syncDashTableHeight,120)});
+  }
+  // Lần render đầu có thể đo khi webfont chưa tải xong → dòng đo hụt chiều cao, đo lại 1 lần
+  if(!_dashFontsBound&&document.fonts&&document.fonts.ready){
+    _dashFontsBound=true;
+    document.fonts.ready.then(()=>syncDashTableHeight());
+  }
+}
+
 // Bảng chi tiết tab Dashboard động.
 // Hãng xe / Gara-Showroom dùng bộ cột theo số vụ phát sinh + tiền ước BT
 // (mẫu số tỷ lệ GQ là tổng số vụ của nhóm); các tiêu chí khác giữ bộ cột tiến độ tồn.
 function dashDetailTable(groups){
   const dimLabel=DASH_DIM_LABEL[DASH_DIM];
-  if(DASH_DIM==='hangxe'||DASH_DIM==='garage'){
+  // Mức tiền: bảng xoay quanh số vụ · tổng tiền ước · số tiền bình quân/vụ
+  if(DASH_DIM==='mucTien'){
+    const t=groups.reduce((a,g)=>({total:a.total+g.total,bt:a.bt+g.bt,
+      daGQ:a.daGQ+g.daGQ,chuaGQ:a.chuaGQ+g.chuaGQ}),{total:0,bt:0,daGQ:0,chuaGQ:0});
+    const bqTong=t.total>0?t.bt/t.total:0;
+    // Bình quân loại trừ nhóm "Chưa có số tiền ước" — mẫu số chỉ gồm HS đã có tiền ước
+    const gNA=groups.find(g=>g.key===MONEY_NA_KEY);
+    const totalEst=t.total-(gNA?gNA.total:0);
+    const bqEst=totalEst>0?t.bt/totalEst:0;
+    return `
+      <div class="table-card dash-table-card">
+        <h3>Bảng chi tiết theo ${dimLabel}</h3>
+        <div class="dash-table-scroll">
+        <table>
+          <thead><tr>
+            <th>${dimLabel}</th><th class="right">Tổng số vụ</th><th class="right">Tỷ trọng số vụ</th>
+            <th class="right">Tổng Tiền ước/duyệt BT</th><th class="right">Tỷ trọng tiền</th>
+            <th class="right">Số tiền bình quân/vụ</th>
+            <th class="right">Đã GQ</th><th class="right">Chưa GQ</th><th class="right">Tỷ lệ GQ</th>
+          </tr></thead>
+          <tbody>
+            ${groups.map(g=>`<tr>
+              <td>${g.label}</td>
+              <td class="right mono">${fmtN(g.total)}</td>
+              <td class="right mono">${pct(g.total,t.total)}%</td>
+              <td class="right mono">${fmtMBC(g.bt)}</td>
+              <td class="right mono">${pct(g.bt,t.bt)}%</td>
+              <td class="right mono" style="font-weight:700;color:var(--claude)">${fmtMBC(g.bqVu)}</td>
+              <td class="right mono">${fmtN(g.daGQ)}</td>
+              <td class="right mono">${fmtN(g.chuaGQ)}</td>
+              <td class="right mono">${g.tyLeGQVu}%</td>
+            </tr>`).join('')}
+          </tbody>
+          <tfoot><tr style="font-weight:700;background:#f1f5f9">
+            <td>TỔNG</td>
+            <td class="right mono">${fmtN(t.total)}</td>
+            <td class="right mono">100%</td>
+            <td class="right mono">${fmtMBC(t.bt)}</td>
+            <td class="right mono">100%</td>
+            <td class="right mono" title="Tính trên ${fmtN(totalEst)} hồ sơ đã có số tiền ước/duyệt BT; nếu tính cả hồ sơ chưa ước thì còn ${fmtMBC(bqTong)}/vụ">${fmtMBC(bqEst)}</td>
+            <td class="right mono">${fmtN(t.daGQ)}</td>
+            <td class="right mono">${fmtN(t.chuaGQ)}</td>
+            <td class="right mono">${pct(t.daGQ,t.total)}%</td>
+          </tr></tfoot>
+        </table>
+        </div>
+      </div>`;
+  }
+  if(dimHasMoneyTable(DASH_DIM)){
     const t=groups.reduce((a,g)=>({total:a.total+g.total,bt:a.bt+g.bt,
       daGQ:a.daGQ+g.daGQ,chuaGQ:a.chuaGQ+g.chuaGQ}),{total:0,bt:0,daGQ:0,chuaGQ:0});
     const tyTong=t.total>0?Math.round(t.daGQ/t.total*1000)/10:0;
+    // Ngưỡng lọc ghi ngay trên tiêu đề bảng để không tốn thêm dòng chú thích
+    const gKhac=groups.find(g=>g.isKhac);
+    const sub=gKhac
+      ? ` <span style="font-weight:500;color:var(--text2)">— ${fmtN(groups.length-1)} ${dimLabel.toLowerCase()} có tiền ước ≥ 100 triệu (${pct(t.bt-gKhac.bt,t.bt)}% tổng tiền)</span>`
+      : '';
     return `
-      <div class="table-card">
-        <h3>Bảng chi tiết theo ${dimLabel}</h3>
-        <div style="overflow-x:auto">
+      <div class="table-card dash-table-card">
+        <h3>Bảng chi tiết theo ${dimLabel}${sub}</h3>
+        <div class="dash-table-scroll">
         <table>
           <thead><tr>
             <th>${dimLabel}</th><th class="right">Tổng số vụ phát sinh</th>
@@ -2069,7 +2247,7 @@ function dashDetailTable(groups){
             <th class="right">Chưa giải quyết</th><th class="right">Tỷ lệ giải quyết</th>
           </tr></thead>
           <tbody>
-            ${groups.map(g=>`<tr>
+            ${groups.map(g=>`<tr${g.isKhac?' style="color:#64748b;font-style:italic"':''}>
               <td>${g.label}</td>
               <td class="right mono">${fmtN(g.total)}</td>
               <td class="right mono">${fmtMBC(g.bt)}</td>
@@ -2091,9 +2269,9 @@ function dashDetailTable(groups){
       </div>`;
   }
   return `
-      <div class="table-card">
+      <div class="table-card dash-table-card">
         <h3>Bảng chi tiết theo ${dimLabel}</h3>
-        <div style="overflow-x:auto">
+        <div class="dash-table-scroll">
         <table>
           <thead><tr>
             <th>${dimLabel}</th><th class="right">Cần GQ</th><th class="right">Đã GQ</th>
@@ -2126,11 +2304,19 @@ function renderDashboard(s){
   ['chart-dash-bucket','chart-dash-ratio','chart-dash-money'].forEach(id=>{
     if(CHARTS[id]){try{CHARTS[id].destroy()}catch{}delete CHARTS[id];}
   });
-  const groups=computeDashGroups(s.rows,DASH_DIM);
+  const groups=computeDashGroups(s.rows,DASH_DIM);            // nhóm cho biểu đồ (Top N)
+  const tableGroups=computeDashGroups(s.rows,DASH_DIM,true);   // nhóm cho bảng (Hãng xe/Gara lọc theo tiền)
   const labels=groups.map(g=>g.short);
   // Hãng xe / Gara-Showroom: chart thứ 2 đổi sang số vụ Đã/Chưa GQ để khớp bảng chi tiết
-  const vuMode=DASH_DIM==='hangxe'||DASH_DIM==='garage';
-  const ratioTitle=vuMode
+  const vuMode=dimHasMoneyTable(DASH_DIM);
+  // Mức tiền: 2 chart đầu đổi sang số vụ và số tiền bình quân/vụ (đơn vị triệu đồng)
+  const moneyMode=DASH_DIM==='mucTien';
+  const bucketTitle=moneyMode
+    ?`Tổng số vụ theo ${DASH_DIM_LABEL[DASH_DIM]}`
+    :`Phân bổ hồ sơ tồn theo bucket ngày — theo ${DASH_DIM_LABEL[DASH_DIM]}`;
+  const ratioTitle=moneyMode
+    ?'Số tiền bình quân/vụ (triệu đồng)'
+    :vuMode
     ?`Đã giải quyết / Chưa giải quyết (số vụ) — theo ${DASH_DIM_LABEL[DASH_DIM]}`
     :'Tỷ lệ giải quyết &amp; Tỷ lệ tồn/PS trung bình tháng (%)';
 
@@ -2144,28 +2330,36 @@ function renderDashboard(s){
         <button class="${DASH_DIM==='hangxe'?'active':''}" onclick="setDashDim('hangxe')">🏭 Hãng xe</button>
         <button class="${DASH_DIM==='garage'?'active':''}" onclick="setDashDim('garage')">🔧 Gara/Showroom</button>
         <button class="${DASH_DIM==='trangthai'?'active':''}" onclick="setDashDim('trangthai')">📌 Trạng thái HS</button>
+        <button class="${DASH_DIM==='mucTien'?'active':''}" onclick="setDashDim('mucTien')">💰 Số tiền bình quân/vụ</button>
       </div>
-      <span class="dash-info">${fmtN(s.rows.length)} hồ sơ · nhóm theo ${DASH_DIM_LABEL[DASH_DIM]}${DASH_TOP_N[DASH_DIM]?` · Top ${DASH_TOP_N[DASH_DIM]}, phần còn lại gộp "Khác"`:''}</span>
+      <span class="dash-info">${fmtN(s.rows.length)} hồ sơ · nhóm theo ${DASH_DIM_LABEL[DASH_DIM]}${
+        dimHasMoneyTable(DASH_DIM)
+          ?` · biểu đồ Top ${DASH_TOP_N[DASH_DIM]} · bảng: nhóm có tiền ước ≥ 100 triệu`
+          :DASH_TOP_N[DASH_DIM]?` · Top ${DASH_TOP_N[DASH_DIM]}, phần còn lại gộp "Khác"`:''}</span>
     </div>
 
     <div class="chart-row">
-      <div class="chart-card"><h3>Phân bổ hồ sơ tồn theo bucket ngày — theo ${DASH_DIM_LABEL[DASH_DIM]}</h3><div class="chart-wrap"><canvas id="chart-dash-bucket"></canvas></div></div>
+      <div class="chart-card"><h3>${bucketTitle}</h3><div class="chart-wrap"><canvas id="chart-dash-bucket"></canvas></div></div>
       <div class="chart-card"><h3>${ratioTitle}</h3><div class="chart-wrap"><canvas id="chart-dash-ratio"></canvas></div></div>
     </div>
     <div class="chart-row">
       <div class="chart-card"><h3>Cơ cấu tiền ước/duyệt BT theo ${DASH_DIM_LABEL[DASH_DIM]}</h3><div class="chart-wrap-pie"><canvas id="chart-dash-money"></canvas></div></div>
-      ${dashDetailTable(groups)}
+      ${dashDetailTable(tableGroups)}
     </div>
   `;
 
   setTimeout(()=>{
-    buildBar('chart-dash-bucket',labels,[
+    buildBar('chart-dash-bucket',labels,moneyMode?[
+      {label:'Tổng số vụ',data:groups.map(g=>g.total)}
+    ]:[
       {label:'1–30 ngày',data:groups.map(g=>g.b1)},
       {label:'31–45 ngày',data:groups.map(g=>g.b2)},
       {label:'46–89 ngày',data:groups.map(g=>g.b3)},
       {label:'≥90 ngày',data:groups.map(g=>g.b4)}
     ]);
-    buildBar('chart-dash-ratio',labels,vuMode?[
+    buildBar('chart-dash-ratio',labels,moneyMode?[
+      {label:'Bình quân/vụ (triệu đ)',data:groups.map(g=>Math.round(g.bqVu/1e6*10)/10)}
+    ]:vuMode?[
       {label:'Đã giải quyết',data:groups.map(g=>g.daGQ)},
       {label:'Chưa giải quyết',data:groups.map(g=>g.chuaGQ)}
     ]:[
@@ -2176,6 +2370,7 @@ function renderDashboard(s){
       const moneyColors=groups.map((g,i)=>GRAD_PALETTE[i%GRAD_PALETTE.length].top);
       buildDonut('chart-dash-money',labels,groups.map(g=>g.bt),moneyColors);
     }
+    syncDashTableHeight();
   },10);
 }
 
@@ -2186,6 +2381,7 @@ function switchTab(name,btn){
   ['dashboard','overview','gdv','baocao','cldv','search'].forEach(t=>{
     document.getElementById('tab-'+t).style.display=t===name?'block':'none';
   });
+  if(name==='dashboard')syncDashTableHeight();   // đo lại chiều cao bảng khi tab vừa hiện
 }
 
 // ─── INFOGRAPHIC TAB ─────────────────────────────────────────────────────────
