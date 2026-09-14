@@ -1981,7 +1981,11 @@ function computeGroupStat(gd){
   const bt=gd.reduce((s,r)=>s+parseMoney(r['Tiền ước/duyệt BT']),0);
   const daTra=gd.reduce((s,r)=>s+parseMoney(r['Tiền BT đã trả cho KH']||r['Tiền BT đã trả cho KH '])+parseMoney(r['Tiền BT đã trả cho GR']),0);
   const tyLeGiaiNgan=bt>0?Math.round(daTra/bt*1000)/10:0;
-  return{total:gd.length,daGQ,tongCanGQ,tongTon,qua45:g45.length,qua90:g90.length,
+  // Góc nhìn "theo số vụ phát sinh" (dùng cho bảng Hãng xe / Gara-Showroom):
+  // mẫu số là toàn bộ hồ sơ của nhóm, không phải tongCanGQ
+  const chuaGQ=gd.length-daGQ;
+  const tyLeGQVu=gd.length>0?Math.round(daGQ/gd.length*1000)/10:0;
+  return{total:gd.length,daGQ,chuaGQ,tyLeGQVu,tongCanGQ,tongTon,qua45:g45.length,qua90:g90.length,
     b1,b2,b3,b4,tyLeGQ,tyLeTon,wl,wlabel,wcolor,bt,daTra,tyLeGiaiNgan};
 }
 
@@ -2045,43 +2049,54 @@ function setDashDim(dim){
   if(_dashLastS)renderDashboard(_dashLastS);
 }
 
-function renderDashboard(s){
-  _dashLastS=s;
-  const el=document.getElementById('tab-dashboard');
-  if(!el)return;
-  // Huỷ chart cũ khi đổi tiêu chí nhóm (renderAll không chạy lại trong trường hợp này)
-  ['chart-dash-bucket','chart-dash-ratio','chart-dash-money'].forEach(id=>{
-    if(CHARTS[id]){try{CHARTS[id].destroy()}catch{}delete CHARTS[id];}
-  });
-  const groups=computeDashGroups(s.rows,DASH_DIM);
-  const labels=groups.map(g=>g.short);
-
-  el.innerHTML=`
-    <div class="dash-toolbar">
-      <span class="dash-toolbar-label">Xem theo:</span>
-      <div class="dash-seg">
-        <button class="${DASH_DIM==='gdv'?'active':''}" onclick="setDashDim('gdv')">👤 Giám định viên</button>
-        <button class="${DASH_DIM==='diaban'?'active':''}" onclick="setDashDim('diaban')">📍 Địa bàn</button>
-        <button class="${DASH_DIM==='nv'?'active':''}" onclick="setDashDim('nv')">🚗 Nghiệp vụ</button>
-        <button class="${DASH_DIM==='hangxe'?'active':''}" onclick="setDashDim('hangxe')">🏭 Hãng xe</button>
-        <button class="${DASH_DIM==='garage'?'active':''}" onclick="setDashDim('garage')">🔧 Gara/Showroom</button>
-        <button class="${DASH_DIM==='trangthai'?'active':''}" onclick="setDashDim('trangthai')">📌 Trạng thái HS</button>
-      </div>
-      <span class="dash-info">${fmtN(s.rows.length)} hồ sơ · nhóm theo ${DASH_DIM_LABEL[DASH_DIM]}${DASH_TOP_N[DASH_DIM]?` · Top ${DASH_TOP_N[DASH_DIM]}, phần còn lại gộp "Khác"`:''}</span>
-    </div>
-
-    <div class="chart-row">
-      <div class="chart-card"><h3>Phân bổ hồ sơ tồn theo bucket ngày — theo ${DASH_DIM_LABEL[DASH_DIM]}</h3><div class="chart-wrap"><canvas id="chart-dash-bucket"></canvas></div></div>
-      <div class="chart-card"><h3>Tỷ lệ giải quyết &amp; Tỷ lệ tồn/PS trung bình tháng (%)</h3><div class="chart-wrap"><canvas id="chart-dash-ratio"></canvas></div></div>
-    </div>
-    <div class="chart-row">
-      <div class="chart-card"><h3>Cơ cấu tiền ước/duyệt BT theo ${DASH_DIM_LABEL[DASH_DIM]}</h3><div class="chart-wrap-pie"><canvas id="chart-dash-money"></canvas></div></div>
+// Bảng chi tiết tab Dashboard động.
+// Hãng xe / Gara-Showroom dùng bộ cột theo số vụ phát sinh + tiền ước BT
+// (mẫu số tỷ lệ GQ là tổng số vụ của nhóm); các tiêu chí khác giữ bộ cột tiến độ tồn.
+function dashDetailTable(groups){
+  const dimLabel=DASH_DIM_LABEL[DASH_DIM];
+  if(DASH_DIM==='hangxe'||DASH_DIM==='garage'){
+    const t=groups.reduce((a,g)=>({total:a.total+g.total,bt:a.bt+g.bt,
+      daGQ:a.daGQ+g.daGQ,chuaGQ:a.chuaGQ+g.chuaGQ}),{total:0,bt:0,daGQ:0,chuaGQ:0});
+    const tyTong=t.total>0?Math.round(t.daGQ/t.total*1000)/10:0;
+    return `
       <div class="table-card">
-        <h3>Bảng chi tiết theo ${DASH_DIM_LABEL[DASH_DIM]}</h3>
+        <h3>Bảng chi tiết theo ${dimLabel}</h3>
         <div style="overflow-x:auto">
         <table>
           <thead><tr>
-            <th>${DASH_DIM_LABEL[DASH_DIM]}</th><th class="right">Cần GQ</th><th class="right">Đã GQ</th>
+            <th>${dimLabel}</th><th class="right">Tổng số vụ phát sinh</th>
+            <th class="right">Tổng Tiền ước/duyệt BT</th><th class="right">Đã giải quyết</th>
+            <th class="right">Chưa giải quyết</th><th class="right">Tỷ lệ giải quyết</th>
+          </tr></thead>
+          <tbody>
+            ${groups.map(g=>`<tr>
+              <td>${g.label}</td>
+              <td class="right mono">${fmtN(g.total)}</td>
+              <td class="right mono">${fmtMBC(g.bt)}</td>
+              <td class="right mono">${fmtN(g.daGQ)}</td>
+              <td class="right mono">${fmtN(g.chuaGQ)}</td>
+              <td class="right mono">${g.tyLeGQVu}%</td>
+            </tr>`).join('')}
+          </tbody>
+          <tfoot><tr style="font-weight:700;background:#f1f5f9">
+            <td>TỔNG</td>
+            <td class="right mono">${fmtN(t.total)}</td>
+            <td class="right mono">${fmtMBC(t.bt)}</td>
+            <td class="right mono">${fmtN(t.daGQ)}</td>
+            <td class="right mono">${fmtN(t.chuaGQ)}</td>
+            <td class="right mono">${tyTong}%</td>
+          </tr></tfoot>
+        </table>
+        </div>
+      </div>`;
+  }
+  return `
+      <div class="table-card">
+        <h3>Bảng chi tiết theo ${dimLabel}</h3>
+        <div style="overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th>${dimLabel}</th><th class="right">Cần GQ</th><th class="right">Đã GQ</th>
             <th class="right">Tỷ lệ GQ</th><th class="right">Đang tồn</th><th class="right">Tồn &gt;45</th><th class="right">Tồn ≥90</th>
             <th class="right">Tỷ lệ giải ngân</th><th class="center">Cảnh báo</th>
           </tr></thead>
@@ -2100,7 +2115,46 @@ function renderDashboard(s){
           </tbody>
         </table>
         </div>
+      </div>`;
+}
+
+function renderDashboard(s){
+  _dashLastS=s;
+  const el=document.getElementById('tab-dashboard');
+  if(!el)return;
+  // Huỷ chart cũ khi đổi tiêu chí nhóm (renderAll không chạy lại trong trường hợp này)
+  ['chart-dash-bucket','chart-dash-ratio','chart-dash-money'].forEach(id=>{
+    if(CHARTS[id]){try{CHARTS[id].destroy()}catch{}delete CHARTS[id];}
+  });
+  const groups=computeDashGroups(s.rows,DASH_DIM);
+  const labels=groups.map(g=>g.short);
+  // Hãng xe / Gara-Showroom: chart thứ 2 đổi sang số vụ Đã/Chưa GQ để khớp bảng chi tiết
+  const vuMode=DASH_DIM==='hangxe'||DASH_DIM==='garage';
+  const ratioTitle=vuMode
+    ?`Đã giải quyết / Chưa giải quyết (số vụ) — theo ${DASH_DIM_LABEL[DASH_DIM]}`
+    :'Tỷ lệ giải quyết &amp; Tỷ lệ tồn/PS trung bình tháng (%)';
+
+  el.innerHTML=`
+    <div class="dash-toolbar">
+      <span class="dash-toolbar-label">Xem theo:</span>
+      <div class="dash-seg">
+        <button class="${DASH_DIM==='gdv'?'active':''}" onclick="setDashDim('gdv')">👤 Giám định viên</button>
+        <button class="${DASH_DIM==='diaban'?'active':''}" onclick="setDashDim('diaban')">📍 Địa bàn</button>
+        <button class="${DASH_DIM==='nv'?'active':''}" onclick="setDashDim('nv')">🚗 Nghiệp vụ</button>
+        <button class="${DASH_DIM==='hangxe'?'active':''}" onclick="setDashDim('hangxe')">🏭 Hãng xe</button>
+        <button class="${DASH_DIM==='garage'?'active':''}" onclick="setDashDim('garage')">🔧 Gara/Showroom</button>
+        <button class="${DASH_DIM==='trangthai'?'active':''}" onclick="setDashDim('trangthai')">📌 Trạng thái HS</button>
       </div>
+      <span class="dash-info">${fmtN(s.rows.length)} hồ sơ · nhóm theo ${DASH_DIM_LABEL[DASH_DIM]}${DASH_TOP_N[DASH_DIM]?` · Top ${DASH_TOP_N[DASH_DIM]}, phần còn lại gộp "Khác"`:''}</span>
+    </div>
+
+    <div class="chart-row">
+      <div class="chart-card"><h3>Phân bổ hồ sơ tồn theo bucket ngày — theo ${DASH_DIM_LABEL[DASH_DIM]}</h3><div class="chart-wrap"><canvas id="chart-dash-bucket"></canvas></div></div>
+      <div class="chart-card"><h3>${ratioTitle}</h3><div class="chart-wrap"><canvas id="chart-dash-ratio"></canvas></div></div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-card"><h3>Cơ cấu tiền ước/duyệt BT theo ${DASH_DIM_LABEL[DASH_DIM]}</h3><div class="chart-wrap-pie"><canvas id="chart-dash-money"></canvas></div></div>
+      ${dashDetailTable(groups)}
     </div>
   `;
 
@@ -2111,7 +2165,10 @@ function renderDashboard(s){
       {label:'46–89 ngày',data:groups.map(g=>g.b3)},
       {label:'≥90 ngày',data:groups.map(g=>g.b4)}
     ]);
-    buildBar('chart-dash-ratio',labels,[
+    buildBar('chart-dash-ratio',labels,vuMode?[
+      {label:'Đã giải quyết',data:groups.map(g=>g.daGQ)},
+      {label:'Chưa giải quyết',data:groups.map(g=>g.chuaGQ)}
+    ]:[
       {label:'Tỷ lệ GQ (%)',data:groups.map(g=>g.tyLeGQ)},
       {label:'Tỷ lệ tồn/PS TB tháng (%)',data:groups.map(g=>g.tyLeTon)}
     ]);

@@ -67,7 +67,7 @@ Cột quan trọng:
 | Theo GĐV | `tab-gdv` | Bảng tổng hợp hồ sơ tồn theo GĐV — kiểu Excel, 4 hàng header |
 | Báo cáo XO | `tab-baocao` | BC1 Top 30 Gara/Showroom doanh thu SC + BC2 Danh sách HS tồn ≥90 ngày + BC3 tồn 46–89 ngày |
 | Đề xuất cải tiến CLDV | `tab-cldv` | Phân tích 3 trục: Chất lượng dịch vụ · Hiệu quả & Năng suất · Quan hệ khách hàng; hàm `renderCLDV(s)` |
-| Dashboard động | `tab-dashboard` | Dashboard đa chiều: thanh chọn "Xem theo" **6 tiêu chí** (Giám định viên / Địa bàn / Nghiệp vụ / Hãng xe / Gara-Showroom / Trạng thái hồ sơ) → 3 biểu đồ và bảng chi tiết tính lại theo tiêu chí nhóm đã chọn. **Không có hàng KPI cố định** — đã gỡ (09/2026) vì các số đó không đổi khi bấm chuyển tiêu chí và đã hiển thị ở tab Tổng quan; tab này chỉ chứa nội dung thực sự thay đổi theo lựa chọn. Hàm `renderDashboard(s)` (dùng `s.rows`), `setDashDim(dim)` (đổi tiêu chí, re-render chỉ tab này), `computeDashGroups(data,dim)` → `groupRowsByDim(data,dim)` → `dimKeyOf(r,dim)` + `computeGroupStat(gd)`. `computeGroupStat` dùng đúng công thức đã chuẩn hoá: `tyLeGQ = daGQ/tongCanGQ`, `tyLeTon = tongTon/(hsps/curMonth)`, cấp độ cảnh báo <80% / 80–130% / >130% — đã đối chiếu khớp 100% với `gdvStats` trong `computeStats()` |
+| Dashboard động | `tab-dashboard` | Dashboard đa chiều: thanh chọn "Xem theo" **6 tiêu chí** (Giám định viên / Địa bàn / Nghiệp vụ / Hãng xe / Gara-Showroom / Trạng thái hồ sơ) → 3 biểu đồ và bảng chi tiết tính lại theo tiêu chí nhóm đã chọn. **Không có hàng KPI cố định** — đã gỡ (09/2026) vì các số đó không đổi khi bấm chuyển tiêu chí và đã hiển thị ở tab Tổng quan; tab này chỉ chứa nội dung thực sự thay đổi theo lựa chọn. Hàm `renderDashboard(s)` (dùng `s.rows`), `setDashDim(dim)` (đổi tiêu chí, re-render chỉ tab này), `computeDashGroups(data,dim)` → `groupRowsByDim(data,dim)` → `dimKeyOf(r,dim)` + `computeGroupStat(gd)`. `computeGroupStat` dùng đúng công thức đã chuẩn hoá: `tyLeGQ = daGQ/tongCanGQ`, `tyLeTon = tongTon/(hsps/curMonth)`, cấp độ cảnh báo <80% / 80–130% / >130% — đã đối chiếu khớp 100% với `gdvStats` trong `computeStats()`. Bảng chi tiết do `dashDetailTable(groups)` sinh, **2 bộ cột khác nhau** (xem mục dưới) |
 | Tra cứu tiến trình | `tab-search` | Tra cứu hồ sơ theo Số HSBT/Biển kiểm soát (khớp một phần, OR) kết hợp lọc GĐV thụ lý/Trạng thái hồ sơ (dropdown, AND) — mọi tiêu chí đều tuỳ chọn, chỉ cần 1 trong 4; bảng kết quả 17 cột (gồm GĐV thụ lý + 16 cột mốc thời gian/tiền/trạng thái); hàm `renderSearch()` (khởi tạo UI 1 lần, cờ `searchTabInit`) + `buildSearchFilterOptions()` (build lại cả 2 dropdown GĐV và Trạng thái hồ sơ mỗi lần renderAll, động theo giá trị thực tế có trong `RAW` — tức theo đúng dữ liệu Google Drive/Dulieu.xlsx đang tải, không hardcode danh sách; giữ lựa chọn hiện tại) + `doSearchHSBT()` (đọc `RAW` toàn bộ, không phụ thuộc filter bar) |
 
 > Tab "Phân loại tồn" (`tab-aging`) đã bị xóa (06/2026) — nội dung phân phối thời gian tồn đã được tích hợp vào tab Đề xuất cải tiến CLDV (Trục 1). `warnRows` trong `computeStats()` vẫn giữ nguyên.
@@ -90,6 +90,18 @@ Cột quan trọng:
 - Các dim không có thứ tự chuẩn được xếp theo **số hồ sơ giảm dần**; phần đuôi vượt ngưỡng gộp vào nhóm "Khác" nên **tổng các nhóm luôn khớp tổng toàn cục** (đã có test bất biến).
 - `normDimVal(v)`: giá trị rỗng hoặc `"-"` trong file nguồn → gom về nhóm `"(Không xác định)"` (dữ liệu thật có 27 HS trạng thái `-` và 44 HS gara `-`).
 - Mỗi nhóm có `label` (đầy đủ, dùng cho bảng) và `short` (cắt ≤22 ký tự, dùng cho nhãn biểu đồ) — tên gara/GĐV dài sẽ phá layout chart nếu dùng `label`.
+
+#### Hai bộ cột của bảng chi tiết Dashboard động (`dashDetailTable(groups)`)
+
+| dim | Bộ cột |
+|-----|--------|
+| `hangxe`, `garage` | Hãng xe / Gara-Showroom · **Tổng số vụ phát sinh** (`total`) · **Tổng Tiền ước/duyệt BT** (`bt`, format `fmtMBC`) · **Đã giải quyết** (`daGQ`) · **Chưa giải quyết** (`chuaGQ`) · **Tỷ lệ giải quyết** (`tyLeGQVu`) — kèm hàng `tfoot` **TỔNG** |
+| `gdv`, `diaban`, `nv`, `trangthai` | Cần GQ · Đã GQ · Tỷ lệ GQ · Đang tồn · Tồn >45 · Tồn ≥90 · Tỷ lệ giải ngân · Cảnh báo (bộ cột tiến độ tồn, giữ nguyên) |
+
+- ⚠️ Hai công thức tỷ lệ giải quyết **khác mẫu số, cùng tồn tại trong `computeGroupStat`**, không được trộn lẫn:
+  - `tyLeGQ = daGQ / tongCanGQ` — chuẩn báo cáo tiến độ (tồn năm trước + PS năm nay), dùng cho GĐV/Địa bàn/Nghiệp vụ/Trạng thái.
+  - `tyLeGQVu = daGQ / total`, `chuaGQ = total − daGQ` — góc nhìn theo số vụ phát sinh của nhóm, dùng cho Hãng xe/Gara để 3 cột Đã GQ + Chưa GQ + Tổng số vụ luôn khớp nhau.
+- Với `hangxe`/`garage`, biểu đồ thứ 2 cũng đổi theo (`vuMode` trong `renderDashboard`): 2 cột **Đã giải quyết / Chưa giải quyết (số vụ)** thay cho cặp Tỷ lệ GQ % / Tỷ lệ tồn/PS % — để chart không lệch nghĩa với bảng.
 
 ## Cấu hình Địa bàn (dùng cho khối Infographic trong tab Tổng quan)
 
