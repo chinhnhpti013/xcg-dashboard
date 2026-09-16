@@ -427,6 +427,9 @@ table.gdv thead th{
 /* Dãn cách riêng cho tab Báo cáo XO */
 #tab-baocao table.gdv th,#tab-baocao table.gdv td{padding:7px 10px}
 #tab-baocao table.gdv thead th{font-size:.6rem;line-height:1.4}
+/* Bảng Tổng hợp HS tồn theo GĐV: ô số liệu phóng to 1,2 lần (.66rem → .79rem); cột Mã GĐV/Tổng cộng giữ nguyên */
+table.gdv.gdv-ton tbody td,table.gdv.gdv-ton tfoot td{font-size:.79rem;padding:2px 5px}
+table.gdv.gdv-ton tbody td.left,table.gdv.gdv-ton tfoot td.left{font-size:.66rem}
 table.gdv thead th.lv2{background:#1976D2}
 table.gdv thead th.lv3{background:#1e88e5}
 table.gdv tbody tr:nth-child(even) td{background:#e3f2fd}
@@ -1631,7 +1634,7 @@ function renderGdv(s){
         <div class="period">Kỳ báo cáo: Tháng ${s.curMonth} năm ${curYear}</div>
       </div>
       <div class="gdv-table-outer">
-        <table class="gdv">
+        <table class="gdv gdv-ton">
           <thead>
             <tr>
               <th rowspan="4">Stt</th>
