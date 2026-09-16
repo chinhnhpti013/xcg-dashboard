@@ -419,8 +419,7 @@ function getFiltered(){
   return RAW.filter(r=>{
     const gdvCol=gdvKey(r);
     const nvCol=String(r['Mã nghiệp vụ']||'').trim();
-    const ttCol=String(r['Trạng thái hồ sơ']||'').trim();
-    const resolved=ttCol==='Đã thanh toán'||ttCol==='Đã hủy';
+    const resolved=isResolved(r);
     if(gdv!=='ALL'&&gdvCol!==gdv)return false;
     if(nv==='TNDS'&&!nvCol.startsWith('XO.1'))return false;
     if(nv==='VCX'&&!nvCol.startsWith('XO.4'))return false;
@@ -448,7 +447,9 @@ function buildGdvFilter(){
   document.getElementById(id).addEventListener('change',renderAll));
 
 // ─── STATS ───────────────────────────────────────────────────────────────────
-function isResolved(r){const t=String(r['Trạng thái hồ sơ']||'');return t==='Đã thanh toán'||t==='Đã hủy'}
+// Đã giải quyết ⇔ Số ngày tồn = 0 (không dựa vào Trạng thái hồ sơ).
+// Ô trống / "-" / chữ → parseFloat ra NaN → coi là chưa giải quyết.
+function isResolved(r){const n=parseFloat(String(r['Số ngày tồn']??'').replace(/,/g,''));return n===0}
 
 function computeStats(data){
   const total=data.length;
@@ -573,7 +574,7 @@ function renderOverview(s){
       ${kpi(fmtN(s.total),'Tổng tiếp nhận','toàn bộ hồ sơ','blue')}
       ${kpi(fmtN(s.resolved),'Đã giải quyết',s.tyLe+'% tổng','green')}
       ${kpi(fmtN(s.processing),'Đang xử lý','chưa giải quyết','amber')}
-      ${kpi(s.tyLe+'%','Tỷ lệ giải quyết','đã thanh toán / hủy','teal')}
+      ${kpi(s.tyLe+'%','Tỷ lệ giải quyết','số ngày tồn = 0','teal')}
       ${kpi(fmtN(s.ton),'Hồ sơ có tồn','số ngày tồn > 0','purple')}
       ${kpi(fmtN(s.duoi45),'Trong hạn ≤45 ngày','an toàn','green')}
       ${kpi(fmtN(s.qua45),'Quá hạn >45 ngày','cần theo dõi','amber')}

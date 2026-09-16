@@ -24,7 +24,7 @@ bạn hãy dùng skill /skill-creator để tạo cho tôi các mẫu báo cáo 
   - `HUONGNV` : Nguyễn Văn Hướng
   - `SONTT` : Trần Thanh Sơn
 
-- **Cột 3 – "Đã giải quyết cả tồn năm trước chuyển sang"**: Ánh xạ file `Dulieu.xlsx` — đếm số lượng cột có tiêu đề **Số HSBT** với điều kiện cột **Trạng thái hồ sơ** = `"Đã thanh toán"` hoặc = `"Đã hủy"`, tương ứng với từng Mã GĐV.
+- **Cột 3 – "Đã giải quyết cả tồn năm trước chuyển sang"**: Ánh xạ file `Dulieu.xlsx` — đếm số lượng cột có tiêu đề **Số HSBT** với điều kiện cột **Số ngày tồn** = `0`, tương ứng với từng Mã GĐV.
 
 - **Cột 4 – "Đang giải quyết bồi thường"**: Ánh xạ file `Dulieu.xlsx` — đếm số lượng cột có tiêu đề **Số HSBT** với điều kiện cột **Số ngày tồn** > 0, tương ứng với từng Mã GĐV.
 
@@ -51,7 +51,7 @@ Bố cục báo cáo dạng bảng:
   - **Cột 3.2 – "HSPS kỳ báo cáo"**: Ánh xạ file `Dulieu.xlsx` — đếm số lượng cột có tiêu đề **Số HSBT** với điều kiện cột **Ngày mở HSBT** >= ngày 01 tháng 01 năm hiện tại, tương ứng với từng Mã GĐV.
   - **Cột 3.3 – "Tổng số HS cần giải quyết"**: = (Cột 3.1 + Cột 3.2), tương ứng với từng Mã GĐV.
 
-- **Cột 4 – "Đã giải quyết trong kỳ"**: Ánh xạ file `Dulieu.xlsx` — đếm số lượng cột có tiêu đề **Số HSBT** với điều kiện cột **Trạng thái hồ sơ** = `"Đã thanh toán"` hoặc = `"Đã hủy"`, tương ứng với từng Mã GĐV.
+- **Cột 4 – "Đã giải quyết trong kỳ"**: Ánh xạ file `Dulieu.xlsx` — đếm số lượng cột có tiêu đề **Số HSBT** với điều kiện cột **Số ngày tồn** = `0`, tương ứng với từng Mã GĐV.
 
 - **Cột 5 – "Tồn chưa giải quyết"**:
   - **Cột 5.1 – "Tồn theo ngày PSHS"**:

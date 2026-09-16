@@ -386,7 +386,9 @@ document.getElementById('file-inp').addEventListener('change',e=>{
 
 // ── HELPERS ────────────────────────────────────────────────────────────────
 function parseTon(v){const n=parseFloat(String(v).replace(/,/g,''));return n>0?n:null}
-function isResolved(r){const t=String(r['Trạng thái hồ sơ']||'');return t==='Đã thanh toán'||t==='Đã hủy'}
+// Đã giải quyết ⇔ Số ngày tồn = 0 (không dựa vào Trạng thái hồ sơ).
+// Ô trống / "-" / chữ → parseFloat ra NaN → coi là chưa giải quyết.
+function isResolved(r){const n=parseFloat(String(r['Số ngày tồn']??'').replace(/,/g,''));return n===0}
 function gdvKey(r){return String(r['GĐV thụ lý']||r['Mã GĐV']||'').trim()}
 function fmtN(v){return new Intl.NumberFormat('vi-VN').format(Math.round(v))}
 function parseDate(v){

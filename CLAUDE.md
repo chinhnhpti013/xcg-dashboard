@@ -38,8 +38,8 @@ Cột quan trọng:
 |-----|-------|
 | `Số HSBT` | Mã định danh hồ sơ bồi thường |
 | `GĐV thụ lý` hoặc `Mã GĐV` | Mã giám định viên |
-| `Trạng thái hồ sơ` | `"Đã thanh toán"` / `"Đã hủy"` / đang xử lý |
-| `Số ngày tồn` | Số ngày hồ sơ chưa giải quyết (> 0 = đang tồn) |
+| `Trạng thái hồ sơ` | 14 giá trị (`"Đã thanh toán"`, `"Đã hủy"`, `"Chờ thanh toán"`…) — chỉ dùng để hiển thị/nhóm, **không** dùng để xác định đã giải quyết |
+| `Số ngày tồn` | `= 0` → **đã giải quyết** · `> 0` → đang tồn · trống/`-`/chữ → chưa giải quyết |
 | `Ngày mở HSBT` | Ngày phát sinh hồ sơ |
 | `Mã nghiệp vụ` | `XO.1.x` (TNDS), `XO.4.x` (VCX) |
 | `Tiền ước/duyệt BT` | Số tiền bồi thường ước tính / đã duyệt |

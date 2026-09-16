@@ -75,8 +75,8 @@ Các cột quan trọng trong file Excel:
 |-----|-------|
 | `Số HSBT` | Mã định danh hồ sơ bồi thường |
 | `GĐV thụ lý` hoặc `Mã GĐV` | Mã giám định viên |
-| `Trạng thái hồ sơ` | `Đã thanh toán` · `Đã hủy` · đang xử lý |
-| `Số ngày tồn` | Số ngày chưa giải quyết (> 0 = đang tồn) |
+| `Trạng thái hồ sơ` | Trạng thái xử lý (chỉ hiển thị/nhóm) |
+| `Số ngày tồn` | `= 0` = đã giải quyết · `> 0` = đang tồn |
 | `Ngày mở HSBT` | Ngày phát sinh hồ sơ |
 | `Mã nghiệp vụ` | `XO.1.x` = TNDS · `XO.4.x` = VCX |
 | `Tiền ước/duyệt BT` | Số tiền bồi thường ước tính / đã duyệt |
@@ -101,7 +101,7 @@ Các cột quan trọng trong file Excel:
 ## Logic tính toán
 
 ### Phân loại hồ sơ
-- **Đã giải quyết**: `Trạng thái hồ sơ` ∈ {`Đã thanh toán`, `Đã hủy`}
+- **Đã giải quyết**: `Số ngày tồn` = 0 (ô trống/`-`/chữ → chưa giải quyết)
 - **Có tồn**: `Số ngày tồn` > 0
 - **Tồn năm trước**: `Ngày mở HSBT` ≤ 31/12/năm trước
 - **HSPS kỳ báo cáo**: `Ngày mở HSBT` ≥ 01/01/năm hiện tại
