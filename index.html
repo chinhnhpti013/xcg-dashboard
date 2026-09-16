@@ -867,6 +867,8 @@ document.getElementById('file-input').addEventListener('change',e=>{if(e.target.
 // ─── GOOGLE DRIVE LOAD (JSONP qua gviz API) ──────────────────────────────────
 const GDRIVE_FILE_ID='1KqAQmNh9W-C8MsbWuYrywnNouGC4t2ISwRMa7oYH4_0';
 const GDRIVE_GID='101924388';
+// ID "Xuất bản lên web" (Tệp → Chia sẻ → Xuất bản lên web, sheet XCG05_HSBT, CSV) — khác file ID, chỉ đọc
+const GDRIVE_PUB_ID='2PACX-1vSfFbWpWUVLGqg09ng84bs5myVPtH5kMHjEBpUyjT19UlgJllXTb5bLPvjeuap4FdteNQDEVNVd3wI4';
 const DRIVE_BTN_HTML='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Tải từ Google Drive';
 
 function _gvizResetBtn(){
@@ -898,6 +900,25 @@ function _processGvizData(data){
         return obj;
       })
       .filter(r=>Object.values(r).some(v=>v!==''&&v!=null));
+    _applyDriveRaw(cols);
+    if(window.__driveViaGvizFallback)
+      alert('⚠️ Đang tải dự phòng qua gviz vì chưa đọc được bản CSV "Xuất bản lên web" của Google Sheet.\n\n'+
+        'gviz tự đoán kiểu cột nên có thể bỏ trống các ô tiền dạng chữ (vd "2,619,000") → KPI "Đã chi trả" và các cột tiền sẽ THIẾU.\n\n'+
+        (location.protocol==='file:'
+          ?'Nguyên nhân: trang đang mở trực tiếp từ file trên máy (file://) — Google chặn tải CSV từ nguồn này. Hãy mở dashboard qua link GitHub Pages.'
+          :'Khắc phục: mở Google Sheet → Tệp → Chia sẻ → Xuất bản lên web → sheet XCG05_HSBT, định dạng CSV → Xuất bản.'));
+  }catch(err){
+    _driveFail('Lỗi xử lý dữ liệu: '+err.message);
+  }
+}
+
+function _driveFail(msg){
+  show('upload-screen');_gvizResetBtn();{const rb=document.getElementById('btn-refresh');if(rb){rb.disabled=false;rb.textContent='🔄 Làm mới';}}
+  alert(msg);
+}
+
+// Dùng chung cho cả 2 đường tải Drive (CSV xuất bản & gviz) — RAW đã được gán trước khi gọi, lỗi được throw ra ngoài
+function _applyDriveRaw(cols){
     if(!RAW.length)throw new Error('Không có dữ liệu trong sheet');
     // Kiểm tra cột quan trọng — cảnh báo nếu thiếu cột
     const KEY_COLS=['Số HSBT','Trạng thái hồ sơ','Số ngày tồn','Ngày mở HSBT','GĐV thụ lý','Mã nghiệp vụ'];
@@ -924,10 +945,6 @@ function _processGvizData(data){
     showFileDateBadge(null,true);
     document.getElementById('footer-date').textContent=
       new Date().toLocaleDateString('vi-VN',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'});
-  }catch(err){
-    show('upload-screen');_gvizResetBtn();{const rb=document.getElementById('btn-refresh');if(rb){rb.disabled=false;rb.textContent='🔄 Làm mới';}}
-    alert('Lỗi xử lý dữ liệu: '+err.message);
-  }
 }
 
 // Google gviz dùng setResponse khi không có custom callback
@@ -952,6 +969,37 @@ function loadFromGoogleDrive(){
 
   show('loading-screen');
 
+  // Ưu tiên bản CSV "Xuất bản lên web": mọi ô trả về đúng dạng chữ như trên Sheet.
+  // gviz tự đoán kiểu cột theo các hàng đầu → cột bị đoán là số sẽ trả null cho ô chữ "2,619,000"
+  // (09/2026: mất 1497/1914 ô "Tiền BT đã trả cho GR", KPI Đã chi trả còn 39.340đ thay vì ~15 tỷ).
+  // Endpoint /export?format=csv không dùng được: bước redirect 307 thiếu header CORS nên trình duyệt chặn.
+  window.__driveViaGvizFallback=false;
+  const ctrl=new AbortController();
+  const tmo=setTimeout(()=>ctrl.abort(),15000);
+  fetch(`https://docs.google.com/spreadsheets/d/e/${GDRIVE_PUB_ID}/pub?gid=${GDRIVE_GID}&single=true&output=csv&_=${Date.now()}`,{cache:'no-store',signal:ctrl.signal})
+    .then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text();})
+    .then(text=>{
+      if(text.charCodeAt(0)===0xFEFF)text=text.slice(1);
+      if(/^\s*</.test(text))throw new Error('Không phải CSV (sheet chưa xuất bản lên web?)');
+      // raw:true — giữ nguyên chuỗi, không để SheetJS tự đổi "11/09/2026" thành ngày kiểu Mỹ
+      const wb=XLSX.read(text,{type:'string',raw:true});
+      return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:'',raw:true});
+    })
+    .then(rows=>{
+      clearTimeout(tmo);
+      try{
+        RAW=rows.filter(r=>Object.values(r).some(v=>v!==''&&v!=null));
+        _applyDriveRaw(rows.length?Object.keys(rows[0]):[]);
+      }catch(err){_driveFail('Lỗi xử lý dữ liệu: '+err.message);}
+    },err=>{
+      clearTimeout(tmo);
+      console.warn('[PTI] Không đọc được CSV xuất bản, chuyển sang gviz:',err);
+      window.__driveViaGvizFallback=true;
+      _loadDriveViaGviz(fileId);
+    });
+}
+
+function _loadDriveViaGviz(fileId){
   const old=document.getElementById('_gviz_script');if(old)old.remove();
 
   const script=document.createElement('script');
@@ -1326,7 +1374,7 @@ function renderOverview(s){
       ${kpi(fmtN(s.tnds),'Hồ sơ TNDS','XO.1…','blue')}
       ${kpi(fmtN(s.vcx),'Hồ sơ VCX','XO.4…','teal')}
       ${kpi(fmtM(s.totalBt),'Tổng BT ước/duyệt','toàn bộ hồ sơ','purple')}
-      ${kpi(fmtM(s.totalDaTra),'Đã chi trả','thực chi','green')}
+      ${kpi(fmtM(s.totalDaTra),'Đã chi trả (gồm VAT)','trả KH + trả GR','green')}
     </div>
     <div class="chart-row">
       <div class="chart-card"><h3>Tiếp nhận · Đã giải quyết · Đang xử lý theo GĐV</h3><div class="chart-wrap"><canvas id="chart-bar-main"></canvas></div></div>
@@ -2739,7 +2787,7 @@ function renderCLDV(s){
         <h3>Phân loại theo Trạng thái Hồ sơ</h3>
         <table><thead><tr>
           <th>Trạng thái</th><th class="center">Số HS</th><th class="center">Tỷ lệ</th>
-          <th class="right">Tiền ước BT</th><th class="right">Đã chi trả</th>
+          <th class="right">Tiền ước BT</th><th class="right">Đã chi trả (gồm VAT)</th>
         </tr></thead><tbody>${ttRows}</tbody></table>
       </div>
       <div style="background:#fff7ed;border-left:4px solid #ea580c;border-radius:0 8px 8px 0;padding:12px 16px">

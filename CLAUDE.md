@@ -47,6 +47,8 @@ Cột quan trọng:
 | `Tên garage (thường gọi)` hoặc `Tên garage (ĐKKD)` | Tên gara/showroom sửa chữa — từ 06/2026 cột `Tên garage` cũ đã tách thành 2 cột này; báo cáo ưu tiên dùng `(thường gọi)`, fallback `(ĐKKD)` |
 | `Tiền BT đã trả cho KH` | Không còn khoảng trắng cuối tên cột (khác với file cũ) — code có fallback đọc cả 2 dạng |
 
+> ⚠️ **Chuẩn VAT lệch nhau**: `Tiền ước/duyệt BT` là số **chưa VAT**, còn `Tiền BT đã trả cho KH` + `Tiền BT đã trả cho GR` là số thực chi **đã gồm VAT** (dữ liệu 09/2026: 933 HS trả = ước × 1,08; 163 HS không VAT). KPI "Đã chi trả" (`totalDaTra` = trả KH + trả GR) vì vậy được gắn nhãn **"Đã chi trả (gồm VAT)"** và có thể lớn hơn tiền ước/duyệt — không phải lỗi cộng trùng. Không chia ngược 1,08 để quy đổi vì thuế suất không đồng nhất.
+
 ## Danh sách Giám định viên
 
 | Mã GĐV | Họ tên |
@@ -142,13 +144,18 @@ Thay vì chỉ upload file, màn hình upload có 2 card song song:
 
 | Lựa chọn | Mô tả |
 |----------|-------|
-| **Google Drive** | Tải tự động qua JSONP (`gviz/tq`) từ file ID cố định. Không bị CORS. Callback: `ptiGvizCb` |
+| **Google Drive** | Ưu tiên `fetch` bản CSV **Xuất bản lên web** (`/pub?gid=…&single=true&output=csv`); lỗi/chưa xuất bản → dự phòng JSONP (`gviz/tq`, callback `ptiGvizCb`) kèm alert cảnh báo |
 | **Upload file** | Kéo thả hoặc chọn file `.xlsx` từ máy tính |
 
 - Google Drive file ID: `1KqAQmNh9W-C8MsbWuYrywnNouGC4t2ISwRMa7oYH4_0` · Sheet GID: `101924388` (cố định, không có ô nhập URL)
 - File phải chia sẻ "Bất kỳ ai có liên kết" mới tải được
-- Hàm tải: `loadFromGoogleDrive()` — luôn dùng `GDRIVE_FILE_ID`, không đọc input từ người dùng
-- ⚠️ URL **bắt buộc** có `&headers=1` để gviz đọc hàng đầu làm tên cột (thiếu tham số này → cột trả về dạng A, B, C, toàn bộ số liệu = 0)
+- Hàm tải: `loadFromGoogleDrive()` — luôn dùng `GDRIVE_FILE_ID`, không đọc input từ người dùng. Luồng: fetch CSV xuất bản → `XLSX.read(text,{type:'string',raw:true})` → `_applyDriveRaw(cols)`; nếu fetch/parse lỗi → `_loadDriveViaGviz(fileId)` với cờ `window.__driveViaGvizFallback=true` → `_processGvizData` → `_applyDriveRaw`. Lỗi xử lý chung đi qua `_driveFail(msg)`
+- ⚠️ **Vì sao không chỉ dùng gviz (09/2026)**: gviz tự đoán kiểu mỗi cột theo các hàng đầu; cột bị đoán là `number` sẽ trả `null` cho mọi ô dạng chữ (Sheet locale VN giữ `"2,619,000"` là chữ). Thực tế mất 1497/1914 ô `Tiền BT đã trả cho GR` + ô tiền ở `Tiền giảm trừ BT`, `Tiền chia sẻ rủi ro`, `Tiền cứu hộ`, `Tiền TƯ cho KH`, `Tiền BT đã trả cho KH` → KPI Đã chi trả hiện 39.340đ thay vì 15,2 tỷ. Các tham số `range`/`select` không ép được kiểu ổn định.
+- ⚠️ `raw:true` khi parse CSV là **bắt buộc** — không có nó SheetJS đổi `"11/09/2026"` thành ngày kiểu Mỹ (tháng/ngày đảo)
+- Không dùng `/export?format=csv`: dữ liệu đúng nhưng bước redirect 307 thiếu header CORS → trình duyệt chặn (đã thử Chrome headless từ file://)
+- Sheet đã bật **Tệp → Chia sẻ → Xuất bản lên web** (09/2026: sheet `XCG05_HSBT`, CSV, tự động xuất bản lại khi thay đổi). ID xuất bản lưu ở hằng `GDRIVE_PUB_ID` (`2PACX-…`), URL `https://docs.google.com/spreadsheets/d/e/${GDRIVE_PUB_ID}/pub?gid=${GDRIVE_GID}&single=true&output=csv`. Dạng `/d/${GDRIVE_FILE_ID}/pub?...` **không dùng được** (401). Nếu người dùng dừng xuất bản rồi xuất bản lại, ID `2PACX-` có thể đổi → phải cập nhật hằng này. Bản xuất bản có thể trễ vài phút so với Sheet.
+- ⚠️ CSV xuất bản **chỉ tải được khi trang chạy qua http/https** (GitHub Pages `https://chinhnhpti013.github.io/xcg-dashboard/`): bước redirect 307 chỉ trả `Access-Control-Allow-Origin` cho Origin thật, không cho `Origin: null` của file:// → mở `index.html` trực tiếp trên máy sẽ rơi về gviz (có alert giải thích). Đã kiểm tra bằng Chrome headless cả 2 trường hợp.
+- ⚠️ URL gviz **bắt buộc** có `&headers=1` để gviz đọc hàng đầu làm tên cột (thiếu tham số này → cột trả về dạng A, B, C, toàn bộ số liệu = 0)
 - ⚠️ URL **bắt buộc** có `&_=${Date.now()}` để tránh browser cache: khi cập nhật file Drive mới, không có cache-buster sẽ vẫn tải dữ liệu cũ
 - **Không thêm lại ô nhập URL/ID tùy chỉnh** — người dùng cập nhật dữ liệu bằng cách ghi đè file Drive giữ nguyên ID
 
