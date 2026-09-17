@@ -272,6 +272,29 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
 .btn-search:hover{filter:brightness(1.08)}
 .btn-search:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.16)}
 .search-hint{font-size:.72rem;color:var(--text2);margin-top:10px}
+/* Trạng thái hồ sơ — dropdown nhiều checkbox */
+.tt-multi{position:relative}
+.tt-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;border:1.5px solid #cbd5e1;border-radius:8px;padding:9px 12px;font-size:.86rem;font-family:'Be Vietnam Pro',sans-serif;background:#fff;color:var(--text);cursor:pointer;text-align:left}
+.tt-toggle span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tt-caret{color:var(--text2);font-size:.75rem;transition:transform .15s}
+.tt-multi.open .tt-toggle{border-color:var(--blue);box-shadow:0 0 0 3px rgba(21,101,192,.14)}
+.tt-multi.open .tt-caret{transform:rotate(180deg)}
+.tt-multi.has-sel .tt-toggle{border-color:#b45309;background:#fffbeb;font-weight:600}
+.tt-panel{position:absolute;top:calc(100% + 4px);left:0;min-width:100%;width:max-content;max-width:320px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.16);z-index:50;padding:6px}
+.tt-actions{display:flex;gap:6px;padding:2px 2px 6px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.tt-actions button{flex:1;border:1px solid #cbd5e1;background:#f8fafc;border-radius:6px;padding:5px 8px;font-size:.74rem;font-family:'Be Vietnam Pro',sans-serif;cursor:pointer;color:var(--text);white-space:nowrap}
+.tt-actions button:hover{background:#eff6ff;border-color:var(--blue)}
+.tt-list{max-height:min(420px,60vh);overflow-y:auto}
+.tt-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer}
+.search-field .tt-item{font-size:.8rem;font-weight:400;color:var(--text);text-transform:none;letter-spacing:0}
+.tt-item:hover{background:#fef3c7}
+.tt-item input{width:15px;height:15px;accent-color:#b45309;margin:0;flex-shrink:0;cursor:pointer}
+.tt-name{flex:1}
+.tt-count{font-size:.7rem;color:var(--text2);background:#f1f5f9;border-radius:10px;padding:1px 7px;font-family:'JetBrains Mono',monospace}
+.search-result-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.btn-export{background:#fff;color:#047857;border:none;border-radius:8px;padding:8px 18px;font-size:.8rem;font-weight:700;font-family:'Be Vietnam Pro',sans-serif;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.18);transition:transform .08s,box-shadow .08s;white-space:nowrap}
+.btn-export:hover{background:#ecfdf5}
+.btn-export:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
 
 /* DASHBOARD ĐỘNG — thanh chọn tiêu chí nhóm (segmented control) */
 .dash-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:18px}
@@ -1909,12 +1932,17 @@ function renderSearch(){
       <div class="search-box">
         <div class="search-row">
           <div class="search-field">
+            <label>Biển kiểm soát</label>
+            <input type="text" id="search-bks" placeholder="Nhập biển số xe…"/>
+          </div>
+          <div class="search-field">
             <label>Số HSBT</label>
             <input type="text" id="search-hsbt" placeholder="Nhập số hồ sơ bồi thường…"/>
           </div>
           <div class="search-field">
-            <label>Biển kiểm soát</label>
-            <input type="text" id="search-bks" placeholder="Nhập biển số xe…"/>
+            <label>Tên garage (thường gọi)</label>
+            <input type="text" id="search-garage" list="search-garage-list" placeholder="Nhập tên gara/showroom…" autocomplete="off"/>
+            <datalist id="search-garage-list"></datalist>
           </div>
           <div class="search-field">
             <label>GĐV thụ lý</label>
@@ -1922,17 +1950,29 @@ function renderSearch(){
           </div>
           <div class="search-field">
             <label>Trạng thái hồ sơ</label>
-            <select id="search-trangthai"><option value="ALL">Tất cả trạng thái</option></select>
+            <div class="tt-multi" id="search-trangthai">
+              <button type="button" class="tt-toggle" onclick="toggleTtPanel(event)"><span id="search-tt-label">Tất cả trạng thái</span><span class="tt-caret">▾</span></button>
+              <div class="tt-panel" id="search-tt-panel" style="display:none">
+                <div class="tt-actions">
+                  <button type="button" onclick="setAllTt(true)">☑ Chọn tất cả</button>
+                  <button type="button" onclick="setAllTt(false)">☐ Bỏ chọn</button>
+                </div>
+                <div class="tt-list" id="search-tt-list"></div>
+              </div>
+            </div>
           </div>
           <button class="btn-search" id="search-btn" onclick="doSearchHSBT()">🔍 Tìm kiếm</button>
         </div>
-        <div class="search-hint">Nhập Số HSBT hoặc Biển kiểm soát (khớp một phần) và/hoặc chọn GĐV thụ lý, Trạng thái hồ sơ để thu hẹp kết quả, rồi nhấn Tìm kiếm. Một biển kiểm soát có thể trả về nhiều hồ sơ.</div>
+        <div class="search-hint">Nhập Biển kiểm soát hoặc Số HSBT (khớp một phần) và/hoặc nhập Tên garage (khớp một phần, không phân biệt dấu), chọn GĐV thụ lý, tích chọn một hoặc nhiều Trạng thái hồ sơ (không tích = tất cả) để thu hẹp kết quả, rồi nhấn Tìm kiếm. Một biển kiểm soát có thể trả về nhiều hồ sơ. Kết quả có thể tải về file Excel (.xlsx).</div>
       </div>
       <div id="search-result"></div>
     `;
-    ['search-hsbt','search-bks'].forEach(id=>{
+    ['search-hsbt','search-bks','search-garage'].forEach(id=>{
       document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')doSearchHSBT();});
     });
+    // Đóng khung chọn trạng thái khi bấm ra ngoài hoặc nhấn Esc
+    document.addEventListener('click',e=>{if(!e.target.closest('#search-trangthai'))closeTtPanel();});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')closeTtPanel();});
   }
   buildSearchFilterOptions();
 }
@@ -1946,24 +1986,64 @@ function buildSearchFilterOptions(){
   });
   if([...selG.options].some(o=>o.value===curG))selG.value=curG;
 
-  const selT=document.getElementById('search-trangthai');
-  const curT=selT.value;
-  while(selT.options.length>1)selT.remove(1);
-  [...new Set(RAW.map(r=>String(r['Trạng thái hồ sơ']||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'vi')).forEach(t=>{
-    const o=document.createElement('option');o.value=t;o.textContent=t;selT.appendChild(o);
+  // Trạng thái hồ sơ: mỗi trạng thái 1 checkbox (kèm số HS), giữ các ô đang tích nếu trạng thái vẫn còn trong dữ liệu
+  const cur=new Set(getCheckedTt());
+  const cnt={};
+  RAW.forEach(r=>{const t=String(r['Trạng thái hồ sơ']||'').trim();if(t)cnt[t]=(cnt[t]||0)+1;});
+  const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  document.getElementById('search-tt-list').innerHTML=Object.keys(cnt).sort((a,b)=>a.localeCompare(b,'vi')).map(t=>
+    `<label class="tt-item"><input type="checkbox" value="${esc(t)}"${cur.has(t)?' checked':''} onchange="updateTtLabel()"/><span class="tt-name">${esc(t)}</span><span class="tt-count">${cnt[t]}</span></label>`
+  ).join('');
+  updateTtLabel();
+
+  // Gợi ý tên gara theo dữ liệu đang tải (ô vẫn cho gõ tự do, khớp một phần)
+  const dl=document.getElementById('search-garage-list');
+  dl.innerHTML='';
+  [...new Set(RAW.map(searchGarageOf).filter(g=>g&&g!=='-'))].sort((a,b)=>a.localeCompare(b,'vi')).forEach(g=>{
+    const o=document.createElement('option');o.value=g;dl.appendChild(o);
   });
-  if([...selT.options].some(o=>o.value===curT))selT.value=curT;
 }
+function searchGarageOf(r){return String(r['Tên garage (thường gọi)']||r['Tên garage (ĐKKD)']||'').trim()}
+// Bỏ dấu + chữ thường + gộp khoảng trắng để so khớp tên gara
+function getCheckedTt(){return[...document.querySelectorAll('#search-tt-list input:checked')].map(i=>i.value)}
+function updateTtLabel(){
+  const all=document.querySelectorAll('#search-tt-list input').length;
+  const sel=getCheckedTt();
+  const lb=document.getElementById('search-tt-label');
+  lb.textContent=!sel.length||sel.length===all?'Tất cả trạng thái':sel.length===1?sel[0]:`Đã chọn ${sel.length} trạng thái`;
+  lb.title=sel.join(', ');
+  document.getElementById('search-trangthai').classList.toggle('has-sel',sel.length>0&&sel.length<all);
+}
+function setAllTt(v){document.querySelectorAll('#search-tt-list input').forEach(i=>i.checked=v);updateTtLabel();}
+function toggleTtPanel(e){
+  e.stopPropagation();
+  const p=document.getElementById('search-tt-panel');
+  const open=p.style.display==='none';
+  p.style.display=open?'':'none';
+  document.getElementById('search-trangthai').classList.toggle('open',open);
+}
+function closeTtPanel(){
+  const p=document.getElementById('search-tt-panel');
+  if(p&&p.style.display!=='none'){p.style.display='none';document.getElementById('search-trangthai').classList.remove('open');}
+}
+function normText(v){return String(v||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[đĐ]/g,'d').toLowerCase().replace(/\s+/g,' ').trim()}
 function normPlate(v){return String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'')}
+let SEARCH_LAST=null; // {found, desc} — kết quả tra cứu gần nhất, dùng cho nút tải Excel
 function doSearchHSBT(){
   const qHsbt=document.getElementById('search-hsbt').value.trim().toUpperCase();
   const qBksRaw=document.getElementById('search-bks').value.trim();
   const qBks=normPlate(qBksRaw);
   const qGdv=document.getElementById('search-gdv').value;
-  const qTt=document.getElementById('search-trangthai').value;
+  // Tích tất cả = không lọc trạng thái (tương đương không tích ô nào)
+  const qTtArr=getCheckedTt().length===document.querySelectorAll('#search-tt-list input').length?[]:getCheckedTt();
+  const qTt=new Set(qTtArr);
+  const qGrRaw=document.getElementById('search-garage').value.trim();
+  const qGr=normText(qGrRaw);
   const box=document.getElementById('search-result');
-  if(!qHsbt&&!qBks&&qGdv==='ALL'&&qTt==='ALL'){
-    box.innerHTML=`<div class="gdv-report-wrap"><div style="padding:24px;text-align:center;color:var(--text2)">Vui lòng nhập Số HSBT/Biển kiểm soát hoặc chọn GĐV thụ lý/Trạng thái hồ sơ để tìm kiếm.</div></div>`;
+  closeTtPanel();
+  SEARCH_LAST=null;
+  if(!qHsbt&&!qBks&&!qGr&&qGdv==='ALL'&&!qTt.size){
+    box.innerHTML=`<div class="gdv-report-wrap"><div style="padding:24px;text-align:center;color:var(--text2)">Vui lòng nhập Biển kiểm soát/Số HSBT/Tên garage hoặc chọn GĐV thụ lý/Trạng thái hồ sơ để tìm kiếm.</div></div>`;
     return;
   }
   const found=RAW.filter(r=>{
@@ -1972,8 +2052,9 @@ function doSearchHSBT(){
     const mHsbt=qHsbt&&hsbt.includes(qHsbt);
     const mBks=qBks&&bks.includes(qBks);
     if((qHsbt||qBks)&&!(mHsbt||mBks))return false;
+    if(qGr&&!normText(searchGarageOf(r)).includes(qGr))return false;
     if(qGdv!=='ALL'&&gdvKey(r)!==qGdv)return false;
-    if(qTt!=='ALL'&&String(r['Trạng thái hồ sơ']||'').trim()!==qTt)return false;
+    if(qTt.size&&!qTt.has(String(r['Trạng thái hồ sơ']||'').trim()))return false;
     return true;
   }).sort((a,b)=>{
     const da=parseDate(a['Ngày mở HSBT']),db=parseDate(b['Ngày mở HSBT']);
@@ -1988,6 +2069,7 @@ function doSearchHSBT(){
     <th class="lv2" style="width:90px">GĐV thụ lý</th>
     <th class="lv2" style="min-width:150px">Số HSBT</th>
     <th class="lv2" style="width:95px">Biển số xe</th>
+    <th class="lv2" style="min-width:160px">Tên garage (thường gọi)</th>
     ${SEARCH_DATE_COLS.map(c=>`<th class="lv2" style="width:100px">${c}</th>`).join('')}
     <th class="lv2" style="width:130px">Tiền ước/duyệt BT</th>
     <th class="lv2" style="width:110px">Trạng thái HS</th>
@@ -2001,20 +2083,33 @@ function doSearchHSBT(){
       <td style="font-family:'JetBrains Mono',monospace;font-size:.74rem">${gdvKey(r)||''}</td>
       <td style="font-family:'JetBrains Mono',monospace;font-size:.74rem" class="left">${r['Số HSBT']||''}</td>
       <td style="font-weight:700">${r['Biển số xe']||''}</td>
+      <td class="left" style="font-size:.74rem">${searchGarageOf(r)}</td>
       ${SEARCH_DATE_COLS.map(c=>`<td style="font-size:.72rem">${fmtDate(r[c])}</td>`).join('')}
       <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:.74rem">${fmtMBC(parseMoney(r['Tiền ước/duyệt BT']))}</td>
       <td style="font-size:.74rem">${r['Trạng thái hồ sơ']||''}</td>
       <td class="${cls}" style="text-align:center;font-weight:700">${fmtN(ngayTon)}</td>
     </tr>`;
   }).join('');
+  const desc=[
+    qBks?`Biển kiểm soát chứa "${qBksRaw}"`:'',
+    qHsbt?`Số HSBT chứa "${qHsbt}"`:'',
+    qGr?`Gara chứa "${qGrRaw}"`:'',
+    qGdv!=='ALL'?`GĐV: ${qGdv}`:'',
+    qTt.size?`Trạng thái: ${qTtArr.join(', ')}`:''
+  ].filter(Boolean);
+  SEARCH_LAST={found,desc};
+  const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   box.innerHTML=`
     <div class="gdv-report-wrap">
-      <div class="gdv-report-header" style="background:linear-gradient(135deg,#b45309,#fbbf24)">
-        <div class="title">KẾT QUẢ TRA CỨU TIẾN TRÌNH GIẢI QUYẾT HỒ SƠ</div>
-        <div class="period">Tìm thấy <b>${found.length}</b> hồ sơ${qHsbt?` · Số HSBT chứa "${qHsbt}"`:''}${qBks?` · Biển kiểm soát chứa "${qBksRaw}"`:''}${qGdv!=='ALL'?` · GĐV: ${qGdv}`:''}${qTt!=='ALL'?` · Trạng thái: ${qTt}`:''}</div>
+      <div class="gdv-report-header search-result-head" style="background:linear-gradient(135deg,#b45309,#fbbf24)">
+        <div>
+          <div class="title">KẾT QUẢ TRA CỨU TIẾN TRÌNH GIẢI QUYẾT HỒ SƠ</div>
+          <div class="period">Tìm thấy <b>${found.length}</b> hồ sơ${desc.map(d=>' · '+esc(d)).join('')}</div>
+        </div>
+        <button class="btn-export" onclick="exportSearchXlsx()" title="Tải toàn bộ ${found.length} hồ sơ tìm được ra file Excel">📥 Tải Excel (.xlsx)</button>
       </div>
       <div class="gdv-table-outer" style="max-height:560px;overflow-y:auto">
-        <table class="gdv" style="min-width:1600px">
+        <table class="gdv" style="min-width:1760px">
           <thead style="position:sticky;top:0;z-index:2">${header}</thead>
           <tbody>${rows}</tbody>
         </table>
@@ -2025,6 +2120,52 @@ function doSearchHSBT(){
       </div>
     </div>
   `;
+}
+// Xuất kết quả tra cứu gần nhất ra .xlsx — cùng bộ cột với bảng kết quả.
+// Ngày ghi dạng số serial Excel (định dạng dd/mm/yyyy) và tiền dạng số để lọc/sắp xếp/cộng được trong Excel.
+function exportSearchXlsx(){
+  if(!SEARCH_LAST||!SEARCH_LAST.found.length){alert('Chưa có kết quả tra cứu để tải về.');return;}
+  if(typeof XLSX==='undefined'){alert('Chưa tải được thư viện Excel (SheetJS). Kiểm tra kết nối mạng rồi thử lại.');return;}
+  const {found,desc}=SEARCH_LAST;
+  const cols=['Stt','GĐV thụ lý','Số HSBT','Biển số xe','Tên garage (thường gọi)',...SEARCH_DATE_COLS,'Tiền ước/duyệt BT','Trạng thái hồ sơ','Số ngày tồn'];
+  const now=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  const aoa=[
+    ['KẾT QUẢ TRA CỨU TIẾN TRÌNH GIẢI QUYẾT HỒ SƠ — PTISOS - Văn phòng Miền Bắc - Phòng Khu vực Quảng Ninh'],
+    [`Tìm thấy ${found.length} hồ sơ${desc.length?' · '+desc.join(' · '):''} · Xuất lúc ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`],
+    [],
+    cols
+  ];
+  const HEAD=aoa.length;
+  found.forEach((r,i)=>{
+    const tonRaw=String(r['Số ngày tồn']??'').trim().replace(/,/g,'');
+    const ton=tonRaw!==''&&!isNaN(tonRaw)?Number(tonRaw):(tonRaw==='-'?'':tonRaw);
+    const tien=parseMoney(r['Tiền ước/duyệt BT']);
+    aoa.push([i+1,gdvKey(r)||'',String(r['Số HSBT']||''),String(r['Biển số xe']||''),searchGarageOf(r),
+      ...SEARCH_DATE_COLS.map(c=>r[c]),tien||'',String(r['Trạng thái hồ sơ']||''),ton]);
+  });
+  const ws=XLSX.utils.aoa_to_sheet(aoa);
+  // Ngày: tự quy đổi sang serial Excel theo ngày/tháng/năm địa phương (tránh lệch múi giờ của SheetJS)
+  const excelSerial=d=>(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())-Date.UTC(1899,11,30))/86400000;
+  const dateCol0=5, moneyCol=dateCol0+SEARCH_DATE_COLS.length;
+  found.forEach((r,i)=>{
+    const R=HEAD+i;
+    SEARCH_DATE_COLS.forEach((c,j)=>{
+      const addr=XLSX.utils.encode_cell({r:R,c:dateCol0+j});
+      const d=parseDate(r[c]);
+      if(d&&!isNaN(d))ws[addr]={t:'n',v:excelSerial(d),z:'dd/mm/yyyy'};
+      else delete ws[addr];
+    });
+    const mAddr=XLSX.utils.encode_cell({r:R,c:moneyCol});
+    if(ws[mAddr]&&ws[mAddr].t==='n')ws[mAddr].z='#,##0';
+  });
+  ws['!cols']=cols.map(c=>({wch:c==='Stt'?6:c==='Tên garage (thường gọi)'?34:c==='Số HSBT'?24:c==='Trạng thái hồ sơ'?22:Math.max(12,c.length+2)}));
+  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:cols.length-1}},{s:{r:1,c:0},e:{r:1,c:cols.length-1}}];
+  ws['!autofilter']={ref:XLSX.utils.encode_range({s:{r:HEAD-1,c:0},e:{r:HEAD-1+found.length,c:cols.length-1}})};
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Tra cuu HSBT');
+  const fname=`TraCuu_HSBT_${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}.xlsx`;
+  XLSX.writeFile(wb,fname);
 }
 
 // ─── TAB 6: DASHBOARD ĐỘNG ───────────────────────────────────────────────────
