@@ -1000,7 +1000,7 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
       <div class="tl-head-ico" aria-hidden="true"><svg class="tl-bot" viewBox="0 0 64 64"><use href="#tl-bot-art"/></svg></div>
       <div class="tl-head-txt">
         <div class="tl-title">Trợ lý Giám định PTI</div>
-        <div class="tl-sub" id="tl-sub">QT PTI.XCG.20 · QT VCX 109/2025 · NĐ 67/2023</div>
+        <div class="tl-sub" id="tl-sub">QT PTI.XCG.20 · QT 109 &amp; 110/2025 · NĐ 67/2023</div>
       </div>
       <button type="button" class="tl-hbtn" onclick="tlHome()" title="Về màn hình chủ đề" aria-label="Chủ đề">⌂</button>
       <button type="button" class="tl-hbtn" onclick="tlClear()" title="Xoá hội thoại" aria-label="Xoá hội thoại">⟲</button>
@@ -3640,7 +3640,7 @@ function tlBuildIndex(){
   if(TL_IDX)return TL_IDX;
   const kb=tlKB(), df={};
   kb.forEach(e=>{
-    e._qn=tlNorm(e.q);
+    e._qn=tlExpand(tlNorm(e.q));   // mở rộng viết tắt như câu hỏi người dùng, để khớp đúng câu chuẩn có "TNDS", "VCX"…
     e._k=(e.k||[]).map(tlNorm).filter(Boolean);
     e._qt=new Set(tlTok(e.q));
     e._kt=new Set(e._k.join(' ').split(' ').filter(t=>t&&!TL_STOP.has(t)));
