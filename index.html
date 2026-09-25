@@ -714,8 +714,14 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
 .tl-fab:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(21,101,192,.5),0 3px 0 rgba(0,0,0,.18)}
 .tl-fab:active{transform:translateY(1px);box-shadow:0 4px 12px rgba(21,101,192,.4)}
 .tl-fab:focus-visible{outline:3px solid #fbbf24;outline-offset:2px}
-.tl-fab-ico{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:1.05rem;
-  background:var(--claude);box-shadow:inset 0 -2px 0 rgba(0,0,0,.15)}
+.tl-fab-ico{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle at 35% 30%,#fff,#fde7de 70%,#f6c7b5);box-shadow:inset 0 -2px 0 rgba(0,0,0,.12),0 0 0 2px rgba(255,255,255,.35)}
+.tl-bot{width:84%;height:84%;display:block;overflow:visible}
+.tl-fab-ico .tl-bot{animation:tlBob 2.8s ease-in-out infinite}
+.tl-fab:hover .tl-bot{animation:tlWiggle .6s ease-in-out}
+@keyframes tlBob{0%,100%{transform:translateY(1px)}50%{transform:translateY(-2px)}}
+@keyframes tlWiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
+@media(prefers-reduced-motion:reduce){.tl-fab-ico .tl-bot,.tl-fab:hover .tl-bot{animation:none}}
 .tl-panel{position:fixed;right:22px;bottom:84px;z-index:1001;width:420px;max-width:calc(100vw - 32px);
   height:min(660px,calc(100vh - 104px));display:flex;flex-direction:column;background:#fff;
   border:1px solid var(--border);border-radius:18px;overflow:hidden;
@@ -724,8 +730,8 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
 @keyframes tlIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
 .tl-head{display:flex;align-items:center;gap:10px;padding:11px 10px 11px 14px;color:#fff;
   background:linear-gradient(135deg,#0a1929,#1565C0);flex-shrink:0}
-.tl-head-ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:1.05rem;
-  background:rgba(255,255,255,.14);flex-shrink:0}
+.tl-head-ico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;
+  background:radial-gradient(circle at 35% 30%,#fff,#e0f2fe);box-shadow:0 2px 8px rgba(0,0,0,.25);flex-shrink:0}
 .tl-head-txt{flex:1;min-width:0}
 .tl-title{font-size:.9rem;font-weight:700;line-height:1.25}
 .tl-sub{font-size:.64rem;color:rgba(255,255,255,.66);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -779,11 +785,40 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
 .tl-form input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(21,101,192,.12)}
 .tl-send{width:44px;border:none;border-radius:10px;background:var(--blue);color:#fff;font-size:1rem;cursor:pointer}
 .tl-send:hover{background:var(--blue-mid)}
+/* Bảng dạng thẻ (điện thoại): mỗi dòng 1 thẻ, mỗi ô "nhãn cột : giá trị" — do tlFitTables() bật khi bảng không vừa khung */
+.tl-msg table.tl-stack,.tl-msg table.tl-stack tbody,.tl-msg table.tl-stack tr,.tl-msg table.tl-stack td,.tl-msg table.tl-stack th{display:block;width:100%}
+.tl-msg table.tl-stack tr:first-child{display:none}
+.tl-msg table.tl-stack tr{border:1px solid #e2e8f0;border-radius:8px;margin:0 0 6px;background:#fff;overflow:hidden}
+.tl-msg table.tl-stack td,.tl-msg table.tl-stack th{display:grid;grid-template-columns:minmax(78px,38%) 1fr;gap:8px;border:none;
+  border-bottom:1px solid #f1f5f9;background:none;color:var(--text);font-size:.74rem;font-weight:400;text-align:left;white-space:normal;overflow-wrap:anywhere}
+.tl-msg table.tl-stack tr>*:last-child{border-bottom:none}
+.tl-msg table.tl-stack tr>*::before{content:attr(data-label);color:var(--text2);font-weight:600;font-size:.68rem}
+.tl-msg table.tl-stack tr>*:first-child{background:#eff6ff;font-weight:700;color:#1e3a8a}
+.tl-msg table.tl-stack tr>*:empty{display:none}
+.tl-cv{min-width:0}
 @media(max-width:600px){
-  .tl-fab{right:14px;bottom:14px;padding:9px}
+  .tl-fab{right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));padding:7px}
+  .tl-fab-ico{width:48px;height:48px}
   .tl-fab-txt{display:none}
-  .tl-panel{inset:0;width:100%;max-width:none;height:100%;border-radius:0;border:none}
+  /* Toàn màn hình theo vùng nhìn thực (--tl-vh do tlFitViewport() gán từ visualViewport: co lại khi bàn phím bật) */
+  .tl-panel{inset:auto 0 auto 0;top:var(--tl-top,0px);width:100%;max-width:none;height:var(--tl-vh,100dvh);
+    border-radius:0;border:none;animation:none}
   #dashboard.tl-open .tl-fab{display:none}
+  .tl-head{padding:max(8px,env(safe-area-inset-top)) 8px 8px 10px;gap:8px}
+  .tl-head-ico{width:36px;height:36px}
+  .tl-sub{white-space:normal;overflow:visible;line-height:1.3}
+  .tl-hbtn{width:38px;height:38px;font-size:1rem}
+  .tl-log{padding:10px 8px;gap:8px}
+  .tl-msg{font-size:.86rem}
+  .tl-msg.user{max-width:92%}
+  .tl-msg.bot{padding:10px}
+  .tl-msg table{font-size:.76rem}
+  .tl-kv{grid-template-columns:minmax(0,40%) 1fr;font-size:.78rem}
+  .tl-kv span{overflow-wrap:anywhere}
+  .tl-chip{font-size:.78rem;padding:7px 12px}
+  .tl-form{padding:8px 8px max(8px,env(safe-area-inset-bottom))}
+  .tl-form input{font-size:16px}   /* <16px làm iOS tự phóng to trang khi gõ → mất 1 phần nội dung */
+  .tl-send{width:48px}
 }
 @media print{.tl-fab,.tl-panel{display:none!important}}
 </style>
@@ -924,11 +959,35 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
 
   <!-- TRỢ LÝ ẢO GĐV — popup tra cứu quy trình PTI (bộ tri thức: assets/tro-ly-gdv-kb.js) -->
   <button type="button" id="tl-fab" class="tl-fab" onclick="tlToggle()" aria-controls="tl-panel" aria-expanded="false" title="Trợ lý giám định — quy trình PTI">
-    <span class="tl-fab-ico" aria-hidden="true">💬</span><span class="tl-fab-txt">Trợ lý GĐV</span>
+    <span class="tl-fab-ico" aria-hidden="true"><svg class="tl-bot" viewBox="0 0 64 64"><use href="#tl-bot-art"/></svg></span><span class="tl-fab-txt">Trợ lý GĐV</span>
   </button>
+  <!-- Logo robot AI của Trợ lý GĐV (vẽ 1 lần, dùng lại qua <use>) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="tl-bot-head" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dbeafe"/></linearGradient>
+      <linearGradient id="tl-bot-body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#60a5fa"/><stop offset="1" stop-color="#1565C0"/></linearGradient>
+    </defs>
+    <symbol id="tl-bot-art" viewBox="0 0 64 64">
+      <line x1="32" y1="13" x2="32" y2="6" stroke="#475569" stroke-width="2.6" stroke-linecap="round"/>
+      <circle cx="32" cy="5.5" r="4" fill="#fbbf24"><animate attributeName="fill" values="#fbbf24;#fde68a;#fb923c;#fbbf24" dur="1.8s" repeatCount="indefinite"/></circle>
+      <rect x="4" y="25" width="7" height="14" rx="3.5" fill="#DA7756"/>
+      <rect x="53" y="25" width="7" height="14" rx="3.5" fill="#DA7756"/>
+      <rect x="22" y="49" width="20" height="13" rx="6" fill="url(#tl-bot-body)"/>
+      <circle cx="32" cy="55.5" r="2.6" fill="#fbbf24"/>
+      <rect x="9" y="12" width="46" height="39" rx="15" fill="url(#tl-bot-head)" stroke="#1565C0" stroke-width="2.4"/>
+      <rect x="15" y="19" width="34" height="24" rx="10" fill="#0a1929"/>
+      <g fill="#22d3ee">
+        <ellipse cx="25" cy="29" rx="4" ry="4.6"><animate attributeName="ry" values="4.6;4.6;0.6;4.6;4.6" keyTimes="0;.9;.94;.98;1" dur="4s" repeatCount="indefinite"/></ellipse>
+        <ellipse cx="39" cy="29" rx="4" ry="4.6"><animate attributeName="ry" values="4.6;4.6;0.6;4.6;4.6" keyTimes="0;.9;.94;.98;1" dur="4s" repeatCount="indefinite"/></ellipse>
+      </g>
+      <circle cx="26.4" cy="27.4" r="1.3" fill="#fff"/><circle cx="40.4" cy="27.4" r="1.3" fill="#fff"/>
+      <path d="M25.5 35.5 Q32 41.5 38.5 35.5" fill="none" stroke="#22d3ee" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="19.5" cy="37" r="2.4" fill="#fb7185" opacity=".85"/><circle cx="44.5" cy="37" r="2.4" fill="#fb7185" opacity=".85"/>
+    </symbol>
+  </svg>
   <section id="tl-panel" class="tl-panel" role="dialog" aria-label="Trợ lý giám định PTI" hidden>
     <header class="tl-head">
-      <div class="tl-head-ico" aria-hidden="true">🤖</div>
+      <div class="tl-head-ico" aria-hidden="true"><svg class="tl-bot" viewBox="0 0 64 64"><use href="#tl-bot-art"/></svg></div>
       <div class="tl-head-txt">
         <div class="tl-title">Trợ lý Giám định PTI</div>
         <div class="tl-sub" id="tl-sub">QT PTI.XCG.20 · QT VCX 109/2025 · NĐ 67/2023</div>
@@ -3637,9 +3696,62 @@ function tlToggle(open){
   fab.setAttribute('aria-expanded',String(show));
   tlEl('dashboard').classList.toggle('tl-open',show);
   if(show){
+    tlFitViewport();
     if(!tlReady){tlReady=true;tlRestore()}
-    setTimeout(()=>tlEl('tl-input').focus(),30);
+    tlFitTables(tlEl('tl-log'));
+    // Điện thoại: không tự bật bàn phím khi mở (bàn phím che nửa màn hình, người dùng thường bấm chip chủ đề trước)
+    if(!TL_MOBILE.matches)setTimeout(()=>tlEl('tl-input').focus(),30);
   }else fab.focus();
+}
+
+// ── Giao diện điện thoại ──
+const TL_MOBILE=window.matchMedia('(max-width:600px)');
+// Khung chat bám đúng vùng nhìn thấy (visualViewport): khi bàn phím bật, khung co lại để ô nhập + câu trả lời không bị che
+function tlFitViewport(){
+  const p=tlEl('tl-panel'); if(!p)return;
+  const vv=window.visualViewport;
+  if(TL_MOBILE.matches&&vv){
+    p.style.setProperty('--tl-vh',Math.round(vv.height)+'px');
+    p.style.setProperty('--tl-top',Math.round(vv.offsetTop)+'px');
+  }else{p.style.removeProperty('--tl-vh');p.style.removeProperty('--tl-top')}
+}
+// Gắn nhãn cột cho từng ô (dùng khi bảng chuyển dạng thẻ); chạy lại nhiều lần vẫn an toàn
+function tlLabelTable(t){
+  if(t.dataset.tlLabeled)return;
+  const rows=[...t.rows]; if(rows.length<2)return;
+  const heads=[...rows[0].cells].map(c=>c.textContent.trim());
+  rows.slice(1).forEach(tr=>[...tr.cells].forEach((c,i)=>{
+    c.setAttribute('data-label',heads[i]||'');
+    if(c.textContent.trim()||c.children.length){
+      const w=document.createElement('span'); w.className='tl-cv';
+      while(c.firstChild)w.appendChild(c.firstChild);
+      c.appendChild(w);
+    }
+  }));
+  t.dataset.tlLabeled='1';
+}
+// Điện thoại: bảng không vừa bề ngang (hoặc ≥3 cột có ô chữ dài bị ép hẹp) → chuyển dạng thẻ để đọc hết, không phải cuộn ngang
+function tlFitTables(root){
+  const panel=tlEl('tl-panel'); if(!root||!panel||panel.hidden)return;
+  root.querySelectorAll('.tl-msg table').forEach(t=>{
+    tlLabelTable(t);
+    t.classList.remove('tl-stack');
+    if(!TL_MOBILE.matches||t.rows.length<2)return;
+    const box=t.parentElement, cols=t.rows[0].cells.length;
+    const longTxt=cols>=3&&[...t.querySelectorAll('td')].some(c=>c.textContent.trim().length>45);
+    if(t.scrollWidth>box.clientWidth+1||longTxt)t.classList.add('tl-stack');
+  });
+}
+let _tlFitTimer=null;
+function tlOnViewport(){
+  tlFitViewport();
+  clearTimeout(_tlFitTimer);
+  _tlFitTimer=setTimeout(()=>tlFitTables(tlEl('tl-log')),120);
+}
+window.addEventListener('resize',tlOnViewport);
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',tlOnViewport);
+  window.visualViewport.addEventListener('scroll',tlFitViewport);
 }
 function tlSave(){try{localStorage.setItem(TL_LS_LOG,JSON.stringify(TL_LOG.slice(-TL_LOG_MAX)))}catch(e){}}
 function tlPush(role,html,save=true){
@@ -3649,6 +3761,7 @@ function tlPush(role,html,save=true){
   if(save)html=html.replace(/<table>/g,'<div class="tl-tbl"><table>').replace(/<\/table>/g,'</table></div>');
   d.innerHTML=html;
   log.appendChild(d);
+  tlFitTables(d);
   // Câu trả lời dài: cuộn tới đầu câu trả lời thay vì cuối
   log.scrollTop+=d.getBoundingClientRect().top-log.getBoundingClientRect().top-8;
   if(save){TL_LOG.push({r:role,h:html});if(TL_LOG.length>TL_LOG_MAX)TL_LOG=TL_LOG.slice(-TL_LOG_MAX);tlSave()}
