@@ -704,6 +704,88 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
   .tlbt-chart-card{min-height:220px}
   .tlbt-chart-card h3{font-size:.72rem}
 }
+
+/* ── TRỢ LÝ ẢO GĐV (popup góc phải dưới, nằm trong #dashboard nên chỉ hiện khi dashboard hiện) ──
+   z-index 1000/1001 > topbar (100) > thanh tab sticky (90). Không thêm overflow cho body/#dashboard. */
+.tl-fab{position:fixed;right:22px;bottom:22px;z-index:1000;display:flex;align-items:center;gap:9px;
+  padding:9px 18px 9px 9px;border:none;border-radius:999px;cursor:pointer;color:#fff;
+  background:linear-gradient(135deg,#1565C0,#0a1929);font:700 .84rem 'Be Vietnam Pro',sans-serif;
+  box-shadow:0 8px 24px rgba(21,101,192,.42),0 3px 0 rgba(0,0,0,.18);transition:transform .15s,box-shadow .15s}
+.tl-fab:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(21,101,192,.5),0 3px 0 rgba(0,0,0,.18)}
+.tl-fab:active{transform:translateY(1px);box-shadow:0 4px 12px rgba(21,101,192,.4)}
+.tl-fab:focus-visible{outline:3px solid #fbbf24;outline-offset:2px}
+.tl-fab-ico{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:1.05rem;
+  background:var(--claude);box-shadow:inset 0 -2px 0 rgba(0,0,0,.15)}
+.tl-panel{position:fixed;right:22px;bottom:84px;z-index:1001;width:420px;max-width:calc(100vw - 32px);
+  height:min(660px,calc(100vh - 104px));display:flex;flex-direction:column;background:#fff;
+  border:1px solid var(--border);border-radius:18px;overflow:hidden;
+  box-shadow:0 20px 56px rgba(15,23,42,.3);animation:tlIn .18s ease-out}
+.tl-panel[hidden]{display:none}
+@keyframes tlIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
+.tl-head{display:flex;align-items:center;gap:10px;padding:11px 10px 11px 14px;color:#fff;
+  background:linear-gradient(135deg,#0a1929,#1565C0);flex-shrink:0}
+.tl-head-ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:1.05rem;
+  background:rgba(255,255,255,.14);flex-shrink:0}
+.tl-head-txt{flex:1;min-width:0}
+.tl-title{font-size:.9rem;font-weight:700;line-height:1.25}
+.tl-sub{font-size:.64rem;color:rgba(255,255,255,.66);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-hbtn{width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.1);
+  color:#fff;cursor:pointer;font-size:.9rem;flex-shrink:0;line-height:1}
+.tl-hbtn:hover{background:rgba(255,255,255,.22)}
+.tl-log{flex:1;min-height:0;overflow-y:auto;padding:14px 12px;background:#f5f7fb;display:flex;flex-direction:column;gap:10px;
+  overscroll-behavior:contain}
+.tl-msg{font-size:.8rem;line-height:1.55;color:var(--text);overflow-wrap:anywhere}
+.tl-msg.user{align-self:flex-end;max-width:85%;background:var(--blue);color:#fff;padding:8px 12px;border-radius:14px 14px 4px 14px}
+.tl-msg.bot{align-self:stretch;background:#fff;border:1px solid #e5e7eb;padding:10px 12px;border-radius:14px 14px 14px 4px;
+  box-shadow:0 1px 3px rgba(15,23,42,.05)}
+.tl-msg h4{font-size:.8rem;color:var(--blue);margin:0 0 6px;line-height:1.4}
+.tl-msg p{margin:4px 0}
+.tl-msg ul{margin:4px 0 4px 18px}
+.tl-msg li{margin:2px 0}
+.tl-msg b{font-weight:700}
+.tl-tbl{overflow-x:auto;margin:6px 0}   /* bảng rộng hơn khung → cuộn ngang trong bảng, không tràn popup */
+.tl-msg table{width:100%;border-collapse:collapse;margin:0;font-size:.72rem}
+/* Ghi đè CSS chung của trang cho th/td (viết hoa, nowrap, bỏ viền dòng cuối) */
+.tl-msg th,.tl-msg td{border:1px solid #e2e8f0;padding:4px 6px;text-align:left;vertical-align:top;overflow-wrap:normal;word-break:normal}
+.tl-msg th{background:#eff6ff;color:#1e3a8a;font-weight:700;font-size:.7rem;text-transform:none;letter-spacing:normal;white-space:normal}
+.tl-msg tr:last-child td{border-bottom:1px solid #e2e8f0}
+.tl-msg td.num{text-align:right;white-space:nowrap}
+.tl-warn{margin:6px 0;padding:6px 9px;border-left:3px solid var(--claude);border-radius:6px;background:var(--claude-light);color:#7c2d12}
+.tl-src{margin-top:8px;padding-top:6px;border-top:1px dashed #e2e8f0;font-size:.67rem;color:var(--text2)}
+.tl-src b{color:var(--text)}
+.tl-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tl-chip{border:1px solid #bfdbfe;background:#eff6ff;color:#1e40af;border-radius:999px;padding:5px 11px;cursor:pointer;
+  font:600 .72rem/1.35 'Be Vietnam Pro',sans-serif;text-align:left}
+.tl-chip:hover{background:#dbeafe}
+.tl-chip.q{border-color:#e2e8f0;background:#fff;color:var(--text);font-weight:500;border-radius:10px}
+.tl-chip.q:hover{border-color:#93c5fd;background:#f8fbff}
+.tl-chip.act{border-color:#fdba74;background:#fff7ed;color:#9a3412}
+.tl-muted{color:var(--text2);font-size:.72rem}
+.tl-rec{margin:8px 0 2px;padding:8px 10px;border:1px solid #e2e8f0;border-radius:10px;background:#fcfcfd}
+.tl-rec-h{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
+.tl-rec-h .plate{font-weight:800;font-size:.86rem;letter-spacing:.02em}
+.tl-kv{display:grid;grid-template-columns:max-content 1fr;gap:1px 10px;font-size:.73rem}
+.tl-kv span:nth-child(odd){color:var(--text2)}
+.tl-mono{font-family:'JetBrains Mono',monospace;font-size:.7rem}
+.tl-ton{display:inline-block;font-weight:800;font-size:.7rem;padding:1px 8px;border-radius:10px;white-space:nowrap}
+.tl-ton.ok{background:#d1fae5;color:#065f46}.tl-ton.warn{background:#fef3c7;color:#92400e}
+.tl-ton.bad{background:#fee2e2;color:#991b1b}.tl-ton.done{background:#e0e7ff;color:#3730a3}
+.tl-step{margin-top:6px;padding:6px 9px;border-radius:8px;background:#eff6ff;border:1px solid #dbeafe;font-size:.73rem}
+.tl-tr-link{cursor:pointer}
+.tl-tr-link:hover td{background:#f8fbff}
+.tl-form{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border);background:#fff;flex-shrink:0}
+.tl-form input{flex:1;min-width:0;border:1.5px solid #cbd5e1;border-radius:10px;padding:9px 12px;outline:none;
+  font:.82rem 'Be Vietnam Pro',sans-serif;color:var(--text)}
+.tl-form input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(21,101,192,.12)}
+.tl-send{width:44px;border:none;border-radius:10px;background:var(--blue);color:#fff;font-size:1rem;cursor:pointer}
+.tl-send:hover{background:var(--blue-mid)}
+@media(max-width:600px){
+  .tl-fab{right:14px;bottom:14px;padding:9px}
+  .tl-fab-txt{display:none}
+  .tl-panel{inset:0;width:100%;max-width:none;height:100%;border-radius:0;border:none}
+  #dashboard.tl-open .tl-fab{display:none}
+}
+@media print{.tl-fab,.tl-panel{display:none!important}}
 </style>
 </head>
 <body>
@@ -839,8 +921,32 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
     &nbsp;|&nbsp; Dữ liệu xử lý offline trong trình duyệt &nbsp;|&nbsp;
     <span id="footer-date"></span>
   </footer>
+
+  <!-- TRỢ LÝ ẢO GĐV — popup tra cứu quy trình PTI (bộ tri thức: assets/tro-ly-gdv-kb.js) -->
+  <button type="button" id="tl-fab" class="tl-fab" onclick="tlToggle()" aria-controls="tl-panel" aria-expanded="false" title="Trợ lý giám định — quy trình PTI">
+    <span class="tl-fab-ico" aria-hidden="true">💬</span><span class="tl-fab-txt">Trợ lý GĐV</span>
+  </button>
+  <section id="tl-panel" class="tl-panel" role="dialog" aria-label="Trợ lý giám định PTI" hidden>
+    <header class="tl-head">
+      <div class="tl-head-ico" aria-hidden="true">🤖</div>
+      <div class="tl-head-txt">
+        <div class="tl-title">Trợ lý Giám định PTI</div>
+        <div class="tl-sub" id="tl-sub">QT PTI.XCG.20 · QT VCX 109/2025 · NĐ 67/2023</div>
+      </div>
+      <button type="button" class="tl-hbtn" onclick="tlHome()" title="Về màn hình chủ đề" aria-label="Chủ đề">⌂</button>
+      <button type="button" class="tl-hbtn" onclick="tlClear()" title="Xoá hội thoại" aria-label="Xoá hội thoại">⟲</button>
+      <button type="button" class="tl-hbtn" onclick="tlToggle(false)" title="Đóng (Esc)" aria-label="Đóng">✕</button>
+    </header>
+    <div id="tl-log" class="tl-log" aria-live="polite"></div>
+    <form class="tl-form" onsubmit="tlSubmit(event)">
+      <input id="tl-input" type="text" autocomplete="off" maxlength="300" placeholder="Hỏi quy trình, hoặc gõ biển số / số HSBT…" aria-label="Câu hỏi cho trợ lý"/>
+      <button type="submit" class="tl-send" title="Gửi" aria-label="Gửi">➤</button>
+    </form>
+  </section>
 </div>
 
+<!-- Bộ tri thức Trợ lý GĐV (TL_KB, TL_FORMS, TL_STATUS…). Thiếu file này trợ lý vẫn tra được hồ sơ. -->
+<script src="assets/tro-ly-gdv-kb.js"></script>
 <script>
 /* ── LOGIN ── */
 (function(){
@@ -3421,6 +3527,507 @@ function buildDonut(id,labels,data,colors){
     }
   });
 }
+
+// ─── TRỢ LÝ ẢO GĐV ───────────────────────────────────────────────────────────
+// Popup tra cứu quy trình PTI chạy offline, không gọi AI/Internet:
+//  · Hỏi quy trình → tìm trong bộ tri thức assets/tro-ly-gdv-kb.js (TL_KB) bằng so khớp
+//    cụm từ khoá + từ đơn không dấu có trọng số IDF (từ hiếm được tính điểm cao hơn).
+//  · Gõ biển số / số HSBT / "hồ sơ tồn của …" → đọc thẳng RAW (cùng quy ước tồn với computeStats).
+//  · Gõ mã mẫu "20.35" → tra TL_FORMS.
+// localStorage: 'pti_ai_log' (hội thoại, tối đa TL_LOG_MAX tin) · 'pti_ai_gdv' ("GĐV của tôi").
+const TL_LS_LOG='pti_ai_log', TL_LS_GDV='pti_ai_gdv', TL_LOG_MAX=40, TL_MIN_SCORE=4.5;
+const TL_STOP=new Set(('la gi the nao cua cho co khong duoc khi thi va cac nhung can phai bao nhieu nhu mot nay do de voi '+
+  'trong ra vao ve o tai len xuong theo hay hoac nhe oi minh toi em anh chi ban giup cach lam sao bi da se dang roi nua '+
+  'cung lai tu hon nhat moi ai dau vay ha nen neu xe ho cai viec di thoi a u uh ok').split(' '));
+// Viết tắt hay dùng → thêm dạng đầy đủ vào câu hỏi trước khi so khớp
+const TL_ABBR={tnds:'trach nhiem dan su',vcx:'vat chat xe',nt3:'nguoi thu ba',gdv:'giam dinh vien',hsbt:'ho so boi thuong',
+  bt:'boi thuong',bh:'bao hiem',ht:'hien truong',dntt:'de nghi thanh toan',cng:'cong nhan gia',gcnbh:'giay chung nhan bao hiem',
+  hdbh:'hop dong bao hiem',gplx:'giay phep lai xe',ndbh:'nguoi duoc bao hiem',cqcn:'co quan chuc nang',xcg:'xe co gioi',
+  tn:'tai nan',gd:'giam dinh',lpx:'lai phu xe',nntx:'nguoi ngoi tren xe',pvbh:'pham vi bao hiem',mkt:'muc khau tru',
+  grlk:'gara lien ket',gr:'gara',garage:'gara',kh:'khach hang',bb:'bien ban',hs:'ho so',tbtn:'thong bao tai nan',
+  ycbt:'yeu cau boi thuong',tct:'tong cong ty',cv:'cong van',ld:'lanh dao',tp:'truong phong',bl:'bao lanh'};
+const TL_STEP_NAME={B2:'Bước 1–2 · Tiếp nhận, hiện trường',B3:'Bước 3 · Giám định chi tiết',B4:'Bước 4 · Bảng kê, phương án',
+  B5:'Bước 5 · Thông báo, giám sát, chứng từ',B6:'Bước 6 · Thanh toán',B7:'Bước 7 · Sau bồi thường',NT3:'Thế quyền đòi NT3 (PL.20.04)'};
+let TL_IDX=null, TL_LOG=[], tlReady=false;
+
+function tlEsc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function tlEl(id){return document.getElementById(id)}
+function tlKB(){return Array.isArray(window.TL_KB)?window.TL_KB:[]}
+// Bỏ dấu + chỉ giữ chữ/số; giữ dấu chấm giữa hai chữ số (mã mẫu 20.35).
+// "tổn thất" gộp thành "tonthat" để không lẫn với "tồn" (hồ sơ tồn) sau khi bỏ dấu.
+function tlNorm(s){
+  return normText(s).replace(/(\d)\.(?=\d)/g,'$1§').replace(/[^a-z0-9§\s]/g,' ')
+    .replace(/§/g,'.').replace(/\s+/g,' ').trim().replace(/(^| )ton that(?= |$)/g,'$1tonthat');
+}
+function tlTok(s){return tlNorm(s).split(' ').filter(t=>t&&(t.length>1||/\d/.test(t))&&!TL_STOP.has(t))}
+function tlExpand(qn){
+  const add=qn.split(' ').map(t=>TL_ABBR[t]).filter(Boolean);
+  return add.length?qn+' '+add.join(' '):qn;
+}
+function tlBuildIndex(){
+  if(TL_IDX)return TL_IDX;
+  const kb=tlKB(), df={};
+  kb.forEach(e=>{
+    e._qn=tlNorm(e.q);
+    e._k=(e.k||[]).map(tlNorm).filter(Boolean);
+    e._qt=new Set(tlTok(e.q));
+    e._kt=new Set(e._k.join(' ').split(' ').filter(t=>t&&!TL_STOP.has(t)));
+    e._at=new Set(tlTok(e.a+' '+(e.s||'')));
+    new Set([...e._qt,...e._kt,...e._at]).forEach(t=>{df[t]=(df[t]||0)+1});
+  });
+  const N=kb.length||1;
+  TL_IDX={idf:t=>Math.log(1+N/(df[t]||0.5))};
+  return TL_IDX;
+}
+function tlScore(e,qn,qt,idf){
+  let s=e._qn===qn?100:0;
+  const pad=' '+qn+' ';
+  // Cụm từ khoá khớp; cụm nằm trọn trong cụm dài hơn cũng khớp thì chỉ tính cụm dài (tránh cộng điểm 2 lần)
+  const hits=e._k.filter(kw=>pad.includes(' '+kw+' '));
+  hits.filter(kw=>!hits.some(o=>o.length>kw.length&&(' '+o+' ').includes(' '+kw+' ')))
+    .forEach(kw=>{s+=2+1.5*kw.split(' ').length});
+  qt.forEach(t=>{const w=idf(t);if(e._qt.has(t))s+=1.2*w;else if(e._kt.has(t))s+=.8*w;else if(e._at.has(t))s+=.2*w});
+  return s;
+}
+function tlSearch(q){
+  const ix=tlBuildIndex(), qn=tlExpand(tlNorm(q)), qt=[...new Set(tlTok(qn))];
+  return tlKB().map(e=>({e,s:tlScore(e,qn,qt,ix.idf)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);
+}
+
+// Định dạng rút gọn của bộ tri thức: "- " gạch đầu dòng · "|a|b|" bảng · "!! " lưu ý · **đậm**
+function tlFmt(txt){
+  const inl=s=>tlEsc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+  const out=[]; let ul=null, tb=null;
+  const endUl=()=>{if(ul){out.push('<ul>'+ul.join('')+'</ul>');ul=null}};
+  const endTb=()=>{if(tb){out.push('<table>'+tb.join('')+'</table>');tb=null}};
+  String(txt||'').split('\n').forEach(raw=>{
+    const l=raw.trim();
+    if(!l){endUl();endTb();return}
+    if(l.startsWith('|')){
+      endUl();
+      const tag=tb?'td':'th';
+      (tb=tb||[]).push('<tr>'+l.replace(/^\||\|$/g,'').split('|').map(c=>`<${tag}>${inl(c.trim())}</${tag}>`).join('')+'</tr>');
+      return;
+    }
+    endTb();
+    if(l.startsWith('- ')){(ul=ul||[]).push('<li>'+inl(l.slice(2))+'</li>');return}
+    endUl();
+    if(l.startsWith('!! ')){out.push('<div class="tl-warn">⚠ '+inl(l.slice(3))+'</div>');return}
+    out.push('<p>'+inl(l)+'</p>');
+  });
+  endUl();endTb();
+  return out.join('');
+}
+function tlChipsKB(list){
+  return list.length?'<div class="tl-chips">'+list.map(e=>`<button type="button" class="tl-chip q" data-tl-act="kb" data-id="${tlEsc(e.id)}">${tlEsc(e.q)}</button>`).join('')+'</div>':'';
+}
+function tlChipsAsk(qs,cls){
+  return '<div class="tl-chips">'+qs.map(q=>`<button type="button" class="tl-chip${cls?' '+cls:''}" data-tl-act="ask" data-q="${tlEsc(q)}">${tlEsc(q)}</button>`).join('')+'</div>';
+}
+function tlGroupChips(){
+  return '<div class="tl-chips">'+(window.TL_GROUPS||[]).map(g=>
+    `<button type="button" class="tl-chip" data-tl-act="grp" data-g="${tlEsc(g.id)}">${g.icon} ${tlEsc(g.name)}</button>`).join('')+'</div>';
+}
+
+// ── Giao diện: mở/đóng, lịch sử hội thoại ──
+function tlToggle(open){
+  const p=tlEl('tl-panel'), fab=tlEl('tl-fab');
+  const show=open===undefined?p.hidden:!!open;
+  p.hidden=!show;
+  fab.setAttribute('aria-expanded',String(show));
+  tlEl('dashboard').classList.toggle('tl-open',show);
+  if(show){
+    if(!tlReady){tlReady=true;tlRestore()}
+    setTimeout(()=>tlEl('tl-input').focus(),30);
+  }else fab.focus();
+}
+function tlSave(){try{localStorage.setItem(TL_LS_LOG,JSON.stringify(TL_LOG.slice(-TL_LOG_MAX)))}catch(e){}}
+function tlPush(role,html,save=true){
+  const log=tlEl('tl-log'), d=document.createElement('div');
+  d.className='tl-msg '+(role==='u'?'user':'bot');
+  // Bọc bảng để cuộn ngang khi hẹp (tin khôi phục từ localStorage đã được bọc sẵn)
+  if(save)html=html.replace(/<table>/g,'<div class="tl-tbl"><table>').replace(/<\/table>/g,'</table></div>');
+  d.innerHTML=html;
+  log.appendChild(d);
+  // Câu trả lời dài: cuộn tới đầu câu trả lời thay vì cuối
+  log.scrollTop+=d.getBoundingClientRect().top-log.getBoundingClientRect().top-8;
+  if(save){TL_LOG.push({r:role,h:html});if(TL_LOG.length>TL_LOG_MAX)TL_LOG=TL_LOG.slice(-TL_LOG_MAX);tlSave()}
+}
+function tlRestore(){
+  let saved=[];
+  try{saved=JSON.parse(localStorage.getItem(TL_LS_LOG)||'[]')}catch(e){}
+  TL_LOG=Array.isArray(saved)?saved.filter(m=>m&&typeof m.h==='string'):[];
+  if(TL_LOG.length)TL_LOG.forEach(m=>tlPush(m.r,m.h,false));
+  else tlHome();
+}
+function tlClear(){
+  TL_LOG=[];
+  try{localStorage.removeItem(TL_LS_LOG)}catch(e){}
+  tlEl('tl-log').innerHTML='';
+  tlHome();
+}
+function tlHome(){
+  const meta=window.TL_META||{};
+  let h=`<h4>Xin chào! Tôi là trợ lý tra cứu quy trình giám định – bồi thường XCG của PTI.</h4>
+    <p class="tl-muted">Căn cứ ${tlEsc(meta.basis||'quy trình PTI')}. Trả lời offline từ bộ hướng dẫn soạn sẵn, luôn kèm nguồn để đối chiếu văn bản gốc.</p>`;
+  if(!tlKB().length)h+=`<div class="tl-warn">⚠ Không tải được bộ tri thức (assets/tro-ly-gdv-kb.js) — vẫn tra cứu được hồ sơ theo biển số/số HSBT.</div>`;
+  h+=`<p style="margin-top:8px"><b>Chọn chủ đề:</b></p>`+tlGroupChips();
+  h+=`<p style="margin-top:8px"><b>Hoặc thử hỏi:</b></p>`+tlChipsAsk([
+    'Khi nào bắt buộc giám định tại hiện trường?','Tỷ lệ khấu hao phụ tùng','Tạm ứng bồi thường tử vong TNDS',
+    'Thời hạn duyệt giá theo số tiền','Hồ sơ tồn ≥90 ngày','Tổng quan hồ sơ tồn'],'q');
+  h+=`<p class="tl-muted" style="margin-top:8px">Mẹo: gõ biển số (vd 14A-123.45) hoặc số HSBT để xem hồ sơ đang ở bước nào; gõ "20.35" để tra biểu mẫu.</p>`;
+  tlPush('b',h,false);
+}
+function tlShowGroup(gid){
+  const g=(window.TL_GROUPS||[]).find(x=>x.id===gid);
+  const list=tlKB().filter(e=>e.g===gid);
+  if(!g)return;
+  tlPush('b',`<h4>${g.icon} ${tlEsc(g.name)}</h4><p class="tl-muted">${list.length} câu hỏi — chọn để xem hướng dẫn:</p>`+tlChipsKB(list));
+}
+function tlSubmit(ev){
+  ev.preventDefault();
+  const inp=tlEl('tl-input'), q=inp.value.trim();
+  if(!q)return;
+  inp.value='';
+  tlAsk(q);
+}
+// Chào hỏi / cảm ơn — trả lời ngắn, không đưa vào tìm kiếm (tránh "chào" khớp nhầm "chào giá")
+function tlSmallTalk(q){
+  const qn=tlNorm(q);
+  if(/^(xin chao|chao|chao ban|chao tro ly|hello|hi|alo|hey)( ban| tro ly| em| anh| chi)?$/.test(qn))
+    return '<p>Chào bạn! Hãy hỏi về quy trình giám định – bồi thường, hoặc gõ biển số/số HSBT để tra hồ sơ.</p>'+tlGroupChips();
+  if(/^(cam on|cam on ban|cam on nhe|thanks|thank you|ok cam on)$/.test(qn))
+    return '<p>Rất vui được hỗ trợ! Khi cần, cứ mở trợ lý ở góc phải dưới màn hình.</p>';
+  return null;
+}
+function tlAsk(q){
+  tlPush('u',tlEsc(q));
+  let h;
+  try{h=tlSmallTalk(q)||tlAnswerData(q)||tlAnswerForm(q)||tlAnswerKB(q)}
+  catch(err){h='<p>Lỗi khi xử lý câu hỏi: '+tlEsc(err.message)+'</p>'}
+  tlPush('b',h);
+}
+
+// ── Trả lời từ bộ tri thức ──
+function tlRelated(e,extra){
+  const byId=id=>tlKB().find(x=>x.id===id);
+  const rel=(e.r||[]).map(byId).filter(Boolean);
+  (extra||[]).forEach(x=>{if(x!==e&&!rel.includes(x))rel.push(x)});
+  return rel.slice(0,5);
+}
+function tlRenderEntry(e,rel){
+  let h=`<h4>${tlEsc(e.q)}</h4>`+tlFmt(e.a);
+  if(e.x==='forms')h+=tlFormsHtml();
+  else if(e.x==='status')h+=tlStatusHtml();
+  else if(e.x==='setgdv')h+=tlGdvPickHtml();
+  h+=`<div class="tl-src">📄 <b>Nguồn:</b> ${tlEsc(e.s||'—')}${e.v===0?' · <i>nội dung tham khảo</i>':''}</div>`;
+  if(rel&&rel.length)h+=`<div class="tl-muted" style="margin-top:6px">Xem thêm:</div>`+tlChipsKB(rel);
+  return h;
+}
+function tlAnswerKB(q){
+  if(!tlKB().length)return '<p>Chưa tải được bộ tri thức (assets/tro-ly-gdv-kb.js). Kiểm tra file này nằm cùng thư mục assets với logo.</p>';
+  const res=tlSearch(q), best=res[0];
+  if(!best||best.s<TL_MIN_SCORE){
+    const maybe=res.slice(0,3).filter(x=>x.s>=1.5).map(x=>x.e);
+    return `<p>Chưa tìm thấy nội dung phù hợp trong bộ hướng dẫn.</p>`+
+      (maybe.length?`<p>Có thể bạn muốn hỏi:</p>`+tlChipsKB(maybe):'')+
+      `<p class="tl-muted" style="margin-top:6px">Thử diễn đạt khác hoặc chọn chủ đề. Nội dung chưa có trong bộ hướng dẫn → tra văn bản gốc (thư mục docs/) hoặc hỏi Trưởng phòng — trợ lý không tự suy đoán quy định.</p>`+tlGroupChips();
+  }
+  const extra=res.slice(1,5).filter(x=>x.s>=Math.max(TL_MIN_SCORE,best.s*.5)).map(x=>x.e);
+  return tlRenderEntry(best.e,tlRelated(best.e,extra));
+}
+
+// ── Biểu mẫu ──
+function tlFormLabel(code){return code.startsWith('NVXE')?code:'BM.PTI.XCG.'+code}
+function tlFormsHtml(){
+  const forms=window.TL_FORMS||[];
+  return Object.keys(TL_STEP_NAME).map(st=>{
+    const fs=forms.filter(f=>f.step===st);
+    if(!fs.length)return '';
+    return `<p style="margin-top:8px"><b>${tlEsc(TL_STEP_NAME[st])}</b></p><table><tr><th>Mã</th><th>Tên biểu mẫu</th></tr>`+
+      fs.map(f=>`<tr><td class="tl-mono" style="white-space:nowrap">${tlEsc(f.code)}</td><td>${tlEsc(f.name)}</td></tr>`).join('')+'</table>';
+  }).join('');
+}
+function tlAnswerForm(q){
+  const u=q.toUpperCase(), qn=tlNorm(q);
+  let code=null, m=u.match(/NVXE\s*0?39[.\s]*0?1[.\s]*(\d{2})/);
+  if(m)code='NVXE039.01.'+m[1];
+  else{
+    // Chỉ coi "20.xx" là mã mẫu khi có chữ BM/mẫu hoặc câu hỏi chỉ gồm mã — tránh nhầm số tiền "20.000.000"
+    m=u.match(/(?:^|[^0-9.])20[.,](\d{2}[A-G]?)(?!\d)(?!\.\d)/);
+    if(m&&(/(^| )(bm|mau|bieu mau|form|pti xcg)( |$)/.test(qn)||/^(bm )?(pti )?(xcg )?20\.\d{2}[a-g]?$/.test(qn)))code='20.'+m[1];
+  }
+  if(!code)return null;
+  const forms=window.TL_FORMS||[];
+  const f=forms.find(x=>x.code===code)||(/[A-G]$/.test(code)?forms.find(x=>x.code===code.slice(0,-1)):null);
+  if(!f)return `<p>Không có mẫu <b>${tlEsc(code)}</b> trong danh mục biểu mẫu của trợ lý.</p>`+tlChipsKB(tlKB().filter(e=>e.id==='bm-danhmuc'));
+  const uses=tlKB().filter(e=>e.a.includes(f.code)).slice(0,5);
+  return `<h4>📝 ${tlEsc(tlFormLabel(code))}</h4><p><b>${tlEsc(f.name)}</b></p>
+    <p>Dùng ở: ${tlEsc(TL_STEP_NAME[f.step]||f.step)}</p>`+
+    (uses.length?`<div class="tl-muted" style="margin-top:6px">Hướng dẫn có nhắc tới mẫu này:</div>`+tlChipsKB(uses):'')+
+    `<div class="tl-src">📄 <b>Nguồn:</b> Bộ biểu mẫu áp dụng Quy trình PTI.XCG.20 (thư mục docs/)</div>`;
+}
+
+// ── Sự kiện: bấm nút trong khung chat (uỷ quyền), phím Esc ──
+document.addEventListener('click',ev=>{
+  const b=ev.target.closest('#tl-log [data-tl-act]');
+  if(!b)return;
+  const act=b.dataset.tlAct;
+  if(act==='kb'){
+    const e=tlKB().find(x=>x.id===b.dataset.id);
+    if(e){tlPush('u',tlEsc(e.q));tlPush('b',tlRenderEntry(e,tlRelated(e)))}
+  }
+  else if(act==='grp')tlShowGroup(b.dataset.g);
+  else if(act==='ask')tlAsk(b.dataset.q);
+  else if(act==='rec')tlAsk(b.dataset.hsbt);
+  else if(act==='open')tlOpenSearch(b.dataset.v,b.dataset.kind);
+  else if(act==='setgdv')tlSetGdv(b.dataset.gdv);
+});
+document.addEventListener('keydown',ev=>{
+  if(ev.key==='Escape'){const p=tlEl('tl-panel');if(p&&!p.hidden)tlToggle(false)}
+});
+// ── Tra hồ sơ trong dữ liệu đang tải (RAW) — cùng quy ước tồn với computeStats() ──
+const TL_PLATE_RE=/^\d{2}[A-Z]{1,2}\d{4,6}$/;
+const TL_MILESTONES=['Ngày tai nạn','Ngày thông báo tai nạn','Ngày nhập call','Ngày mở HSBT','Ngày giám định chi tiết',
+  'Ngày trình CNG','Ngày check CNG','Ngày validate CNG','Ngày trình duyệt giá','Ngày check duyệt giá','Ngày validate duyệt giá',
+  'Ngày bảo lãnh','Ngày trình ĐNTT','Ngày check ĐNTT','Ngày validate ĐNTT','Ngày duyệt bồi thường','Ngày trả tiền GR','Ngày trả tiền KH'];
+function tlHasData(){return Array.isArray(RAW)&&RAW.length>0}
+function tlNoData(){return '<p>Chưa có dữ liệu hồ sơ trên dashboard — hãy tải dữ liệu (Google Drive hoặc file Dulieu.xlsx) rồi hỏi lại.</p>'}
+function tlDataNote(){
+  const b=tlEl('file-date-badge'), t=b?b.textContent.trim():'';
+  return `<div class="tl-src">📊 <b>Dữ liệu:</b> ${fmtN(RAW.length)} hồ sơ đang tải trên dashboard${t?' · '+tlEsc(t):''}</div>`;
+}
+function tlTonOf(r){return parseTon(r['Số ngày tồn'])}
+function tlTonBadge(r){
+  if(isResolved(r))return '<span class="tl-ton done">Đã GQ</span>';
+  const n=tlTonOf(r);
+  if(n===null)return '<span class="tl-ton">Chưa có số ngày</span>';
+  return `<span class="tl-ton ${n>=90?'bad':n>45?'warn':'ok'}">${fmtN(n)} ngày</span>`;
+}
+function tlStatusInfo(st){
+  const n=normText(st);
+  return (window.TL_STATUS||[]).find(s=>{try{return new RegExp(s.re).test(n)}catch(e){return false}})||null;
+}
+function tlSlaLine(amt){
+  const sla=(window.TL_SLA_B4||[]).find(x=>amt<x.max);
+  if(!sla||!amt)return '';
+  return `<br/>⏱ Ước ${tlEsc(fmtMBC(amt))} → nhóm <b>${tlEsc(sla.label)}</b>: GĐV trình ≤ ${sla.gdv}; check &amp; validate ≤ ${sla.cv} (giờ làm việc).`;
+}
+function tlNvLabel(r){
+  const m=String(r['Mã nghiệp vụ']||'');
+  return m.startsWith('XO.1')?'TNDS ('+m+')':m.startsWith('XO.4')?'VCX ('+m+')':(m||'–');
+}
+function tlLastMilestone(r){
+  let last=null;
+  TL_MILESTONES.forEach(c=>{const d=parseDate(r[c]);if(d&&!isNaN(d))last={c,d}});
+  return last;
+}
+function tlRecKey(r){return String(r['Số HSBT']||r['Biển số xe']||'').trim()}
+function tlRecordCard(r){
+  const st=String(r['Trạng thái hồ sơ']||'').trim()||'-';
+  const info=tlStatusInfo(st), amt=parseMoney(r['Tiền ước/duyệt BT']), g=gdvKey(r), n=tlTonOf(r), ms=tlLastMilestone(r);
+  let h=`<div class="tl-rec"><div class="tl-rec-h"><span class="plate">${tlEsc(r['Biển số xe']||'—')}</span>${tlTonBadge(r)}</div>
+    <div class="tl-kv">
+      <span>Số HSBT</span><span class="tl-mono">${tlEsc(r['Số HSBT']||'—')}</span>
+      <span>GĐV thụ lý</span><span>${tlEsc(g||'—')}${GDV_NAMES[g]?' – '+tlEsc(GDV_NAMES[g]):''}</span>
+      <span>Nghiệp vụ</span><span>${tlEsc(tlNvLabel(r))}</span>
+      <span>Gara</span><span>${tlEsc(searchGarageOf(r)||'—')}</span>
+      <span>Ngày tai nạn</span><span>${fmtDate(r['Ngày tai nạn'])}</span>
+      <span>Ngày mở HSBT</span><span>${fmtDate(r['Ngày mở HSBT'])}</span>
+      <span>Ước/duyệt BT</span><span>${tlEsc(fmtMBC(amt))} <span class="tl-muted">(chưa VAT)</span></span>
+      <span>Trạng thái</span><span><b>${tlEsc(st)}</b></span>
+      ${ms?`<span>Mốc gần nhất</span><span>${tlEsc(ms.c)}: ${fmtDate(ms.d)}</span>`:''}
+    </div>`;
+  if(info)h+=`<div class="tl-step">📍 <b>${tlEsc(info.step)} · ${tlEsc(info.name)}</b><br/>${tlEsc(info.todo)}${info.step==='Bước 4'?tlSlaLine(amt):''}</div>`;
+  if(n!==null&&n>=90)h+=`<div class="tl-warn">⚠ Tồn ${fmtN(n)} ngày (≥ 90) — nằm trong danh sách cảnh báo BC2 (tab Báo cáo XO), cần ưu tiên rà soát, xử lý.</div>`;
+  else if(n!==null&&n>45)h+=`<div class="tl-warn">⚠ Tồn ${fmtN(n)} ngày (46–89) — nằm trong BC3, cần đẩy nhanh trước mốc 90 ngày.</div>`;
+  return h+'</div>';
+}
+function tlRecordsHtml(found,label,open){
+  if(!found.length)return `<p>Không tìm thấy hồ sơ có ${tlEsc(label)} trong dữ liệu đang tải.</p>
+    <p class="tl-muted">Kiểm tra lại biển số/số HSBT; nếu hồ sơ mới phát sinh, dữ liệu có thể chưa cập nhật (bấm 🔄 Làm mới).</p>`+tlDataNote();
+  const t=v=>{const d=parseDate(v);return d?d.getTime():0};
+  found=found.slice().sort((a,b)=>t(b['Ngày mở HSBT'])-t(a['Ngày mở HSBT']));
+  let h=`<h4>🔎 ${found.length} hồ sơ có ${tlEsc(label)}</h4>`;
+  found.slice(0,3).forEach(r=>{h+=tlRecordCard(r)});
+  if(found.length>3){
+    h+=`<p style="margin-top:8px">Các hồ sơ khác (bấm để xem chi tiết):</p><table><tr><th>Biển số</th><th>Trạng thái</th><th>Tồn</th></tr>`+
+      found.slice(3,13).map(r=>`<tr class="tl-tr-link" data-tl-act="rec" data-hsbt="${tlEsc(tlRecKey(r))}"><td><b>${tlEsc(r['Biển số xe'])}</b></td><td>${tlEsc(r['Trạng thái hồ sơ']||'-')}</td><td class="num">${tlTonBadge(r)}</td></tr>`).join('')+'</table>';
+    if(found.length>13)h+=`<p class="tl-muted">… và ${found.length-13} hồ sơ khác.</p>`;
+  }
+  if(open)h+=`<div class="tl-chips"><button type="button" class="tl-chip act" data-tl-act="open" data-kind="${open.kind}" data-v="${tlEsc(open.v)}">🔍 Mở ở tab Tra cứu tiến trình</button></div>`;
+  return h+tlDataNote();
+}
+// Nhận biết biển số (14A-123.45 / 14A12345 / "14A 123.45"), số HSBT (đủ dạng .../BT/... hoặc 5–7 số bắt đầu bằng 0)
+function tlFindKeys(q,qn){
+  const toks=q.trim().split(/\s+/), out={};
+  for(let i=0;i<toks.length&&!out.plate;i++){
+    const one=normPlate(toks[i]);
+    if(TL_PLATE_RE.test(one))out.plate=one;
+    else if(i+1<toks.length&&/^\d{2}[A-Z]{1,2}\d?$/.test(one)){const two=normPlate(toks[i]+toks[i+1]);if(TL_PLATE_RE.test(two))out.plate=two}
+  }
+  const full=q.match(/\d{7}\/\S+/);
+  if(full)out.hsbt=full[0].toUpperCase();
+  else{
+    const hs=q.match(/(?:^|[^\d.,])(0\d{4,6})(?![\d.,])/);
+    const hs2=/(^| )(hsbt|so hs|so ho so|ho so so)( |$)/.test(qn)?q.match(/(?:^|[^\d.,])(\d{5,7})(?![\d.,])/):null;
+    if(hs||hs2)out.hsbt=(hs||hs2)[1];
+  }
+  // "tra/tìm <mảnh số>" → ưu tiên khớp một phần cả biển số và số HSBT
+  const m=qn.match(/^(?:tra cuu|tra|tim|kiem tra|xem)\s+(?:ho so\s+|hs\s+|xe\s+|bien so\s+|bks\s+)?([a-z0-9.]{4,})$/);
+  if(m&&/\d/.test(m[1])&&!out.plate&&!full){out.partial=normPlate(m[1]);delete out.hsbt}
+  return out;
+}
+function tlGdvFromQuery(qn){
+  const codes=Object.keys(GDV_NAMES);
+  let c=codes.find(k=>new RegExp('(^| )'+k.toLowerCase()+'( |$)').test(qn));
+  if(!c)c=codes.find(k=>qn.includes(tlNorm(GDV_NAMES[k])));
+  if(!c)c=codes.find(k=>{const given=tlNorm(GDV_NAMES[k]).split(' ').pop();
+    return new RegExp('(^| )(cua|gdv|anh|chi|ban|em|a|c)\\s+'+given+'( |$)').test(qn)});
+  return c||null;
+}
+// Ngưỡng ngày tồn: "≥90", "từ 90 ngày", "trên 45 ngày"… Riêng mốc 90 luôn hiểu là ≥ 90 (quy ước cảnh báo)
+function tlThreshold(q){
+  const m=normText(q).match(/(>=|≥|>|tren|qua|tu|hon)\s*(\d{1,3})(?!\d)/);
+  if(!m)return null;
+  const n=+m[2];
+  if(!(n>0&&n<1000))return null;
+  return {n,strict:['>','tren','qua','hon'].includes(m[1])&&n!==90};
+}
+function tlThrLabel(thr){return thr?(thr.strict?'> ':'≥ ')+thr.n+' ngày':''}
+function tlPassThr(r,thr){const n=tlTonOf(r);return n!==null&&(!thr||(thr.strict?n>thr.n:n>=thr.n))}
+function tlTonTable(list,thr,max){
+  if(!list.length)return `<p>Không có hồ sơ tồn${thr?' '+tlThrLabel(thr):''}.</p>`;
+  return `<p style="margin-top:6px"><b>${fmtN(list.length)} hồ sơ tồn${thr?' '+tlThrLabel(thr):''}</b> — sắp theo số ngày tồn giảm dần${list.length>max?`, hiện ${max} hồ sơ đầu`:''} (bấm dòng để xem chi tiết):</p>
+    <table><tr><th>Biển số</th><th>GĐV</th><th>Trạng thái</th><th>Tồn</th></tr>`+
+    list.slice(0,max).map(r=>`<tr class="tl-tr-link" data-tl-act="rec" data-hsbt="${tlEsc(tlRecKey(r))}"><td><b>${tlEsc(r['Biển số xe'])}</b></td><td>${tlEsc(gdvKey(r))}</td><td>${tlEsc(r['Trạng thái hồ sơ']||'-')}</td><td class="num">${tlTonBadge(r)}</td></tr>`).join('')+'</table>';
+}
+function tlGdvReport(code,thr){
+  if(!tlHasData())return tlNoData();
+  const rows=RAW.filter(r=>gdvKey(r)===code), name=GDV_NAMES[code]||'';
+  if(!rows.length)return `<p>Không có hồ sơ nào của <b>${tlEsc(code)}</b> trong dữ liệu đang tải.</p>`+tlDataNote();
+  const ton=rows.filter(r=>tlTonOf(r)!==null), resolved=rows.filter(isResolved).length;
+  const b=[0,0,0,0];
+  ton.forEach(r=>{const n=tlTonOf(r);b[n<=30?0:n<=45?1:n<90?2:3]++});
+  const list=ton.filter(r=>tlPassThr(r,thr)).sort((a,c)=>tlTonOf(c)-tlTonOf(a));
+  let h=`<h4>👤 ${tlEsc(code)}${name?' – '+tlEsc(name):''}</h4>
+    <table><tr><th>Tổng HS</th><th>Đã GQ</th><th>Đang tồn</th><th>Chưa có số ngày tồn</th></tr>
+    <tr><td class="num">${fmtN(rows.length)}</td><td class="num">${fmtN(resolved)}</td><td class="num"><b>${fmtN(ton.length)}</b></td><td class="num">${fmtN(rows.length-resolved-ton.length)}</td></tr></table>
+    <table><tr><th>1–30 ngày</th><th>31–45</th><th>46–89</th><th>≥ 90 ngày</th></tr>
+    <tr><td class="num">${b[0]}</td><td class="num">${b[1]}</td><td class="num">${b[2]}</td><td class="num" style="color:var(--red);font-weight:700">${b[3]}</td></tr></table>`;
+  h+=tlTonTable(list,thr,12);
+  h+=tlChipsAsk(thr&&thr.n===90&&!thr.strict?['Tổng quan hồ sơ tồn']:[`Hồ sơ tồn ≥90 ngày của ${code}`,'Tổng quan hồ sơ tồn'],'q');
+  return h+tlDataNote();
+}
+function tlTonList(thr){
+  if(!tlHasData())return tlNoData();
+  const list=RAW.filter(r=>tlPassThr(r,thr)).sort((a,c)=>tlTonOf(c)-tlTonOf(a));
+  const by={};
+  list.forEach(r=>{const g=gdvKey(r)||'(trống)';by[g]=(by[g]||0)+1});
+  let h=`<h4>⏳ Hồ sơ tồn${thr?' '+tlThrLabel(thr):''} — toàn phòng</h4>`;
+  if(list.length)h+='<table><tr><th>GĐV</th><th>Số HS</th></tr>'+Object.entries(by).sort((a,b)=>b[1]-a[1]).map(([g,c])=>
+    `<tr class="tl-tr-link" data-tl-act="ask" data-q="${tlEsc('Hồ sơ tồn của '+g+(thr?' '+tlThrLabel(thr):''))}"><td>${tlEsc(g)}${GDV_NAMES[g]?' – '+tlEsc(GDV_NAMES[g]):''}</td><td class="num">${fmtN(c)}</td></tr>`).join('')+'</table>';
+  h+=tlTonTable(list,thr,15);
+  return h+tlDataNote();
+}
+function tlOverview(){
+  if(!tlHasData())return tlNoData();
+  const codes=[...new Set([...Object.keys(GDV_NAMES),...RAW.map(gdvKey).filter(Boolean)])];
+  const T={n:0,ton:0,q45:0,q90:0};
+  const rows=codes.map(c=>{
+    const rs=RAW.filter(r=>gdvKey(r)===c);
+    if(!rs.length)return null;
+    const ns=rs.map(tlTonOf).filter(n=>n!==null);
+    const o={c,n:rs.length,ton:ns.length,q45:ns.filter(n=>n>45).length,q90:ns.filter(n=>n>=90).length,max:ns.length?Math.max(...ns):0};
+    T.n+=o.n;T.ton+=o.ton;T.q45+=o.q45;T.q90+=o.q90;
+    return o;
+  }).filter(Boolean);
+  return `<h4>📊 Tổng quan hồ sơ tồn theo GĐV</h4>
+    <table><tr><th>GĐV</th><th>Tổng</th><th>Tồn</th><th>&gt;45</th><th>≥90</th><th>Lâu nhất</th></tr>`+
+    rows.map(o=>`<tr class="tl-tr-link" data-tl-act="ask" data-q="${tlEsc('Hồ sơ tồn của '+o.c)}"><td style="white-space:nowrap"><b>${tlEsc(o.c)}</b></td><td class="num">${fmtN(o.n)}</td><td class="num">${fmtN(o.ton)}</td><td class="num">${fmtN(o.q45)}</td><td class="num" style="color:var(--red);font-weight:700">${fmtN(o.q90)}</td><td class="num">${o.max?fmtN(o.max)+' ngày':'–'}</td></tr>`).join('')+
+    `<tr><th>Tổng</th><th class="num">${fmtN(T.n)}</th><th class="num">${fmtN(T.ton)}</th><th class="num">${fmtN(T.q45)}</th><th class="num">${fmtN(T.q90)}</th><th></th></tr></table>
+    <p class="tl-muted">Bấm vào một GĐV để xem danh sách hồ sơ tồn. Quy ước giống tab Tổng quan: tồn = số ngày tồn &gt; 0; quá hạn &gt; 45; cảnh báo ≥ 90.</p>`+
+    tlChipsAsk(['Hồ sơ tồn ≥90 ngày','Hồ sơ tồn trên 45 ngày'],'q')+tlDataNote();
+}
+function tlStatusHtml(){
+  let h='<table><tr><th>Nhóm trạng thái</th><th>Bước</th><th>Việc cần làm tiếp</th></tr>'+(window.TL_STATUS||[]).map(s=>
+    `<tr><td><b>${tlEsc(s.name)}</b></td><td style="white-space:nowrap">${tlEsc(s.step)}</td><td>${tlEsc(s.todo)}</td></tr>`).join('')+'</table>';
+  const sla=window.TL_SLA_B4||[];
+  if(sla.length)h+='<p style="margin-top:6px"><b>Thời hạn Bước 4 theo số tiền (giờ làm việc)</b></p><table><tr><th>Số tiền</th><th>GĐV trình</th><th>Check &amp; validate</th></tr>'+
+    sla.map(x=>`<tr><td>${tlEsc(x.label)}</td><td>${x.gdv}</td><td>${x.cv}</td></tr>`).join('')+'</table>';
+  if(tlHasData()){
+    const cnt={};
+    RAW.forEach(r=>{const t=String(r['Trạng thái hồ sơ']||'').trim()||'-';cnt[t]=(cnt[t]||0)+1});
+    h+='<p style="margin-top:6px"><b>Phân bố trạng thái trong dữ liệu đang tải</b></p><table><tr><th>Trạng thái</th><th>Số HS</th><th>Bước</th></tr>'+
+      Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(([t,c])=>{const i=tlStatusInfo(t);
+        return `<tr><td>${tlEsc(t)}</td><td class="num">${fmtN(c)}</td><td>${tlEsc(i?i.step:'—')}</td></tr>`}).join('')+'</table>';
+  }
+  return h;
+}
+function tlGdvPickHtml(){
+  let my=null;
+  try{my=localStorage.getItem(TL_LS_GDV)}catch(e){}
+  return '<div class="tl-chips">'+Object.entries(GDV_NAMES).map(([c,n])=>
+    `<button type="button" class="tl-chip${c===my?' act':''}" data-tl-act="setgdv" data-gdv="${tlEsc(c)}">${c===my?'✓ ':''}${tlEsc(c)} – ${tlEsc(n)}</button>`).join('')+'</div>';
+}
+function tlSetGdv(code){
+  if(!GDV_NAMES[code])return;
+  try{localStorage.setItem(TL_LS_GDV,code)}catch(e){}
+  tlPush('b',`<p>✓ Đã lưu <b>GĐV của tôi: ${tlEsc(code)} – ${tlEsc(GDV_NAMES[code])}</b> trên trình duyệt này. Lần sau gõ "hồ sơ của tôi" để xem nhanh.</p>`+tlGdvReport(code,null));
+}
+function tlOpenSearch(v,kind){
+  const btn=[...document.querySelectorAll('.tabs .tab')].find(b=>(b.getAttribute('onclick')||'').includes("'search'"));
+  if(!btn||typeof doSearchHSBT!=='function')return;
+  switchTab('search',btn);
+  const set=(id,val)=>{const el=tlEl(id);if(el)el.value=val};
+  set('search-bks',kind==='bks'?v:'');set('search-hsbt',kind==='hsbt'?v:'');set('search-garage','');set('search-gdv','ALL');
+  if(typeof setAllTt==='function')setAllTt(false);
+  doSearchHSBT();
+  if(window.innerWidth<=600)tlToggle(false);
+  const box=tlEl('tab-search');
+  if(box)window.scrollTo({top:box.getBoundingClientRect().top+window.scrollY-140,behavior:'smooth'});
+}
+// Ý định tra dữ liệu: biển số/HSBT → thẻ hồ sơ; "tồn của <GĐV>" / "hồ sơ của tôi" / "tồn ≥90 ngày" / "tổng quan tồn"
+function tlAnswerData(q){
+  const qn=tlNorm(q);
+  const k=tlFindKeys(q,qn);
+  if(k.plate||k.hsbt||k.partial){
+    if(!tlHasData())return tlNoData();
+    const byPlate=v=>RAW.filter(r=>normPlate(r['Biển số xe']).includes(v));
+    const byHsbt=v=>RAW.filter(r=>String(r['Số HSBT']||'').toUpperCase().includes(v));
+    if(k.plate)return tlRecordsHtml(byPlate(k.plate),'biển số '+k.plate,{kind:'bks',v:k.plate});
+    if(k.partial){  // "tra 07419" → khớp một phần cả biển số lẫn số HSBT
+      const p=k.partial, seen=new Set(), found=[...byPlate(p),...byHsbt(p)].filter(r=>!seen.has(r)&&seen.add(r));
+      return tlRecordsHtml(found,'"'+p+'" (biển số hoặc số HSBT)',{kind:'bks',v:p});
+    }
+    const h=k.hsbt, found=byHsbt(h);
+    if(!found.length&&!h.includes('/')){  // số ngắn không khớp HSBT → thử như một phần biển số
+      const alt=byPlate(h);
+      if(alt.length)return tlRecordsHtml(alt,'biển số chứa '+h,{kind:'bks',v:h});
+    }
+    return tlRecordsHtml(found,'số HSBT '+h,{kind:'hsbt',v:h});
+  }
+  const qx=qn;                                          // tlNorm đã tách "tổn thất" khỏi "tồn"
+  if(/(^| )(tinh the nao|la gi|nghia la|dinh nghia|cach tinh|quy uoc|y nghia)( |$)/.test(qx))return null; // câu hỏi định nghĩa → bộ tri thức
+  const tonW=/(^| )(ton|qua han|chua giai quyet|dang xu ly)( |$)/.test(qx);
+  const listW=/(^| )(danh sach|liet ke|cac ho so|nhung ho so|ho so nao|bao nhieu ho so)( |$)/.test(qx);
+  const ovW=/(^| )(tong quan|thong ke|tinh hinh|tong hop)( |$)/.test(qx);
+  const hsW=/(^| )ho so( |$)/.test(qx);
+  const mine=/(^| )(cua toi|cua em|cua minh|toi phu trach)( |$)/.test(qx);
+  const thr=(tonW||hsW)?tlThreshold(q):null;
+  let gdv=tlGdvFromQuery(qx);
+  if(!gdv&&mine){
+    let my=null;
+    try{my=localStorage.getItem(TL_LS_GDV)}catch(e){}
+    if(my&&GDV_NAMES[my])gdv=my;
+    else if(tonW||hsW)return `<p>Bạn chưa chọn "GĐV của tôi". Chọn mã GĐV của bạn (lưu trên trình duyệt này):</p>`+tlGdvPickHtml();
+  }
+  if(gdv&&(tonW||hsW||listW||ovW||thr||qx.split(' ').length<=3))return tlGdvReport(gdv,thr);
+  if(ovW&&(tonW||hsW))return tlOverview();
+  if(tonW&&(listW||thr))return tlTonList(thr);
+  return null;
+}
+// ─── HẾT TRỢ LÝ ẢO GĐV ───
 </script>
 </body>
 </html>

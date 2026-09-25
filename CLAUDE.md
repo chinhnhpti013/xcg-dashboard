@@ -17,6 +17,9 @@ Luôn trả lời bằng **tiếng Việt**.
 ```
 bao-cao-tuan/
 ├── index.html          ← Dashboard chính (HTML thuần, không cần server)
+├── assets/
+│   ├── logo-ptisos.png
+│   └── tro-ly-gdv-kb.js ← Bộ tri thức Trợ lý GĐV (quy trình PTI) — xem mục "Trợ lý ảo GĐV"
 ├── input/
 │   └── Dulieu.xlsx     ← Dữ liệu nguồn, người dùng tải lên qua giao diện
 ├── output/
@@ -119,6 +122,22 @@ Cột quan trọng:
 - ⚠️ `syncDashTableHeight()` phải chạy **lại sau `document.fonts.ready`** (cờ `_dashFontsBound`): lần render đầu webfont Be Vietnam Pro chưa tải xong, `tr.offsetHeight` đo hụt → chọn nhầm mức co quá nhẹ (đo thật: 11,26 dòng lúc chưa có font nhưng chỉ hiện 9 dòng sau khi font vào).
 - Với `mucTien` (`moneyMode` trong `renderDashboard`), **cả 2 chart đầu đổi**: chart 1 = **Tổng số vụ theo mức tiền** (thay biểu đồ bucket ngày), chart 2 = **Số tiền bình quân/vụ (triệu đồng)**. Không gộp số vụ và số tiền vào cùng một chart — hai đại lượng lệch bậc độ lớn sẽ làm cột bẹp. Chart donut thứ 3 (cơ cấu tiền ước/duyệt BT) giữ nguyên.
 
+## Trợ lý ảo GĐV (popup "💬 Trợ lý GĐV")
+
+Popup hỏi–đáp quy trình giám định – bồi thường XCG của PTI và tra hồ sơ trong dữ liệu đang tải. **Chạy offline, không gọi AI/Internet** (phương án A: tra cứu bộ tri thức soạn sẵn). Không phải tab — **không** thêm vào `switchTab()`/thanh tab.
+
+- **Vị trí DOM**: `#tl-fab` (nút nổi) + `#tl-panel` (khung chat) nằm **bên trong `#dashboard`**, sau `<footer>` → chỉ hiện khi dashboard hiện (ẩn ở màn đăng nhập/upload/loading). `position:fixed`, z-index 1000/1001 (> topbar 100 > thanh tab 90). Màn hình ≤600px: panel phủ toàn màn hình, `#dashboard.tl-open` ẩn nút nổi.
+- **Bộ tri thức**: `assets/tro-ly-gdv-kb.js`, nạp bằng `<script src>` ngay trước script chính. Khai báo `TL_META`, `TL_GROUPS` (10 nhóm), `TL_FORMS` (73 biểu mẫu BM.PTI.XCG.20.xx + NVXE039.01.xx), `TL_SLA_B4` (thời hạn Bước 4 theo số tiền), `TL_STATUS` (trạng thái phần mềm → bước quy trình + việc cần làm), `TL_KB` (116 mục). Thiếu file → trợ lý vẫn tra được hồ sơ.
+- **Nguồn nội dung (ưu tiên quy trình PTI)**: QT giải quyết YCBT PTI.XCG.20 (QĐ 20/12/2024) + phụ lục PL.PTI.XCG.20.01–20.18; Quy tắc VCX ô tô QĐ 109/QĐ-PTI ngày 23/09/2025 (hiệu lực 14/10/2025); NĐ 67/2023/NĐ-CP (trích theo PL.20.12); hướng dẫn mở logic, luồng hủy HS, mẫu trình giá PTI QN. Bản gốc (phần lớn là PDF scan) nằm trong `docs/` — **không** có trên trang web.
+- **Mục TL_KB**: `id`, `g` (nhóm), `q` (câu hỏi chuẩn), `k` (từ khoá/cụm đồng nghĩa), `a` (trả lời — định dạng rút gọn: `- ` gạch đầu dòng, `|a|b|` bảng, `!! ` khung lưu ý, `**đậm**`), `s` (nguồn — **bắt buộc**), `r` (id liên quan), `v:0` (nội dung tham khảo), `x` ('forms' | 'status' | 'setgdv' → engine nối thêm bảng động).
+- ⚠️ **Không đưa họ tên, SĐT, email cán bộ vào bộ tri thức** — file nằm cùng trang web (GitHub Pages công khai), ai mở trang cũng đọc được (đăng nhập của trang chỉ là kiểm tra phía trình duyệt).
+- **Thứ tự trả lời** trong `tlAsk(q)`: `tlSmallTalk` (chào/cảm ơn) → `tlAnswerData` (biển số/HSBT/tồn) → `tlAnswerForm` (mã mẫu) → `tlAnswerKB`.
+- **Tìm kiếm** (`tlSearch`): `tlNorm` = `normText` bỏ dấu + chỉ giữ chữ/số (giữ dấu chấm giữa 2 chữ số, vd `20.35`) + gộp **"tổn thất" → `tonthat`** (tránh lẫn với "tồn" sau khi bỏ dấu); bỏ stopword `TL_STOP`; mở rộng viết tắt `TL_ABBR` (tnds, vcx, nt3, gdv, bt…). Điểm = cụm từ khoá khớp nguyên cụm (`2 + 1.5×số từ`; cụm nằm trọn trong cụm dài hơn cũng khớp thì chỉ tính cụm dài) + từ đơn có trọng số **IDF** (khớp câu hỏi ×1.2, từ khoá ×0.8, nội dung ×0.2); khớp đúng câu hỏi chuẩn +100. Dưới `TL_MIN_SCORE = 4.5` → trả "chưa tìm thấy" + gợi ý, **không tự suy đoán quy định**.
+- **Tra dữ liệu** (`tlAnswerData`, đọc `RAW`): biển số (`\d{2}[A-Z]{1,2}\d{4,6}` sau `normPlate`, chấp nhận "14A 123.45"); số HSBT dạng đầy đủ `…/BT/…` hoặc 5–7 số **bắt đầu bằng 0** (số ngắn không khớp HSBT → thử như một phần biển số); "tra/tìm <mảnh số>" → khớp một phần cả hai. Thẻ hồ sơ hiển thị mốc ngày gần nhất + bước quy trình theo `TL_STATUS` + thời hạn Bước 4 theo `Tiền ước/duyệt BT`. "Hồ sơ tồn của <mã/tên GĐV>", "hồ sơ của tôi", "tồn ≥90 ngày" (`tlThreshold`: mốc 90 luôn hiểu ≥90), "tổng quan tồn". Câu có "tính thế nào/là gì/cách tính…" → chuyển sang bộ tri thức. Quy ước tồn **giống `computeStats()`** (`parseTon`, `isResolved`, >45, ≥90) — đã đối chiếu khớp 1.367 / 194 / 38 / 9 với dữ liệu 07/2026.
+- **CSS**: khối `.tl-*` cuối `<style>`. Bảng trong khung chat phải ghi đè CSS chung `th{text-transform:uppercase;white-space:nowrap}` và `tr:last-child td{border-bottom:none}`; `tlPush` tự bọc `<table>` trong `.tl-tbl` (cuộn ngang, không tràn popup). Ô bảng dùng `overflow-wrap:normal` (tránh ngắt giữa mã GĐV "TUNG|HX"); đoạn văn dùng `anywhere` (số HSBT dài).
+- **Sự kiện**: nút trong khung chat dùng `data-tl-act` (kb | grp | ask | rec | open | setgdv) + 1 listener uỷ quyền trên document — không nhúng nội dung người dùng vào `onclick`. Esc đóng popup. "Mở ở tab Tra cứu tiến trình" gọi `switchTab('search')` rồi điền ô và `doSearchHSBT()`.
+- **Bổ sung nội dung**: thêm mục vào `TL_KB` (id không trùng, ghi `s`), thêm từ khoá theo cách GĐV hay hỏi, rồi kiểm thử lại: chạy script chính trong Node `vm` (DOM giả lập, RAW từ Dulieu.xlsx) và gọi `tlSearch(q)` với bộ câu hỏi mẫu — mốc 09/2026: 105/105 câu chuẩn + 24/24 câu diễn đạt mới đúng, câu lạc đề đều < 4.5. Giao diện điện thoại kiểm bằng Chrome headless chụp trang nhúng trong iframe 390px (Chrome desktop có độ rộng cửa sổ tối thiểu nên `--window-size=390` không mô phỏng đúng).
+
 ## Cấu hình Địa bàn (dùng cho khối Infographic trong tab Tổng quan)
 
 ```js
@@ -178,6 +197,8 @@ Dùng `localStorage` với 3 key:
 - `pti_raw_v1` — JSON dữ liệu
 - `pti_filename` — tên file
 - `pti_filedate` — timestamp `lastModified` (chỉ có khi upload file, không có khi dùng Drive)
+
+Trợ lý GĐV dùng thêm 2 key riêng (không bị "↩ Tải file khác" xoá): `pti_ai_log` (hội thoại, tối đa 40 tin, HTML đã render) và `pti_ai_gdv` (mã "GĐV của tôi").
 
 - Khi tải file → tự động lưu cả 3 key
 - Khi mở lại trang → nút "🔄 Khôi phục" xuất hiện, tự restore + hiện lại badge
