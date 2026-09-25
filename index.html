@@ -785,6 +785,15 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
 .tl-form input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(21,101,192,.12)}
 .tl-send{width:44px;border:none;border-radius:10px;background:var(--blue);color:#fff;font-size:1rem;cursor:pointer}
 .tl-send:hover{background:var(--blue-mid)}
+.tl-mic{width:44px;flex-shrink:0;border:1.5px solid #cbd5e1;border-radius:10px;background:#fff;color:var(--blue);cursor:pointer;
+  display:grid;place-items:center;transition:background .15s,color .15s,border-color .15s}
+.tl-mic[hidden]{display:none}
+.tl-mic svg{width:20px;height:20px}
+.tl-mic:hover{border-color:var(--blue);background:#eff6ff}
+.tl-mic.on{background:#dc2626;border-color:#dc2626;color:#fff;animation:tlMicPulse 1.2s ease-out infinite}
+@keyframes tlMicPulse{0%{box-shadow:0 0 0 0 rgba(220,38,38,.55)}100%{box-shadow:0 0 0 12px rgba(220,38,38,0)}}
+.tl-form input.tl-listening{border-color:#dc2626;background:#fef2f2;color:#7f1d1d}
+@media(prefers-reduced-motion:reduce){.tl-mic.on{animation:none}}
 /* Bảng dạng thẻ (điện thoại): mỗi dòng 1 thẻ, mỗi ô "nhãn cột : giá trị" — do tlFitTables() bật khi bảng không vừa khung */
 .tl-msg table.tl-stack,.tl-msg table.tl-stack tbody,.tl-msg table.tl-stack tr,.tl-msg table.tl-stack td,.tl-msg table.tl-stack th{display:block;width:100%}
 .tl-msg table.tl-stack tr:first-child{display:none}
@@ -818,7 +827,8 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
   .tl-chip{font-size:.78rem;padding:7px 12px}
   .tl-form{padding:8px 8px max(8px,env(safe-area-inset-bottom))}
   .tl-form input{font-size:16px}   /* <16px làm iOS tự phóng to trang khi gõ → mất 1 phần nội dung */
-  .tl-send{width:48px}
+  .tl-send,.tl-mic{width:48px}
+  .tl-form{gap:6px}
 }
 @media print{.tl-fab,.tl-panel{display:none!important}}
 </style>
@@ -999,6 +1009,9 @@ table.ig-hs tr:nth-child(even) td{background:var(--surface2)}
     <div id="tl-log" class="tl-log" aria-live="polite"></div>
     <form class="tl-form" onsubmit="tlSubmit(event)">
       <input id="tl-input" type="text" autocomplete="off" maxlength="300" placeholder="Hỏi quy trình, hoặc gõ biển số / số HSBT…" aria-label="Câu hỏi cho trợ lý"/>
+      <button type="button" id="tl-mic" class="tl-mic" onclick="tlVoiceToggle()" title="Hỏi bằng giọng nói" aria-label="Hỏi bằng giọng nói" aria-pressed="false" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3" fill="currentColor"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4M9 21h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
       <button type="submit" class="tl-send" title="Gửi" aria-label="Gửi">➤</button>
     </form>
   </section>
@@ -3701,7 +3714,7 @@ function tlToggle(open){
     tlFitTables(tlEl('tl-log'));
     // Điện thoại: không tự bật bàn phím khi mở (bàn phím che nửa màn hình, người dùng thường bấm chip chủ đề trước)
     if(!TL_MOBILE.matches)setTimeout(()=>tlEl('tl-input').focus(),30);
-  }else fab.focus();
+  }else{if(typeof tlVoiceCancel==='function')tlVoiceCancel();fab.focus()}
 }
 
 // ── Giao diện điện thoại ──
@@ -3804,6 +3817,69 @@ function tlSubmit(ev){
   inp.value='';
   tlAsk(q);
 }
+
+// ── Hỏi bằng giọng nói (Web Speech API, vi-VN) ──
+// Chrome/Edge/Safari có; Firefox không có → ẩn nút micro. Lưu ý: Chrome/Edge gửi âm thanh lên máy chủ nhận dạng
+// của trình duyệt (cần Internet); phần trả lời vẫn tra offline như gõ phím.
+const TL_SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let tlRec=null, tlRecOn=false, tlRecText='', tlRecErr='';
+// Chuẩn hoá câu nói: "14 A 123 45" / "14 a 123 chấm 45" → "14A12345" để tlFindKeys nhận ra biển số
+function tlVoiceNorm(s){
+  s=String(s||'').replace(/\s+chấm\s+/gi,'.').replace(/\s+gạch\s+/gi,'-').trim();
+  s=s.replace(/\b(\d{2})\s*[-.]?\s*([A-Za-z]{1,2})\s*[-.]?\s*(\d)?\s*[-.]?\s*(\d{3})\s*[.\s]?\s*(\d{2})\b/g,
+    (m,a,b,c,d,e)=>a+b.toUpperCase()+(c||'')+d+e);
+  return s.replace(/[.?!,\s]+$/,'');
+}
+function tlVoiceUi(on){
+  const b=tlEl('tl-mic'), inp=tlEl('tl-input');
+  if(!b)return;
+  b.classList.toggle('on',on);
+  b.setAttribute('aria-pressed',String(on));
+  b.title=on?'Đang nghe… bấm để dừng':'Hỏi bằng giọng nói';
+  inp.classList.toggle('tl-listening',on);
+  inp.placeholder=on?'🎙 Đang nghe… hãy nói câu hỏi':'Hỏi quy trình, hoặc gõ biển số / số HSBT…';
+}
+function tlVoiceStop(){if(tlRec&&tlRecOn){try{tlRec.stop()}catch(e){}}}
+function tlVoiceCancel(){if(tlRec&&tlRecOn){tlRecErr='aborted';try{tlRec.abort()}catch(e){}}}
+function tlVoiceToggle(){
+  if(!TL_SR)return;
+  if(tlRecOn){tlVoiceStop();return}
+  if(!tlRec){
+    tlRec=new TL_SR();
+    tlRec.lang='vi-VN';
+    tlRec.interimResults=true;
+    tlRec.continuous=false;
+    tlRec.maxAlternatives=1;
+    tlRec.onstart=()=>{tlRecOn=true;tlRecText='';tlRecErr='';tlVoiceUi(true)};
+    tlRec.onresult=e=>{
+      let fin='', tmp='';
+      for(let i=0;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)fin+=t;else tmp+=t}
+      tlRecText=fin||tlRecText;
+      tlEl('tl-input').value=(fin||tmp).trim();
+    };
+    tlRec.onerror=e=>{tlRecErr=e.error||'error'};
+    tlRec.onend=()=>{
+      tlRecOn=false;tlVoiceUi(false);
+      const inp=tlEl('tl-input'), q=tlVoiceNorm(tlRecText||inp.value);
+      if(tlRecErr==='aborted'){inp.value='';return}   // đóng popup giữa chừng → huỷ, không gửi
+      if(tlRecErr&&tlRecErr!=='no-speech'&&tlRecErr!=='aborted'){
+        const msg={'not-allowed':'Trình duyệt chưa được cấp quyền dùng micro. Bấm biểu tượng 🔒 cạnh thanh địa chỉ → cho phép <b>Micrô</b>, rồi thử lại.',
+          'service-not-allowed':'Trình duyệt chưa được cấp quyền dùng micro. Bấm biểu tượng 🔒 cạnh thanh địa chỉ → cho phép <b>Micrô</b>, rồi thử lại.',
+          'audio-capture':'Không tìm thấy micro trên thiết bị.',
+          'network':'Không kết nối được dịch vụ nhận dạng giọng nói của trình duyệt (cần Internet). Bạn có thể gõ câu hỏi thay thế.',
+          'language-not-supported':'Trình duyệt chưa hỗ trợ nhận dạng tiếng Việt. Bạn có thể gõ câu hỏi thay thế.'}[tlRecErr]
+          ||'Không nhận dạng được giọng nói ('+tlEsc(tlRecErr)+'). Bạn có thể thử lại hoặc gõ câu hỏi.';
+        tlPush('b','<p>🎙 '+msg+'</p>',false);
+        return;
+      }
+      if(!q){if(tlRecErr==='no-speech')tlPush('b','<p class="tl-muted">🎙 Chưa nghe thấy gì — bấm micro và nói lại nhé.</p>',false);return}
+      inp.value='';
+      tlAsk(q);
+    };
+  }
+  try{tlRec.start()}catch(e){/* đang chạy dở — bỏ qua */}
+}
+if(TL_SR){const b=tlEl('tl-mic');if(b)b.hidden=false}
 // Chào hỏi / cảm ơn — trả lời ngắn, không đưa vào tìm kiếm (tránh "chào" khớp nhầm "chào giá")
 function tlSmallTalk(q){
   const qn=tlNorm(q);
