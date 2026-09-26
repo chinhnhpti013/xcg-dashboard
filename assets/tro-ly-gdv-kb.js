@@ -17,7 +17,8 @@
    Mỗi mục trong TL_KB:
      id : mã duy nhất (không trùng)
      g  : nhóm — 'tiepnhan' | 'giamdinh' | 'duyetgia' | 'chungtu' | 'saubt' |
-          'quytac' | 'tnds' | 'nt3' | 'cldv' | 'bieumau' | 'dulieu'
+          'quytac' | 'tnds' | 'nt3' | 'cldv' | 'phaply' | 'tinhhuong' |
+          'bieumau' | 'dulieu'
      q  : câu hỏi chuẩn (hiện trên nút gợi ý)
      k  : từ khoá/cụm từ đồng nghĩa (có dấu hay không dấu đều được)
      a  : câu trả lời. Định dạng rút gọn, mỗi dòng một ý:
@@ -33,8 +34,8 @@
    ══════════════════════════════════════════════════════════════════════════ */
 
 window.TL_META = {
-  version: '2026-09-25b',
-  basis: 'QT PTI.XCG.20 (12/2024) · QT VCX 109/2025 · QT 110/2025 · NĐ 67/2023'
+  version: '2026-09-26',
+  basis: 'QT PTI.XCG.20 (12/2024) · QT VCX 109/2025 · QT 110/2025 · NĐ 67/2023 (sửa bởi NĐ 220/2026) · Luật KDBH 2022 (sửa bởi Luật 139/2025)'
 };
 
 /* Nhóm chủ đề — thứ tự hiển thị trên màn hình chào */
@@ -48,6 +49,8 @@ window.TL_GROUPS = [
   { id: 'tnds',     icon: '⚖️', name: 'TNDS & tạm ứng' },
   { id: 'nt3',      icon: '🚗', name: 'Phân lỗi & đòi NT3' },
   { id: 'cldv',     icon: '⭐', name: 'CLDV & công văn PTI' },
+  { id: 'phaply',   icon: '📕', name: 'Khung pháp lý' },
+  { id: 'tinhhuong',icon: '🧩', name: 'Tình huống thực tế' },
   { id: 'bieumau',  icon: '📝', name: 'Biểu mẫu' },
   { id: 'dulieu',   icon: '📊', name: 'Tra cứu hồ sơ' }
 ];
@@ -372,7 +375,43 @@ Chưa đủ tài liệu → GĐV thụ lý hiện trường tiếp tục thu th�
 - BH BB TNDS: theo quy định nhà nước từng thời kỳ.
 Ngoài các trường hợp trên, GĐV báo cáo theo thẩm quyền để quyết định cần hay không cần hồ sơ CQCN.
 **Hồ sơ công an thường gồm:** biên bản khám nghiệm hiện trường, sơ đồ & bản ảnh, biên bản khám nghiệm phương tiện, thông báo kết quả điều tra ban đầu, biên bản giải quyết TN/kết luận điều tra, biên bản hoà giải.`,
-  s: 'PL.PTI.XCG.20.05 – mục I; PL.PTI.XCG.20.10 – mục 2.4', r: ['ht-baocao', 'gd-chay'] }
+  s: 'PL.PTI.XCG.20.05 – mục I; PL.PTI.XCG.20.10 – mục 2.4', r: ['ht-baocao', 'gd-chay'] },
+
+{ id: 'tn-qn-cam-ket', g: 'tiepnhan',
+  q: 'Cam kết thời gian phục vụ khách hàng trên địa bàn Quảng Ninh là bao lâu?',
+  k: ['Quảng Ninh', 'thời gian có mặt Quảng Ninh', 'Hạ Long', 'Uông Bí', 'Đông Triều', 'Cẩm Phả', 'Móng Cái', 'cam kết địa bàn', 'bao lâu ra hiện trường', 'SLA Quảng Ninh', 'duyệt giá bao lâu', 'tạm ứng 50%'],
+  a: `Theo bản cam kết dịch vụ PTI Quảng Ninh (04/01/2019) — tham khảo khi trả lời khách hàng trên địa bàn:
+- **Thông báo tai nạn:** chủ xe/lái xe gọi **1900 545475** trong vòng **30 phút** kể từ khi xảy ra tai nạn (Call Center 24/7).
+- **Thời gian GĐV có mặt tại hiện trường (Quảng Ninh):** **30 phút** tại Hạ Long, Uông Bí, Đông Triều, Cẩm Phả, Móng Cái; tối đa **02 tiếng** tại các huyện, thị xã khác.
+- **Giám định tại xưởng:** trong vòng **02 tiếng** kể từ khi xe được đưa về xưởng.
+- **Duyệt giá sửa chữa** kể từ khi xưởng gửi báo giá:
+|Số tiền sửa chữa|Thời hạn duyệt giá|
+|Dưới 10 triệu|04 giờ làm việc|
+|Từ 10 đến dưới 50 triệu|08 giờ làm việc|
+|Từ 50 đến 100 triệu|24 giờ làm việc|
+|Trên 100 triệu|05 ngày làm việc|
+- **Tạm ứng:** khi KH hoặc xưởng có công văn yêu cầu, PTI có thể tạm ứng **50%** số tiền sửa chữa thuộc trách nhiệm.
+- **Thanh toán bồi thường:** trong vòng **10 ngày** kể từ khi nhận đủ hồ sơ, chứng từ và hiện vật thu hồi.
+- **Đối soát hồ sơ:** định kỳ **ngày 20 hằng tháng** PTI thông báo danh sách hồ sơ còn thiếu giấy tờ; KH có **10 ngày** kể từ ngày nhận thông báo để bổ sung (không tính thời gian cơ quan chức năng xử lý, trả hồ sơ).
+!! Đây là bản cam kết cũ (2019) dùng để tham khảo mức phục vụ tại địa bàn. Thời hạn **duyệt giá và Bước 4 hiện hành** áp dụng theo QT PTI.XCG.20 và CV 4406 — nếu lệch nhau thì lấy quy trình hiện hành.`,
+  s: 'Quy trình xử lý đền bù (bồi thường) xe ô tô — PTI Quảng Ninh, 04/01/2019 (Ban XCG cung cấp)', r: ['dg-thoihan', 'cl-camket', 'cl-duyetgia'], v: 0 },
+
+{ id: 'tn-anchi-quytac', g: 'tiepnhan',
+  q: 'Kiểm tra ấn chỉ bảo hiểm và xác định Quy tắc áp dụng cho hồ sơ thế nào?',
+  k: ['ấn chỉ', 'ấn chỉ vật lý', 'ấn chỉ điện tử', 'cấp đơn online', 'quét QR', 'mã QR ấn chỉ', 'quy tắc nào áp dụng', 'quy tắc 26/12/2024', 'tranh chấp quy tắc', 'kiểm tra giấy chứng nhận bảo hiểm thật'],
+  a: `Mỗi hồ sơ áp dụng **Quy tắc bảo hiểm ghi trên ấn chỉ (GCNBH/HĐBH) tại thời điểm cấp**, không phải quy tắc mới nhất.
+Bộ Quy tắc bảo hiểm tự nguyện XCG ban hành **26/12/2024** có thời điểm áp dụng khác nhau theo loại ấn chỉ:
+|Loại ấn chỉ|Áp dụng cho đơn cấp từ|
+|Ấn chỉ vật lý|**23/01/2025**|
+|Ấn chỉ điện tử (online)|**25/02/2025**|
+Khi giải quyết bồi thường, GĐV phải:
+- Xác định ấn chỉ là **vật lý hay điện tử** và **thời điểm cấp**.
+- **Quét mã QR** trên ấn chỉ để kiểm tra Quy tắc áp dụng có đúng thông báo của ban nghiệp vụ không.
+- Đơn cấp đúng quy định → giải quyết bồi thường bình thường.
+- **Tranh chấp với khách hàng** về Quy tắc áp dụng, hoặc quét QR thấy Quy tắc **không đúng thời điểm cấp** → gọi điện đồng thời gửi email cho **Ban/Phòng kỹ thuật nghiệp vụ XCG** để làm rõ; nhận email xác nhận thì **đính kèm email + chứng từ (PDF hoặc ảnh chụp màn hình) vào hồ sơ bồi thường trên web** làm căn cứ.
+- Có dấu hiệu sai phạm cấp đơn → **báo cáo đầu mối tiếp nhận sai phạm** theo quy định.
+!! Quy tắc VCX **QĐ 109/2025** (hiệu lực 14/10/2025) là bản sau bộ 26/12/2024 — đơn cấp trước ngày hiệu lực vẫn theo quy tắc cũ ghi trên ấn chỉ.`,
+  s: 'Thông báo Phòng KTNV XCG về thời điểm áp dụng Quy tắc BH tự nguyện ban hành 26/12/2024 (docs/Kho tri thức — Tiện ích tra cứu CV)', r: ['qt-thaydoi', 'gd-tailieu', 'sb-saipham'] }
 );
 /* ─── 2. GIÁM ĐỊNH CHI TIẾT (Bước 3) ─── */
 TL_KB.push(
@@ -455,11 +494,11 @@ Nội dung GĐ: giám định hồ sơ tài liệu → xác định nguyên nhâ
 - Kiểm tra CV trả lời của TCTD: đối tượng thụ hưởng, số tài khoản, hình thức BT, ngày xác nhận, hiệu lực.
 - Giấy uỷ quyền thụ hưởng/nhận tiền: người uỷ quyền, thẩm quyền, người được uỷ quyền, thời hiệu, nội dung. NĐBH là cá nhân uỷ quyền nhận tiền → cần chứng thực chữ ký.
 - Xác nhận quyền thụ hưởng của TCTD và giấy uỷ quyền thụ hưởng là chứng từ phải **lưu bản cứng**.`,
-  s: 'PL.PTI.XCG.20.06 – mục II.1; PL.PTI.XCG.20.15 – mục III; PL.PTI.XCG.20.18', r: ['ct-xacnhanpa', 'sb-luutru', 'gd-nganhang'] },
+  s: 'PL.PTI.XCG.20.06 – mục II.1; PL.PTI.XCG.20.15 – mục III; PL.PTI.XCG.20.18', r: ['ct-xacnhanpa', 'sb-luutru'] },
 
 { id: 'gd-ngapnuoc', g: 'giamdinh',
   q: 'Giám định xe ngập nước, thuỷ kích như thế nào?',
-  k: ['ngập nước', 'thủy kích', 'thuỷ kích', 'nước vào động cơ', 'bó máy', 'hộp điều khiển', 'lọc gió', 'que thăm dầu', 'bugi'],
+  k: ['giám định ngập nước', 'giám định thuỷ kích', 'ngập nước', 'thủy kích', 'thuỷ kích', 'nước vào động cơ', 'bó máy', 'hộp điều khiển', 'lọc gió', 'que thăm dầu', 'bugi'],
   a: `**Ngập nước (động cơ, điện, điều khiển):** GĐ **ngay** khi xe về xưởng.
 - Xác định vết/ngấn nước trên xe, sàn xe, hoen gỉ nội thất, hộp điều khiển, giắc điện.
 - Phối hợp xưởng vệ sinh ngay nội thất, sàn, hộp điều khiển, hệ thống điện; chụp tem mác hộp điều khiển, **ký kiểm soát** các hạng mục sau khi xử lý.
@@ -537,7 +576,7 @@ Nội dung GĐ: giám định hồ sơ tài liệu → xác định nguyên nhâ
 - Dấu hiệu trục lợi là trường hợp **bắt buộc thu thập hồ sơ CQCN** và lập **Báo cáo GĐ BM 20.09**.
 - HĐBH/GCNBH nghi giả → báo bộ phận An ninh nội bộ.
 !! Không trung thực trong cung cấp thông tin, chứng từ → giảm trừ 50% – 100% STBT (QT VCX 2025, 12.1.3).`,
-  s: 'PL.PTI.XCG.20.06 – mục II (lưu ý); PL.PTI.XCG.20.02 – mục 1, 2.3; PL.PTI.XCG.20.05; QT VCX 109/2025 – khoản 12.1.3', r: ['ht-cqcn', 'ht-baocao', 'dg-giamtru', 'td-nguoi-xacminh', 'gd-anhcapdon'] }
+  s: 'PL.PTI.XCG.20.06 – mục II (lưu ý); PL.PTI.XCG.20.02 – mục 1, 2.3; PL.PTI.XCG.20.05; QT VCX 109/2025 – khoản 12.1.3', r: ['ht-cqcn', 'ht-baocao', 'dg-giamtru', 'gd-anhcapdon'] }
 );
 /* ─── 3. DUYỆT GIÁ & PHƯƠNG ÁN (Bước 4) ─── */
 TL_KB.push(
@@ -907,7 +946,87 @@ TL_KB.push(
 - Ngoài giờ (18h – 08h hôm sau): **x2**, tối đa 600.000đ/vụ. Thứ Bảy, Chủ nhật, ngày lễ: **x3**, tối đa 1.000.000đ/vụ.
 - Chứng từ: **Biên bản giám định hiện trường**.
 **Chi phí giám định** (hạch toán theo hồ sơ): trong phạm vi 30 km GĐV tự túc phương tiện; ngoài 30 km, ngoài giờ, trường hợp đặc biệt (cao tốc) hoặc được phê duyệt → ưu tiên **thẻ taxi** của TCT. Gồm cả khách sạn, cân đo đong đếm, sao chụp hồ sơ CQCN, thuê chuyên gia/GĐ, chuyển phát. Chứng từ: hoá đơn hợp lệ.`,
-  s: 'PL.PTI.XCG.20.09', r: ['ht-bienban', 'dg-bangke'] }
+  s: 'PL.PTI.XCG.20.09', r: ['ht-bienban', 'dg-bangke'] },
+
+{ id: 'sb-mologic', g: 'saubt',
+  q: 'Trình mở logic hồ sơ bồi thường trên iLead làm thế nào, ai duyệt?',
+  k: ['mở logic', 'mo logic', 'trình mở logic', 'iLead', 'ilead', 'phân quyền mở logic', 'điều chuyển ước quá hạn', 'gỡ ngày quyết định', 'chưa phát sinh doanh thu thực thu', 'không duyet hs khi chua phat sinh doanh thu', 'đã bảo lãnh sang trạng thái khác', 'check 1 check 2'],
+  a: `Mở logic là thao tác xin mở khoá trạng thái hồ sơ trên phần mềm, trình qua **iLead** (Service Desk → My Request → Thêm yêu cầu).
+**Bước 1 – GĐV thụ lý trình:** chọn Công ty PTI → Chi nhánh (VP ĐD giám định bồi thường PTI tại Hà Nội với GĐV Miền Bắc) → Loại dịch vụ **CG** → Quy trình **[CG] Trình chủ trương/Quy chế/chính sách/PA nhân sự…**
+Thông tin **bắt buộc**: Số hồ sơ · Biển kiểm soát · Lý do yêu cầu (ghi chi tiết) · chọn User Check 1 (mọi trường hợp) · chọn User Check 2 (chỉ khi mở logic thay đổi Đề nghị thanh toán / gỡ ngày Quyết định) · User Validate · User tiếp nhận thực thi.
+**Bước 2 – Check:** Checker 1 kiểm tra số hồ sơ, biển số, lý do có đúng thực tế, có tuân thủ quy định và không phát sinh rủi ro không. Checker 2 (trường hợp trên) xác nhận **đã trả hồ sơ trên cổng thanh toán**.
+**Bước 3 – Validate:** kiểm tra đã check đủ và xét duyệt nội dung.
+**Phân quyền mở logic điều chuyển ước quá hạn (số tiền chưa VAT):**
+|Số tiền|Make|Check|Validate|
+|≤ 30 trđ|GĐV|TP KV của GĐV thụ lý|TP thẩm định KV Miền|
+|Trên 30 – 100 trđ|GĐV|TP KV của GĐV thụ lý|GĐ VP Miền|
+|Trên 100 trđ|GĐV|TP KV của GĐV thụ lý|GĐ VP Miền (thực thi: GĐ TT SOS)|
+- Mở logic từ **Đề nghị thanh toán → trạng thái khác** (gỡ ngày Quyết định): Make GĐV · Check 1 TP KV · Check 2 user phụ trách cổng thanh toán tự động · Validate & thực thi GĐ VP Miền.
+- Mở logic từ **Đã bảo lãnh → trạng thái khác** và **các loại logic khác**: Make GĐV · Check TP KV · Validate & thực thi TP thẩm định KV Miền.
+**Mở logic hồ sơ chưa phát sinh doanh thu thực thu** (lỗi *"Không DUYET HS khi chưa phát sinh doanh thu thực thu"* — tổn thất khi chưa đóng/đóng thiếu phí, có sửa đổi phí sau ngày tổn thất):
+- Tên yêu cầu: *Mở logic HSBT chưa phát sinh doanh thu thực thu*; lý do chọn theo mẫu (tổn thất trong hạn thanh toán phí / kênh bán đã thu phí của KH chưa đến hạn nộp cho PTI / hợp đồng chia kỳ đã thanh toán kỳ trước / có SĐBS về phí sau ngày tổn thất…).
+- Đính kèm: **phiếu xác minh phí**, hợp đồng bảo hiểm/đại lý/thoả thuận hợp tác, danh sách đối soát – xác nhận cấp đơn, phiếu thu của kênh/đại lý, uỷ nhiệm chi, báo có ngân hàng, chuyển quyền thụ hưởng… Đơn cấp qua kênh phải có **biên bản đối soát ký và đóng dấu hai bên**.
+- Thời gian mở hạn cho GĐV thực hiện: **từ ngày mở đến ngày cuối của tháng tiếp theo**. Ban Vận hành xử lý trong **24 giờ** kể từ khi nhận yêu cầu.
+!! Chứng từ chứng minh nộp phí đã trình trên iLead vẫn **phải upload vào hồ sơ trên PMNV** để phục vụ hậu kiểm.`,
+  s: 'Hướng dẫn trình mở logic HSBT NV XCG & Bảng phân quyền mở logic (docs/Kho tri thức — Tiện ích tra cứu CV)', r: ['gd-thanhtoanphi', 'gd-xmp', 'sb-ktnb'] },
+
+{ id: 'sb-ktnb', g: 'saubt',
+  q: 'Kiểm toán nội bộ lưu ý những lỗi nào trong hồ sơ bồi thường XCG?',
+  k: ['KTNB', 'kiểm toán nội bộ', 'lỗi hồ sơ', 'upload chứng từ PMNV', 'thẩm quyền Make', 'vượt thẩm quyền', 'đóng hồ sơ bằng 0', 'nhập bồi thường bằng 0', 'công văn từ chối', 'hậu kiểm', 'khuyến nghị kiểm toán'],
+  a: `Kết quả kiểm tra hồ sơ bồi thường XCG của Kiểm toán nội bộ — các nội dung bắt buộc thực hiện:
+- **Hồ sơ TNDS / hồ sơ 2 bước:** người **Make** phải upload **đầy đủ chứng từ** vào hồ sơ trên PMNV. Người **Check/Validate** phải kiểm tra hồ sơ trên PMNV trước khi duyệt (mail hoặc bản cứng) và **chỉ duyệt khi chứng từ đã đủ**.
+- **Thẩm quyền Make:** trường hợp **vượt thẩm quyền Make** phải có người đủ thẩm quyền hướng dẫn, đồng hành; việc đồng hành thể hiện bằng **chữ ký của người đồng hành trên Biên bản giám định**. GĐV phải báo Trưởng nhóm/người đủ thẩm quyền để cùng thực hiện.
+- **Hồ sơ từ chối bồi thường:** bắt buộc cập nhật/**upload Công văn từ chối** vào hồ sơ trên PMNV.
+- **Hồ sơ đóng / nhập bồi thường bằng 0:** bắt buộc **nhập đầy đủ lý do đóng hồ sơ** trên PMNV. Người Validate chỉ duyệt đóng khi đã đáp ứng đủ.
+- **Hồ sơ mở logic về phí:** chứng từ chứng minh việc nộp phí đã thể hiện trên iLead vẫn phải **upload vào hồ sơ trên PMNV**.
+- **Gửi thống kê sai phạm cho Đơn vị kinh doanh:** phải **CC bộ phận SAS** để phối hợp theo dõi, kiểm soát.
+!! Trưởng nhóm/FCM phải tăng cường kiểm soát ngay từ bước **Make** để hạn chế sai sót lặp lại.`,
+  s: 'Thông báo TTSOS về thực hiện khuyến nghị của Kiểm toán nội bộ nghiệp vụ XCG (docs/Kho tri thức — Tiện ích tra cứu CV)', r: ['sb-mologic', 'dg-tuchoi', 'sb-saipham'] },
+
+{ id: 'sb-saipham', g: 'saubt',
+  q: 'Phát hiện sai phạm cấp đơn khi giải quyết bồi thường thì báo cho ai?',
+  k: ['sai phạm cấp đơn', 'báo cáo sai phạm', 'CC SAS', 'bộ phận SAS', 'thông tư 50', 'ảnh khai thác', 'nhập sai kênh khai thác', 'đóng phí không đúng quy định', 'hồ sơ lỗi ngày quyết định', 'KPI xử phạt'],
+  a: `**Báo cáo sai phạm cấp đơn:** khi tiếp nhận, xử lý hồ sơ bồi thường mà phát hiện sai phạm liên quan đến cấp đơn, GĐV lập báo cáo gửi bộ phận Kinh doanh và **bắt buộc CC đầu mối bộ phận SAS**. Các sai phạm thường gặp (không giới hạn):
+- Đóng phí không đúng quy định, dẫn đến phải bổ sung/cung cấp **Thông tư 50** (tiềm ẩn rủi ro bị chỉnh sửa, can thiệp nội dung).
+- **Không có ảnh khai thác** hoặc ảnh khai thác không đúng quy định.
+- **Nhập sai kênh khai thác**.
+- Các sai sót nghiệp vụ khác có liên quan.
+**Hồ sơ lỗi đã có ngày quyết định** (nhập liệu sai dẫn đến hồ sơ lỗi): luồng trình gồm **M** (GĐV gây lỗi) → **C1** (SM Khu vực) → **C2** (Trung tâm kế toán nghiệp vụ) → **C3** (BP Vận hành) → **V** (TM hoặc SM Miền). Thực thi: lỗi 1 — mở bổ sung vùng chờ hồ sơ mới; lỗi 2 — kiểm soát thu hồi hồ sơ cũ rồi mới mở vùng chờ hồ sơ mới.
+!! Từ kỳ KPIs **tháng 10/2025** trở đi, vi phạm nhập liệu dẫn đến hồ sơ lỗi có ngày quyết định **bị xử phạt nghiêm** (trước đó kỳ 09/2025 được đề xuất không hạ bậc KPIs). GĐV phải nhập liệu cẩn thận, đúng chuẩn mực.`,
+  s: 'Thông báo TT PTI SOS về báo cáo sai phạm cấp đơn và luồng trình hồ sơ lỗi đã có ngày quyết định (docs/Kho tri thức — Tiện ích tra cứu CV)', r: ['sb-ktnb', 'gd-trucloi'] },
+
+{ id: 'sb-19072024', g: 'saubt',
+  q: 'Hồ sơ mở trước và từ 19/07/2024 khác nhau thế nào về quy trình, biểu mẫu?',
+  k: ['19/07/2024', '19-07-2024', 'hồ sơ mở trước', 'ký tay', 'ký số', 'tờ trình bồi thường', 'thông báo phương án giải quyết', 'đề nghị thanh toán', 'hệ thống tự sinh', 'giao thoa quy trình', 'make check validate trên web'],
+  a: `Chứng từ nghiệp vụ đính kèm khi trình thanh toán bồi thường chia **2 nhóm theo ngày mở hồ sơ**:
+|Nội dung|Hồ sơ mở **trước 19/07/2024**|Hồ sơ mở **từ 19/07/2024**|
+|Quy trình|GĐV làm tờ trình duyệt giá và bồi thường **ký tay**, nhập liệu trên web|GĐV làm **hoàn toàn trên web**, Make – Check – Validate trên hệ thống|
+|Biểu mẫu|Tờ trình bồi thường (ký tay) · Thông báo bồi thường (ký tay)|**Thông báo phương án giải quyết yêu cầu bồi thường** và **Đề nghị thanh toán** — hệ thống tự sinh sau khi Validate|
+- Biểu mẫu của hồ sơ từ 19/07/2024 **chỉ sinh ra sau khi Validate** và **không có chữ ký tay**: Thông báo phương án giải quyết bồi thường mang **hình ảnh ký số và tên người Validate**; Đề nghị thanh toán hiển thị ngày duyệt tại mục "Ngày đề nghị thanh toán" cùng tên – vai trò những người giải quyết hồ sơ.
+- Khi trình thanh toán trên iLead: người **Make là GĐV**, người **Check là Trưởng phòng khu vực**; chứng từ đính kèm gồm hoá đơn, bảng kê danh sách (nếu có) và chứng từ nghiệp vụ theo bảng trên.
+- Chọn chi nhánh luồng thanh toán: GĐV Miền Bắc chọn **"VP ĐD Giám định Bồi thường PTI tại Hà Nội" (090)**; Miền Nam chọn mã **091**. Mỗi hồ sơ chỉ chọn đúng **01 luồng thanh toán**.`,
+  s: 'Hướng dẫn trình thanh toán bồi thường trên iLead giai đoạn giao thoa quy trình (docs/Kho tri thức — Tiện ích tra cứu CV)', r: ['ct-dntt', 'sb-mologic'] },
+
+{ id: 'sb-thanhly', g: 'saubt',
+  q: 'Thu hồi và thanh lý tài sản sau bồi thường (xác xe, phụ tùng) làm thế nào?',
+  k: ['thu hồi tài sản', 'thanh lý tài sản', 'xác xe', 'bán thanh lý', 'hội đồng thanh lý', 'chào giá cạnh tranh xác xe', 'tiêu hủy phụ tùng', 'giá khởi điểm', 'niêm yết công khai', 'quyền sở hữu xác xe', 'khấu trừ giá trị thu hồi'],
+  a: `Quy trình thu hồi và thanh lý tài sản sau bồi thường NV BH XCG (ban hành **01/07/2025**).
+**Nguyên tắc thu hồi:**
+- Tài sản **không có giá trị bán thanh lý** nhưng dễ bị trục lợi (ảnh khó thể hiện thiệt hại, garage dễ chuyển từ thay thế sang sửa chữa…) vẫn **phải thu hồi hoặc tiêu huỷ**.
+- Tài sản thu hồi phải được quản lý chặt chẽ **từ khâu tháo dỡ giám định đến khi tổ chức bán thanh lý**; phải kiểm kê, lập hồ sơ lưu trữ và bảo quản đầy đủ.
+- Mọi hoạt động thanh lý phải lập **văn bản bàn giao** có chữ ký xác nhận các bên, ghi rõ thông tin xe, tình trạng, thời điểm giao nhận. Hồ sơ thu hồi phải lưu đầy đủ, tra cứu được.
+**Nguyên tắc thanh lý:**
+- Trước khi thanh lý phải xác định rõ **quyền định đoạt**: (i) đã bồi thường cho KH và tài sản thuộc sở hữu PTI; hoặc (ii) đang trong quá trình xét duyệt, PTI và NĐBH **thống nhất bằng văn bản** thanh lý trước bồi thường, **khấu trừ trực tiếp vào tiền bồi thường** và PTI **không nhận quyền sở hữu**.
+- Phải kiểm tra hiện trạng bằng hình ảnh, mô tả, đánh giá; có **biên bản định giá** (nội bộ hoặc thuê định giá độc lập) và đủ hồ sơ giấy tờ trước khi bán.
+- Giá bán và quyết định thanh lý phải khách quan, dựa trên tình trạng thực tế và giá thị trường/tổ chức giám định độc lập, và do **Hội đồng thanh lý** phê duyệt.
+- Thông tin chào bán phải **niêm yết công khai trên ít nhất một kênh chính thức của PTI** (ví dụ website), gồm: mô tả tài sản, tình trạng thực tế, ảnh chụp, **giá khởi điểm**, phương thức chào giá, thời hạn nhận đề nghị mua, phương thức lựa chọn.
+- **Thành viên Hội đồng thanh lý không được mua** tài sản thanh lý, không nhờ người khác mua hộ, không dành ưu ái cho đối tác.
+**Bước 2 – Xét duyệt tài sản thu hồi:** người có thẩm quyền duyệt hồ sơ có thể điều chỉnh danh mục phải thu hồi/không thu hồi so với đề xuất của GĐV, xác nhận tại **biên bản giám định**.
+- **Không thu hồi, tài sản không có giá trị** → tổ chức **tiêu huỷ** đúng quy định môi trường, an toàn, có chứng kiến của đại diện các bên (PTI và đơn vị sửa chữa/lưu trữ); lập **biên bản tiêu huỷ kèm hình ảnh** và lưu hồ sơ.
+- **Xác xe, PTI đồng thuận với chủ xe:** quy trình chào giá và thanh lý xác xe chạy **song song** với giải quyết bồi thường tổn thất toàn bộ; lập **Biên bản làm việc uỷ quyền chào giá thanh lý xác xe** (mẫu NVXE039.03.01) và **Biên bản xác định số tiền bồi thường còn lại** (mẫu NVXE039.03.02).
+- Toàn bộ chào giá, xác định người mua, ký hợp đồng và xử lý thanh lý xác xe phải hoàn tất trong **20 ngày làm việc** kể từ ngày Hội đồng thanh lý xác định giá khởi điểm (được gia hạn tương ứng nếu phải bổ sung hồ sơ chào giá hoặc xin phê duyệt lại giá khởi điểm).
+!! Việc thanh lý/định đoạt xác xe phải phù hợp Luật KDBH, Bộ luật Dân sự, quy định nội bộ PTI và điều khoản HĐBH đã ký, và **không làm ảnh hưởng quyền, lợi ích hợp pháp của người được bảo hiểm**.`,
+  s: 'QĐ ban hành Quy trình thu hồi và thanh lý tài sản sau bồi thường NV BH XCG, 01/07/2025 – mục 4.1, 4.2, Bước 2', r: ['ct-thuhoi', 'dg-toanbo', 'ct-toanbo'] }
 );
 /* ─── 6. QUY TẮC VCX 2025 (QĐ 109/QĐ-PTI) ─── */
 TL_KB.push(
@@ -1056,7 +1175,28 @@ TL_KB.push(
 - **PTI đơn phương chấm dứt:** hoàn phí tương ứng thời gian còn lại trong 15 ngày làm việc.
 - **Sau khi bồi thường bằng tiền** (toàn bộ hoặc bộ phận không có chứng từ sửa chữa) mà HĐ còn hiệu lực → GĐV báo KTV/đầu mối cấp đơn làm thủ tục chấm dứt (≤ 02 ngày).
 - **BB TNDS:** xe bị **thu hồi đăng ký, biển số** → HĐ chấm dứt từ thời điểm thu hồi; hoàn phí thời gian còn lại.`,
-  s: 'QT VCX 109/2025 – Điều 6; QT PTI.XCG.20 – mục 7.1.1; NĐ 67/2023 – Điều 11 (theo PL.PTI.XCG.20.12)', r: ['ct-bangtien'] }
+  s: 'QT VCX 109/2025 – Điều 6; QT PTI.XCG.20 – mục 7.1.1; NĐ 67/2023 – Điều 11 (theo PL.PTI.XCG.20.12)', r: ['ct-bangtien'] },
+
+{ id: 'qt-xemay', g: 'quytac',
+  q: 'Bảo hiểm vật chất mô tô, xe máy có phạm vi và loại trừ thế nào?',
+  k: ['vật chất xe máy', 'VCX mô tô', 'bảo hiểm xe máy', 'mô tô', 'mất cắp xe máy', 'mất cướp xe máy', 'PL 20.14', 'cháy nổ xe máy', 'dưới 300.000', 'bãi giữ xe có phiếu', '60 ngày không tìm được xe', 'tìm lại được xe sau bồi thường'],
+  a: `Bảo hiểm vật chất mô tô, xe máy theo **QĐ 08/2013/QĐ-PTI ngày 10/01/2013**, gồm **3 nhóm rủi ro**:
+**I. Bảo hiểm cháy nổ** — thiệt hại vật chất xe do hoả hoạn, cháy, nổ. Không thuộc phạm vi: các loại trừ chung; tai nạn ngoài phạm vi bảo hiểm; **tổn thất dưới 300.000 đồng** (chưa VAT).
+**II. Bảo hiểm mất cắp, mất cướp toàn bộ xe** — chỉ thuộc phạm vi khi:
+- Mất cắp tại **điểm trông giữ xe của trường học, bệnh viện, cơ quan nhà nước và toà nhà**, hoặc **bãi giữ xe công cộng có giấy phép** của cơ quan nhà nước có thẩm quyền **và có phát phiếu giữ xe**;
+- Nhà, nơi cư trú bị **trộm cướp đột nhập, cạy phá có dấu vết để lại** và/hoặc bị tấn công, đe doạ tấn công bằng vũ lực;
+- Bị **cướp**.
+**Không thuộc phạm vi mất cắp:** trộm đột nhập **không để lại dấu vết** cạy/đập/phá, dùng **chìa khoá giả**, tổn thất **không có bằng chứng / không lý giải được / do sự bất cẩn**; hành vi lừa đảo, lợi dụng lòng tin, gian lận, thông đồng với kẻ gian của NĐBH.
+**Thủ tục và bồi thường mất cắp/mất cướp:**
+- Báo **ngay** cơ quan Công an, chính quyền địa phương nơi xảy ra sự việc và PTI; trong vòng **24 giờ** kể từ lúc phát hiện, NĐBH phải **thông báo bằng văn bản** cho PTI.
+- PTI **không chịu trách nhiệm** với tổn thất mà NĐBH **không thông báo bằng văn bản trong 30 ngày** kể từ ngày xảy ra sự kiện mất cắp, bị cướp.
+- Sau **60 ngày** không tìm được xe: STBH **bằng hoặc thấp hơn** giá trị thực tế lúc tham gia → bồi thường **toàn bộ STBH** ghi trên GCNBH; STBH **cao hơn** giá trị thực tế → bồi thường theo **giá trị thực tế của xe**.
+- **Tìm lại được xe sau khi bồi thường:** PTI có quyền định đoạt xe đó, hoặc yêu cầu NĐBH hoàn trả đầy đủ số tiền bồi thường đã nhận.
+- Xe tham gia **dưới giá trị**: PTI thu hồi giá trị còn lại (sau khi trừ chi phí thu hồi xe) theo **tỷ lệ giữa STBH và giá trị thực tế** lúc tham gia bảo hiểm.
+**III. Bảo hiểm do các nguyên nhân khác** — thiệt hại vật chất xe do **tai nạn bất ngờ, ngoài sự kiểm soát** của chủ xe/NĐBH/lái xe.
+**Loại trừ chung cho cả 3 nhóm:** hành động **cố ý** gây tai nạn của NĐBH/chủ xe/lái xe/người được giao sử dụng xe · chiến tranh và các lý do tương tự (nội chiến, đình công, bạo động dân sự, khủng bố) · tai nạn xảy ra **ngoài lãnh thổ Việt Nam** (trừ khi có thoả thuận khác bằng văn bản).
+!! Đây là nghiệp vụ riêng cho **mô tô, xe máy** — không dùng Quy tắc VCX ô tô (QĐ 109/2025) cho hồ sơ xe máy.`,
+  s: 'PL.PTI.XCG.20.14 – Hướng dẫn xác định phạm vi TNBH vật chất mô tô, xe máy (theo QĐ 08/2013/QĐ-PTI ngày 10/01/2013)', r: ['qt-phamvi', 'qt-loaitru', 'qt-bs04'] }
 );
 
 TL_KB.push(
@@ -1108,7 +1248,7 @@ TL_KB.push(
 |Tài sản do mô tô, xe gắn máy (kể cả xe máy điện) gây ra|**50 triệu đồng/1 vụ**|
 - DNBH không bồi thường phần vượt giới hạn, trừ khi chủ xe có tham gia **BH TNDS tự nguyện**.
 - Mức BT sức khoẻ, tính mạng theo **Bảng Phụ lục VI** NĐ 67/2023 (hoặc thoả thuận, không vượt Phụ lục VI).`,
-  s: 'NĐ 67/2023/NĐ-CP (theo PL.PTI.XCG.20.12 – mục 3, 7.6, 7.8)', r: ['td-nguyentac', 'td-nt3', 'td-xemay'] },
+  s: 'NĐ 67/2023/NĐ-CP (theo PL.PTI.XCG.20.12 – mục 3, 7.6, 7.8)', r: ['td-nguyentac', 'td-nt3'] },
 
 { id: 'td-nt3', g: 'tnds',
   q: 'Ai là người thứ ba trong bảo hiểm TNDS? Ai không được bồi thường?',
@@ -1216,7 +1356,54 @@ TL_KB.push(
 - **Hồ sơ:** TBTN & YCBT; GCN/HĐBH; đăng ký xe, GPLX, đăng kiểm; chứng từ y tế (giấy ra viện, bệnh án, giấy chứng nhận thương tật); tử vong: giấy chứng tử hoặc BB khám nghiệm tử thi/kết luận điều tra/bản án ghi nhận tử vong + giấy tờ thừa kế; tài liệu công an (nếu có); BBGĐ thiệt hại.
 - Giám định: vụ không còn hiện trường phải **xác minh**; xác định số người trên xe, số người bị thương, tử vong. Mẫu hướng dẫn **BM 20.01C**, tờ trình **BM 20.25C**.
 !! HĐ cấp theo Quy tắc cũ QĐ 370/2018 (tai nạn lái, phụ xe và người ngồi trên xe) → hướng dẫn PL.PTI.XCG.20.13: trẻ em dưới 7 tuổi được trả 50% STBH, chở quá số người giảm theo tỷ lệ.`,
-  s: 'Quy tắc QĐ 110/QĐ-PTI ngày 23/09/2025 – Điều 10, 11, 13, 15; PL.PTI.XCG.20.13; QT PTI.XCG.20 – mục 2.2, 4.2.3; PL.PTI.XCG.20.02 – mục 2.2.3', r: ['qt-110', 'qt-thaydoi', 'td-nt3'] }
+  s: 'Quy tắc QĐ 110/QĐ-PTI ngày 23/09/2025 – Điều 10, 11, 13, 15; PL.PTI.XCG.20.13; QT PTI.XCG.20 – mục 2.2, 4.2.3; PL.PTI.XCG.20.02 – mục 2.2.3', r: ['qt-110', 'qt-thaydoi', 'td-nt3'] },
+
+{ id: 'td-tyle-nguoi', g: 'tnds',
+  q: 'Bảng tỷ lệ trả tiền bồi thường thiệt hại về người dùng thế nào?',
+  k: ['bảng tỷ lệ thương tật', 'tỷ lệ tổn thương cơ thể', 'phụ lục 01 QĐ 110', 'trả tiền thiệt hại về người', 'mất chi', 'cụt ngón', 'liệt tứ chi', 'nhiều thương tật', 'thương tật không có trong bảng', 'hội đồng giám định y khoa', 'nạn nhân chết không xác định tung tích'],
+  a: `**Phụ lục 01 ban hành kèm QĐ 110/QĐ-PTI ngày 23/09/2025** — Bảng tỷ lệ trả tiền bồi thường thiệt hại về người, dùng cho bảo hiểm trách nhiệm của chủ xe/lái xe đối với phụ xe, người ngồi trên xe.
+- Bảng chia theo hệ cơ quan: tổn thương **xương sọ và hệ thần kinh**, mắt, tai – mũi – họng, hàm mặt, hệ hô hấp, hệ tim mạch, hệ tiêu hoá, hệ tiết niệu – sinh dục, cơ – xương – khớp, phần mềm, bỏng… Mỗi mục cho **khoảng tỷ lệ %** (ví dụ chạm sọ 6–10%, mẻ sọ dưới 3 cm 11–15%, liệt hoàn toàn tứ chi 99%, tổn thương não gây di chứng sống kiểu thực vật 100%).
+- Số tiền chi trả = **tỷ lệ % × mức trách nhiệm bảo hiểm/người/vụ** ghi trên GCNBH/HĐBH.
+**Những trường hợp đặc biệt (cuối Phụ lục 01):**
+- **Dính các khớp ngón tay** (trừ ngón cái và ngón trỏ) và **khớp ngón chân** (trừ ngón cái) → chỉ bằng **50%** số tiền của trường hợp cụt ngón đó.
+- **Mất hẳn chức năng** của từng bộ phận hoặc **hỏng vĩnh viễn** → coi như **mất bộ phận đó hoặc mất chi**.
+- Trước tai nạn nạn nhân **chỉ còn một mắt**, nay mất nốt mắt lành → coi như **mất hoàn toàn hai mắt**.
+- **Nhiều loại thương tật** → cộng số tiền của từng loại, nhưng **không vượt quá giới hạn trách nhiệm bảo hiểm**.
+- **Thương tật không có trong bảng** → bồi thường theo tỷ lệ trên cơ sở **so sánh tính nghiêm trọng** với trường hợp tương tự có trong bảng, hoặc căn cứ **kết luận của Hội đồng giám định y khoa**.
+- Nạn nhân **chết nhưng không xác định được tung tích hoặc không có người thừa kế hợp pháp** → bồi thường căn cứ **chi phí thực tế cần thiết để mai táng và phục vụ việc lưu trữ tìm tung tích**, không vượt quá giới hạn trách nhiệm.
+!! Bảng này là của **sản phẩm tự nguyện QĐ 110/2025**. Bồi thường **TNDS bắt buộc** về người áp dụng bảng tỷ lệ tại **NĐ 67/2023** — không dùng lẫn hai bảng.`,
+  s: 'Phụ lục 01 kèm QĐ 110/QĐ-PTI ngày 23/09/2025 – Bảng tỷ lệ trả tiền bồi thường thiệt hại về người (mục "Những trường hợp đặc biệt")', r: ['td-nntx', 'qt-110', 'td-mtn'] },
+
+{ id: 'td-taisan-ct', g: 'tnds',
+  q: 'Chứng từ chứng minh thiệt hại tài sản của bên thứ ba gồm những gì?',
+  k: ['chứng từ thiệt hại tài sản', 'tài sản người thứ ba', 'giấy nhận tiền bồi thường', 'bãi nại', 'dưới 10 triệu', 'trên 10 triệu', 'hoa màu cây trồng gia súc', 'công trình giao thông', 'hàng hóa để bên đường', 'chứng minh đã chi trả cho bên thứ ba', 'hợp đồng sửa chữa 20 triệu'],
+  a: `Hồ sơ chứng minh thiệt hại tài sản bên thứ ba trong bồi thường TNDS — chia theo **ai trực tiếp khắc phục**:
+**A. NĐBH bồi thường bằng tiền cho bên thứ ba** (hoặc tài sản không thể sửa chữa):
+- Báo giá tham khảo giá thị trường / báo giá tại gara liên kết PTI (bản chính hoặc bản sao có GĐV PTI xác nhận); với xe cơ giới thêm **đăng ký, đăng kiểm của bên thứ ba** (photo có GĐV ký xác nhận).
+- Hoá đơn, chứng từ hợp lệ hoặc bằng chứng về việc sửa chữa, thay mới tài sản.
+- **Biên bản thoả thuận bồi thường thiệt hại tài sản bằng tiền** giữa NĐBH và bên thứ ba.
+- **Chứng từ chứng minh NĐBH đã chi trả** cho bên thứ ba:
+|Giá trị thiệt hại|Yêu cầu|
+|**≤ 10 triệu**|Giấy nhận tiền bồi thường kèm bãi nại (bản chính, **có ký xác nhận của GĐV PTI**)|
+|**> 10 triệu**|Giấy nhận tiền bồi thường kèm bãi nại (bản chính/bản sao **có xác nhận của cơ quan chức năng có thẩm quyền**)|
+|Chuyển khoản|Sao kê chuyển khoản ngân hàng (bản chính hoặc bản sao có GĐV PTI xác nhận)|
+**B. PTI hoặc NĐBH trực tiếp sửa chữa/thay mới:** biên bản thoả thuận bồi thường **bằng sửa chữa, thay mới** · báo giá/dự toán (bản chính) · **hợp đồng sửa chữa/mua bán khi từ 20 triệu trở lên** · hoá đơn sửa chữa/mua bán · **nghiệm thu sửa chữa và bãi nại của bên thứ ba** (bản chính) · phiếu thu/sao kê/thanh lý HĐSC chứng minh đã thanh toán · biên bản thu hồi tài sản bị thiệt hại (nếu có).
+**Theo loại tài sản:** hoa màu, cây trồng, gia súc, gia cầm, nông sản, nhà ở và đồ dùng gia dụng tư nhân → báo giá thị trường; công trình giao thông/xây dựng và tài sản của cơ quan, tổ chức, doanh nghiệp → **dự toán sửa chữa của cơ sở hợp pháp lập**; hàng hoá, máy móc, thiết bị, vật tư → hoá đơn/hợp đồng mua bán, **trừ** nông sản, hải sản, thực phẩm, thủ công mỹ nghệ, đất cát đá sỏi do cá thể tự sản xuất – tiêu thụ, hàng cũ hỏng thu gom, máy móc cũ không còn giao bán trên thị trường (không nhất thiết phải có hoá đơn).
+!! **GĐV ký xác nhận** trên biên bản thoả thuận bồi thường dân sự, giao nhận tiền bồi thường phải là GĐV **được lãnh đạo phân công giám định hiện trường** hoặc **trực tiếp chứng kiến** việc thoả thuận, trả tiền giữa các bên.`,
+  s: 'Hướng dẫn thu thập tài liệu chứng minh thiệt hại tài sản, kèm Hướng dẫn bồi thường BH BB TNDS của chủ xe PL.PTI.XCG.03.01 (docs/Kho tri thức — Tiện ích tra cứu CV)', r: ['td-taisan', 'td-hoso', 'nt3-buoc'] },
+
+{ id: 'td-hanghoa-giamtru', g: 'tnds',
+  q: 'Mức giảm trừ bồi thường TNDS đối với hàng hoá vận chuyển trên xe là bao nhiêu?',
+  k: ['giảm trừ TNDS hàng hóa', 'giảm trừ bồi thường hàng hóa', 'giảm trừ hàng hoá', 'chế tài hàng hóa', 'PL 20.11', 'QT.XO.370/2018', 'không thông báo 05 ngày', 'vượt biển cấm vượt', 'tự ý di chuyển khỏi hiện trường', 'không tạo điều kiện xác minh', 'không bảo lưu quyền đòi'],
+  a: `Áp dụng cho hồ sơ TNDS của chủ xe **đối với hàng hoá vận chuyển trên xe** (Quy tắc BH tự nguyện XCG số **370/2018/QĐ-PTI ngày 26/12/2018**, cho đơn cấp từ 01/01/2019 trong thời hạn hiệu lực của quy tắc này):
+|Mức giảm trừ|Trường hợp|
+|**10% – 30%**|Không thông báo ngay cho PTI và **không gửi thông báo tổn thất bằng văn bản trong 05 ngày** kể từ ngày tai nạn; không báo ngay cơ quan công an/chính quyền địa phương nơi gần nhất (trừ **bất khả kháng**) · không thực hiện đầy đủ biện pháp cứu chữa, hạn chế thiệt hại về người và tài sản, bảo vệ hiện trường · **xe vượt tại khu vực có biển cấm vượt** (khi có kết luận CSGT hoặc đủ cơ sở xác định)|
+|**30% – 50%**|Chủ xe **tự ý di chuyển khỏi hiện trường**, tự ý tháo gỡ hoặc sửa chữa tài sản khi chưa có ý kiến chấp thuận của PTI (trừ khi cần thiết để bảo đảm an toàn, đề phòng hạn chế thiệt hại, hoặc phải thi hành theo yêu cầu cơ quan có thẩm quyền)|
+|**50% – 99%**|Chủ xe **không tạo điều kiện thuận lợi** cho PTI xác minh tính chân thực của thông tin, tài liệu, chứng từ trong hồ sơ bồi thường|
+|**50% – 100%**|Không bảo lưu quyền khiếu nại và chuyển quyền đòi người thứ ba cho PTI kèm hồ sơ, căn cứ cần thiết; không hợp tác chặt chẽ với PTI để đòi người thứ ba; **tự động thoả thuận bồi thường với người thứ ba** gây thiệt hại cho PTI · chủ xe **không trung thực**|
+- *Bất khả kháng* được hiểu là sự cố nằm ngoài khả năng dự đoán và kiểm soát của chủ xe, xảy ra không do lỗi của chủ xe, khiến chủ xe không thể thực hiện đúng hoặc đầy đủ nghĩa vụ của mình.
+!! Đây là thang giảm trừ của **nghiệp vụ TNDS hàng hoá theo quy tắc 370/2018**. Với **vật chất xe** dùng thang giảm trừ của Quy tắc VCX hiện hành (QĐ 109/2025 – Điều 12); với **TNDS bắt buộc** mức giảm trừ thiệt hại tài sản **tối đa 5%** theo NĐ 67/2023. Luôn xác định hồ sơ áp dụng quy tắc nào trước khi tính giảm trừ.`,
+  s: 'PL.PTI.XCG.20.11 – Hướng dẫn xác định phạm vi TNBH TNDS của chủ xe đối với hàng hoá, mục 5.1 (dẫn Điều 13 QT.XO.370/2018)', r: ['td-hanghoa', 'dg-giamtru', 'nt3-khongbaoluu'] }
 );
 /* ─── 8. PHÂN LỖI & ĐÒI NGƯỜI THỨ BA ─── */
 TL_KB.push(
@@ -1432,7 +1619,7 @@ TL_KB.push(
   a: `Chọn mã GĐV của bạn bên dưới. Trợ lý nhớ lựa chọn này trên trình duyệt này; sau đó gõ **"hồ sơ của tôi"** hoặc **"tồn của tôi"** để xem nhanh.`,
   s: 'Trợ lý GĐV', r: ['dl-huongdan'] }
 );
-/* ─── 11. CAM KẾT CLDV & CÔNG VĂN PTI (bổ sung 09/2026 từ docs/Thi dinh ky, docs/Quy tac xcg mới) ─── */
+/* ─── 11. CAM KẾT CLDV & CÔNG VĂN PTI ─── */
 TL_KB.push(
 { id: 'cl-camket', g: 'cldv',
   q: 'Các cam kết chất lượng dịch vụ (CLDV) nghiệp vụ XCG theo CV 4406 gồm những gì?',
@@ -1454,7 +1641,7 @@ TL_KB.push(
 |Nhóm Zalo/Viber riêng theo KH: doanh thu 300–500 triệu (KTV/GĐV/LĐ phòng/CQ), 500 triệu–2 tỷ (+ LĐ Ban XCG), từ 2 tỷ (+ PTGĐ)|KH xe TM, xe thương mại, VIP|
 - Cứu hộ PAN khi xe sự cố kỹ thuật + bảo lãnh tại Hà Nội, HCM, Đà Nẵng: tất cả; ngoài 3 địa bàn này KH trả trước, PTI thanh toán **500.000đ/chuyến** khi có chứng từ: kênh Vnpost (xe thương mại, VIP theo HĐBH).
 !! Vi phạm cam kết xử lý theo quy chế xử phạt hiện hành. Phòng GĐBT đào tạo toàn bộ GĐV/BTV; P.CLDV khách hàng theo dõi, kiểm tra.`,
-  s: 'CV 4406/PTI-BHXCG ngày 22/10/2021 – Phụ lục 01', r: ['cl-duyetgia', 'ht-thoigian', 'dg-khautru', 'cl-app'] },
+  s: 'CV 4406/PTI-BHXCG ngày 22/10/2021 – Phụ lục 01', r: ['cl-duyetgia', 'ht-thoigian', 'dg-khautru'] },
 
 { id: 'cl-duyetgia', g: 'cldv',
   q: 'Cam kết thời gian duyệt giá sửa chữa với khách hàng theo nhóm khách hàng?',
@@ -1469,32 +1656,6 @@ TL_KB.push(
 !! Đây là cam kết với khách hàng. Thời hạn nội bộ từng khâu (GĐV trình, check, validate) theo QT PTI.XCG.20 Bước 4 — xem mục "Thời hạn duyệt giá theo số tiền".`,
   s: 'CV 4406/PTI-BHXCG ngày 22/10/2021 – Phụ lục 01 mục III', r: ['dg-thoihan', 'cl-camket'] },
 
-{ id: 'cl-app', g: 'cldv',
-  q: 'Quy định giám định bằng App PTI – Giám định viên: tỷ lệ bắt buộc và xử phạt?',
-  k: ['App PTI', 'app giám định viên', 'giám định bằng app', 'PTI Portal', 'tỷ lệ sử dụng app', 'đánh giá 1 sao', '2 sao', 'điểm KPI', 'hạ bậc KPI', 'baocao.pti.com.vn', 'CV 2186'],
-  a: `CV **2186/PTI-BHXCG ngày 30/05/2022** (App PTI – GĐV giai đoạn 3):
-|Công việc|Yêu cầu|
-|GĐ hiện trường|GĐ bằng App **100%**; hướng dẫn thu thập hồ sơ 1 lần **100%**; chia sẻ **100%** vị trí GĐV cho KH|
-|GĐ chi tiết HS dưới 10 triệu|GĐ bằng App **100%**; công nhận/duyệt giá **≤ 04 giờ** từ khi tạo BBGĐ trên App; bảo lãnh xe ra xưởng qua App **100%** (HS đến 10 triệu, gara/SH liên kết)|
-|HS trên 10 triệu|Khuyến khích dùng App|
-- Được GĐ theo cách truyền thống (tối đa **10%**): lỗi hệ thống/thiết bị, mất sóng/sóng yếu, lý do chính đáng khác.
-- Xử phạt không đạt tỷ lệ/chất lượng dùng App: lần 1 nhắc nhở · lần 2 hạ **05 điểm KPI** (GĐV + LĐ phòng GĐ) · lần 3 hạ **01 bậc KPI**.
-- Bị KH đánh giá **1–2 sao** vì CLDV kém, không giải trình được: dưới 03 HS/tháng trừ 05 điểm KPI · 03–05 HS trừ 10 điểm · từ 05 HS hạ 02 bậc KPI.
-- Theo dõi: App **PTI Portal** (mục Quản lý GĐV — thống kê sự vụ, tiến trình duyệt giá, thời gian tới hiện trường, đánh giá…) và web báo cáo XCG (Báo cáo MyPTI). LĐ phòng GĐ xem hằng ngày để đôn đốc.`,
-  s: 'CV 2186/PTI-BHXCG ngày 30/05/2022 (docs/Thi dinh ky/CV TB QUY DINH SU DUNG APP PTI - GIAM DINH VIEN.pdf)', r: ['cl-camket', 'gd-chupanh'] },
-
-{ id: 'cl-hdkh', g: 'cldv', v: 0,
-  q: 'Khách đã di chuyển xe khỏi nơi tai nạn một đoạn ngắn thì có coi là còn hiện trường không?',
-  k: ['di rời hiện trường', 'di chuyển xe khỏi hiện trường', 'dưới 1km', '1 km', 'còn hiện trường', 'hướng dẫn hồ sơ bằng văn bản', 'hướng dẫn 1 lần', 'bàn giao giám định', 'khách phải đi lại nhiều lần', 'CV 2479', 'di chuyển xe', 'rời khỏi nơi tai nạn', 'vài trăm mét', 'rồi mới báo', 'báo sau khi di chuyển'],
-  a: `CV **2479/PTI-BHXCG ngày 11/06/2021** (chấn chỉnh khiếu nại: GĐ hiện trường chậm, hướng dẫn thiếu, không hỗ trợ khi làm việc với CQCN):
-- KH đã di rời xe gần nơi tai nạn vì lý do khách quan, **khoảng cách dưới 1 km** rồi mới báo PTI → GĐV coi là **xe còn ở hiện trường**: tới hỗ trợ, xác minh lại diễn biến, nguyên nhân, phạm vi BH.
-- CQCN đã đưa xe về nơi lưu giữ → GĐV phối hợp cùng KH làm việc với CQCN và bên thứ 3 cho tới khi xe được cho đi sửa chữa hoặc bàn giao cho GĐV tiếp theo.
-- **100% hồ sơ** phải hướng dẫn KH thu thập chứng từ bằng văn bản hoặc qua App (trừ không gặp được chủ xe/lái xe vì lý do khách quan). Trao đổi qua điện thoại → nhắn lại nội dung qua SMS/Viber/Zalo kèm ảnh văn bản hướng dẫn.
-- GĐV chỉ hết trách nhiệm GĐ hiện trường khi đã **bàn giao** được việc GĐ chi tiết cho GĐV khác; đơn vị giải quyết BT là đầu mối phối hợp thu thập hồ sơ và thông báo KH đúng hạn.
-- Người bị thương điều trị ở địa phương có đơn vị PTI → đơn vị PTI địa bàn đó phối hợp thu thập hồ sơ bệnh án.
-!! Văn bản ban hành trước QT PTI.XCG.20 (12/2024), dẫn quy trình cũ PTI.CG.02 — dùng làm nguyên tắc phục vụ; thủ tục cụ thể theo quy trình hiện hành.`,
-  s: 'CV 2479/PTI-BHXCG ngày 11/06/2021', r: ['ht-khinao', 'ht-bangiao', 'ht-thuthapct'] },
-
 { id: 'gd-anhcapdon', g: 'cldv',
   q: 'Quy định chụp ảnh đánh giá rủi ro trước khi cấp đơn VCX (CV 3653) để GĐV đối chiếu?',
   k: ['ảnh cấp đơn', 'chụp ảnh trước khi cấp đơn', 'đánh giá rủi ro', 'ảnh khai thác', 'ảnh đánh giá rủi ro', 'CV 3653', 'tổn thất sát ngày cấp đơn', '08 số cuối số khung', 'nhập liệu GCN'],
@@ -1507,15 +1668,26 @@ TL_KB.push(
   s: 'CV 3653/PTI-BHXCG ngày 03/10/2024', r: ['gd-tailieu', 'gd-xmp', 'gd-trucloi'] },
 
 { id: 'gd-thanhtoanphi', g: 'giamdinh',
-  q: 'Thời hạn thanh toán phí bảo hiểm XCG được nợ bao nhiêu ngày? Chưa đóng phí có được bồi thường?',
-  k: ['thời hạn thanh toán phí', 'nợ phí bao nhiêu ngày', 'được nợ phí', 'CV 1933', 'CV 1449', 'khách hàng doanh nghiệp nợ phí', 'hợp đồng dưới 1 năm', 'tự động chấm dứt', 'chưa đóng phí có được bồi thường'],
-  a: `- **Quy tắc 2025:** HĐBH chỉ có hiệu lực khi bên mua BH đã thanh toán **đủ, đúng hạn** phí; không thanh toán đủ trong thời hạn và không có thoả thuận gia hạn bằng văn bản → HĐBH/GCNBH **tự động chấm dứt**.
-- **CV 1933/2023/PTI-PC (25/05/2023, sửa CV 1449/PTI-PC)** — nghiệp vụ XCG:
-|Khách hàng|Thời hạn thanh toán phí|
-|Doanh nghiệp/tổ chức/HCSN — GCN cấp lẻ, HĐBH dưới 1 năm, hoặc HĐBH từ 1 năm có tổng phí đến 7 triệu|**Không quá 15 ngày kể từ ngày bắt đầu thời hạn BH**|
-|Cá nhân|Thời hạn đại lý/khai thác viên nộp phí về PTI theo mục 3, 4 CV 3898/PTI-BHXCG (30/09/2022)|
-- GĐV lấy **Xác minh phí BM 20.08** để kiểm tra ngày thanh toán phí, phí còn nợ. Tổn thất khi chưa đến hạn thanh toán → vẫn giám định; quá hạn mà chưa đóng → báo cáo lãnh đạo theo thẩm quyền.`,
-  s: 'CV 1933/2023/PTI-PC ngày 25/05/2023 – mục 1.2.1; QT 110/2025 – Điều 4 (thời hạn BH); PL.PTI.XCG.20.06', r: ['gd-xmp', 'gd-tailieu'] },
+  q: 'Thời hạn thanh toán phí bảo hiểm XCG được nợ bao nhiêu ngày? Chưa đóng phí có được bồi thường không?',
+  k: ['thời hạn thanh toán phí', 'nợ phí', 'nợ phí bảo hiểm', 'nợ phí bao nhiêu ngày', 'được nợ phí mấy ngày', 'được nợ phí', 'hạn nộp phí', 'CV 1959', '1959', 'chia kỳ thanh toán phí', 'khách hàng doanh nghiệp nợ phí', 'hợp đồng dưới 1 năm', 'chưa đóng phí có được bồi thường', 'gia hạn thanh toán phí', 'banca nợ phí', 'môi giới nợ phí', 'tái tục liên tục', 'phí tối thiểu kỳ 1', 'tài khoản chuyên thu'],
+  a: `**CV 1959/PC-PTI ngày 22/05/2025** — Hướng dẫn quy định thanh toán phí bảo hiểm.
+**Nguyên tắc chung:** bên mua bảo hiểm thanh toán phí khi giao kết HĐBH. Nếu có thoả thuận về thời hạn:
+- **Đóng một lần:** không quá **30 ngày** kể từ ngày bắt đầu thời hạn bảo hiểm. Thời hạn bảo hiểm dưới 30 ngày → chậm nhất vào **ngày kết thúc thời hạn bảo hiểm**.
+- **Đóng theo kỳ:** tối đa **04 kỳ** trong suốt thời hạn bảo hiểm. Kỳ đầu không quá **30 ngày** kể từ ngày bắt đầu thời hạn bảo hiểm; các kỳ sau theo thoả thuận **tại HĐBH đã giao kết ban đầu**, các bên **không được thoả thuận thay đổi** trong quá trình thực hiện. Mọi trường hợp **không vượt quá thời hạn bảo hiểm**.
+- **Gia hạn thanh toán phí** phải được quy định trong HĐBH và **chỉ áp dụng khi bên mua có tài sản bảo đảm hoặc bảo lãnh** thanh toán phí.
+**Riêng nghiệp vụ xe cơ giới** (xét theo tổng phí của tất cả loại hình trên HĐBH/GCNBH):
+|HĐBH/GCNBH|KH Doanh nghiệp/Tổ chức/HCSN|KH Cá nhân|
+|GCNBH **cấp lẻ không lập hợp đồng**|Thu phí **01 lần** khi cấp GCNBH — **không được nợ phí**|Thu phí **01 lần** khi cấp — **không được nợ phí**|
+|HĐBH thời hạn **dưới 01 năm**|Không quá **15 ngày** kể từ ngày bắt đầu thời hạn BH|Thu 01 lần khi cấp, không được nợ. Qua **môi giới**: HĐ đến 30 ngày → nợ không quá thời hạn BH; HĐ trên 30 ngày–dưới 1 năm → nợ tối đa **30 ngày**|
+|HĐBH **từ 01 năm**, tổng phí **≤ 7 triệu**|Không quá **15 ngày**|Thu 01 lần khi cấp. Xem các ngoại lệ bên dưới|
+|HĐBH **từ 01 năm**, tổng phí **trên 7 – 20 triệu**|Thu 01 lần, không quá **15 ngày**|Thu 01 lần khi cấp. Xem các ngoại lệ bên dưới|
+|HĐBH **từ 01 năm**, tổng phí **trên 20 – 100 triệu**|Tối đa **02 kỳ**: kỳ 1 **không dưới 60%** tổng phí, không quá **30 ngày**; kỳ 2 toàn bộ phần còn lại, không quá **90 ngày**|Thu 01 lần khi cấp. Xem các ngoại lệ bên dưới|
+**Ngoại lệ cho khách hàng cá nhân** (HĐBH từ 01 năm):
+- **Xe tái tục liên tục** tại PTI hoặc DNBH khác, cấp GCNBH **trước** ngày bắt đầu thời hạn bảo hiểm → được nợ phí với thời hạn **không vượt quá ngày bắt đầu thời hạn bảo hiểm**. Tái tục từ DNBH khác: đơn vị phải **đính kèm bản chụp GCNBH cũ ngay tại ngày cấp đơn** trên phần mềm nghiệp vụ.
+- **Kênh Banca**: nợ tối đa **15 ngày** kể từ ngày bắt đầu thời hạn BH nếu thoả mãn một trong hai điều kiện: (a) có nội dung **chuyển quyền thụ hưởng cho Ngân hàng/Tổ chức tài chính** (thể hiện trên HĐBH/GCNBH/giấy xác nhận chuyển quyền thụ hưởng), hoặc (b) **thanh toán qua tài khoản chuyên thu của PTI**.
+- **Kênh môi giới**: nợ tối đa **30 ngày** kể từ ngày bắt đầu thời hạn bảo hiểm.
+!! Khi giám định, **in phiếu xác minh phí** để kiểm tra tỷ lệ phí và hạn nộp phí. Tổn thất xảy ra khi hợp đồng **chưa phát sinh doanh thu thực thu** → phần mềm chặn duyệt hồ sơ, phải **trình mở logic** kèm chứng từ chứng minh.`,
+  s: 'CV 1959/PC-PTI ngày 22/05/2025 – Hướng dẫn quy định thanh toán phí bảo hiểm, mục I.1 (1.1 và 1.2.1 nghiệp vụ xe cơ giới)', r: ['gd-xmp', 'gd-tailieu', 'sb-mologic'] },
 
 { id: 'gd-gplx-ca', g: 'giamdinh',
   q: 'Giấy phép lái xe do Công an, Quân đội cấp có hợp lệ khi lái xe dân sự không?',
@@ -1537,49 +1709,6 @@ TL_KB.push(
 - Chỉ trưng cầu **giám định độc lập** khi KH **không chấp nhận** kết quả GĐ của PTI.
 - BT trên giá trị thiệt hại do PTI/GĐ độc lập xác định + điều kiện HĐBH, giảm trừ/khấu hao/khấu trừ, mức trách nhiệm, thoả thuận BT với bên thứ ba.`,
   s: 'CV 5884/PTI-BHXCG ngày 24/12/2020 – mục II', r: ['dg-chaogia', 'gd-thuegd'] },
-
-{ id: 'ct-xacnhan5tr', g: 'chungtu', v: 0,
-  q: 'Tổn thất nhỏ đến 5 triệu có phải thu Giấy xác nhận bồi thường không?',
-  k: ['giấy xác nhận bồi thường', 'giấy bãi nại', 'bãi nại', 'dưới 5 triệu', '5 triệu', 'CV 87', 'tài sản bên thứ 3 là ô tô'],
-  a: `CV **87/PTI-BHXCG ngày 07/01/2021**: **không yêu cầu** thu thập **Giấy xác nhận bồi thường** (mẫu cũ BM.PTI.CG.03.08) trong hồ sơ tổn thất **vật chất xe ô tô** và **tài sản bên thứ 3 là xe ô tô** có giá trị **đến 05 triệu đồng**. Áp dụng cho vụ chưa giải quyết từ 01/01/2021 đến khi có thông báo khác (mục đích: đơn giản thủ tục, tiết kiệm chi phí).
-!! Văn bản ban hành theo quy trình ISO bồi thường 2019, trước QT PTI.XCG.20 — đối chiếu danh mục chứng từ hiện hành (PL.20.15, mẫu hướng dẫn BM 20.01A/C) trước khi áp dụng.`,
-  s: 'CV 87/PTI-BHXCG ngày 07/01/2021', r: ['ct-suachua', 'td-hoso'] },
-
-{ id: 'gd-nganhang', g: 'chungtu',
-  q: 'Quy trình phối hợp bồi thường với ngân hàng thụ hưởng (xe thế chấp) theo CV 5602?',
-  k: ['ngân hàng thụ hưởng', 'phối hợp ngân hàng', 'NH/TCTD', 'chuyển quyền thụ hưởng', 'bảo lưu quyền thụ hưởng', 'thông báo ngân hàng', 'bồi thường về ngân hàng', 'CV 5602', 'giấy chuyển quyền thụ hưởng'],
-  a: `CV **5602/PTI-BHXCG ngày 07/12/2020** — áp dụng khi **số tiền ước thiệt hại vượt mức** được chủ động giải quyết ghi trong Giấy chuyển quyền thụ hưởng (cần ý kiến NH/TCTD):
-|Bước|Việc|Thời hạn|
-|B1|Thông báo NH/TCTD đề nghị xác nhận quyền thụ hưởng bằng văn bản; bản scan/ảnh gửi email/Viber/Zalo đầu mối NH, bản gốc gửi văn thư theo địa chỉ trên Giấy chuyển quyền thụ hưởng|≤ 04 giờ từ khi kết thúc GĐ và ước thiệt hại|
-|B2|Duyệt giá / trình duyệt giá theo quy định|—|
-|B3|Thông báo duyệt giá/phương án: NH **đồng ý chuyển quyền** cho chủ xe → báo chủ xe, gara ký HĐ sửa chữa · NH **chưa có ý kiến** → báo chi phí sửa chữa tới gara, chủ xe, NH · NH **yêu cầu trả về NH** → báo giá duyệt & phạm vi BH tới chủ xe, NH|≤ 04 giờ từ khi kết thúc GĐ và nhận văn bản của NH|
-|B4|Đồng ý chuyển quyền → bảo lãnh thanh toán với gara, thu chứng từ, thanh toán · NH yêu cầu BT bằng tiền → hoàn thiện hồ sơ, BT bằng tiền|Thanh toán ≤ **15 ngày làm việc** từ khi nhận văn bản của NH|
-- Mẫu hiện hành: công văn đề nghị NH xác nhận quyền thụ hưởng **BM.PTI.XCG.20.20** / xác nhận phương thức giải quyết BT **BM 20.20A** (CV 5602 dẫn mẫu cũ BM.PTI.CG.02.10b, 02.16a/b/c).
-!! PL.20.06 hiện hành yêu cầu gửi văn bản cho TCTD trong **½ ngày** kể từ khi ước thiệt hại đến hạn mức phải thông báo, gửi thư có báo phát và lưu báo phát.`,
-  s: 'CV 5602/PTI-BHXCG ngày 07/12/2020; PL.PTI.XCG.20.06 – mục II.1', r: ['gd-thuhuong', 'ct-xacnhanpa'] },
-
-{ id: 'td-nguoi-xacminh', g: 'tnds', v: 0,
-  q: 'Vụ tai nạn chỉ thiệt hại về người (có tử vong) phải xác minh những gì, trong bao lâu?',
-  k: ['chỉ thiệt hại về người', 'xác minh nạn nhân', 'trục lợi TNDS', 'xác minh tai nạn chết người', 'CV 756', 'gia đình nạn nhân', 'chính quyền địa phương', 'hàng xóm'],
-  a: `CV **756/PTI-BHXCG ngày 02/03/2023** (điều chỉnh mục 2.3 QT giám định 2020, từ 06/03/2023; lý do: phát hiện HSBT trục lợi TNDS có người tử vong):
-- **Còn hiện trường:** hướng dẫn xử lý ban đầu, GĐ hiện trường, mở HSBT; gửi công văn thu thập bản sao tài liệu công an với vụ **tử vong** của bên thứ ba/hành khách (thông báo kết quả điều tra, xác minh, giải quyết vụ TNGT hoặc thông báo kết luận điều tra) — trong **01 ngày**.
-- **Không còn hiện trường:** hướng dẫn thủ tục bằng văn bản, mở HSBT trong 01 ngày; đơn vị thụ lý gửi công văn thu thập tài liệu công an (cả trường hợp chỉ thương tật) trong 01 ngày.
-- **Xác minh** bằng 1 trong 2 cách, kết thúc trong **15 ngày**: (1) xác minh hiện trường — diễn biến, nguyên nhân, lỗi và mức độ lỗi các bên, thông tin nạn nhân (đơn vị quản lý địa bàn tai nạn); (2) xác minh qua gia đình, hàng xóm, chính quyền nơi cư trú nạn nhân — họ tên, tuổi, địa chỉ, thời gian địa điểm tai nạn, ngày mất, xe gây tai nạn, **số tiền chủ xe đã bồi thường** cho người thừa kế (đơn vị quản lý nơi cư trú).
-- Chuyển toàn bộ tài liệu xác minh cho bộ phận bồi thường.
-!! Văn bản trước QT PTI.XCG.20 — thủ tục hiện hành theo PL.20.02 (xác minh hiện trường) và PL.20.12; nội dung xác minh trên vẫn là danh mục kiểm tra chống trục lợi hữu ích.`,
-  s: 'CV 756/PTI-BHXCG ngày 02/03/2023', r: ['ht-xacminh', 'td-tamung', 'gd-trucloi'] },
-
-{ id: 'td-xemay', g: 'tnds', v: 0,
-  q: 'Giám định bồi thường TNDS bắt buộc xe máy (mô tô) làm thế nào cho nhanh?',
-  k: ['xe máy', 'mô tô', 'TNDS xe máy', 'bảo hiểm xe máy', 'ấn chỉ', 'tra cứu ấn chỉ', 'giấy chứng nhận thật giả', 'CV 2299', 'không cần hóa đơn'],
-  a: `CV **2299/PTI-BHXCG ngày 29/05/2020** — đơn giản hoá GĐBT TNDSBB xe máy:
-- **Callcenter:** tra cứu ấn chỉ (thật/giả); không tra được → hẹn KH trả lời trong 24 giờ, chuyển Ban TCKT xác nhận. Mọi trường hợp đều chuyển thông tin cho GĐV; GCN chưa nhập/chưa tra được → sau 30 phút Callcenter gọi lại KH xác nhận đã được hỗ trợ.
-- **GĐV:** liên hệ KH ≤ **05 phút**; xác định còn/không còn hiện trường, loại thiệt hại (người ngồi trên xe; bên thứ 3 về người, tài sản); GĐ hiện trường hoặc hẹn xác minh lại.
-- **Người ngồi trên xe và tài sản bên thứ 3 thiệt hại dưới 10 triệu:** thu giấy ra viện/chứng thương/chứng nhận phẫu thuật (NNTX); GĐ, xác định thiệt hại bên thứ 3; lập biên bản xác nhận bồi thường giữa các bên — **không yêu cầu hoá đơn/phiếu thu, chứng từ sửa chữa** với tài sản bên thứ 3 dưới 10 triệu.
-- **Còn lại** (thiệt hại người, tài sản trên 10 triệu): hướng dẫn KH báo chính quyền/công an nơi xảy ra tai nạn lập hồ sơ; lập BBGĐ hiện trường; hướng dẫn hồ sơ bằng văn bản.
-- Hoàn thiện, bàn giao hồ sơ ≤ 01 ngày từ khi nhận đủ; BTV/kế toán thanh toán ≤ 01 ngày.
-!! CV căn cứ TT 22/2016/TT-BTC (đã hết hiệu lực) — mức trách nhiệm, hồ sơ theo **NĐ 67/2023**; phạm vi VCX xe máy theo PL.20.14.`,
-  s: 'CV 2299/PTI-BHXCG ngày 29/05/2020', r: ['td-mtn', 'td-hoso'] },
 
 { id: 'sb-taibh', g: 'saubt',
   q: 'Tổn thất đơn có tái bảo hiểm, đồng bảo hiểm: thông báo và thu đòi thế nào?',
@@ -1608,5 +1737,270 @@ TL_KB.push(
 **Thời hạn:** nộp hồ sơ YCBT **01 năm** từ ngày xảy ra sự kiện; khiếu nại **90 ngày** từ khi nhận thông báo BT; khởi kiện **03 năm**.
 **Giám định:** không thống nhất nguyên nhân, mức thiệt hại → giám định độc lập; kết luận khác PTI thì PTI trả phí GĐ, trùng thì NĐBH trả.`,
   s: 'Quy tắc BH trách nhiệm của chủ xe/lái xe đối với phụ xe, người ngồi trên xe ô tô — QĐ 110/QĐ-PTI ngày 23/09/2025 – Điều 1, 2, 9, 11, 12, 14', r: ['td-nntx', 'qt-thaydoi'] }
+);
+
+/* ─── 12. KHUNG PHÁP LÝ (Luật KDBH, NĐ 67/2023 & NĐ 220/2026, BLDS) ─── */
+TL_KB.push(
+{ id: 'pl-vanban', g: 'phaply',
+  q: 'Nghiệp vụ bồi thường XCG hiện đang áp dụng những văn bản pháp luật nào?',
+  k: ['văn bản pháp luật', 'căn cứ pháp lý', 'luật nào', 'nghị định nào', 'thông tư nào', 'danh mục văn bản', 'hệ thống văn bản', 'cơ sở pháp lý bồi thường'],
+  a: `Các văn bản pháp luật nền cho nghiệp vụ giám định – bồi thường xe cơ giới:
+|Văn bản|Nội dung|Hiệu lực|
+|**Luật KDBH 08/2022/QH15**|Hợp đồng bảo hiểm, quyền & nghĩa vụ các bên, thời hạn bồi thường|01/01/2023|
+|**Luật 139/2025/QH15** sửa đổi Luật KDBH|Chủ yếu về tổ chức, hoạt động DNBH|01/01/2026 (khoản 6 & 8 Điều 2: 01/07/2026)|
+|**Văn bản hợp nhất 31/VBHN-VPQH**|Bản hợp nhất Luật KDBH 2022 + Luật 139/2025 — **dùng bản này để tra điều luật**|—|
+|**NĐ 67/2023/NĐ-CP**|BH bắt buộc TNDS chủ xe cơ giới, BH cháy nổ bắt buộc, BH bắt buộc trong xây dựng|06/09/2023|
+|**NĐ 220/2026/NĐ-CP**|Sửa đổi NĐ 67/2023 (phần xây dựng + đổi thuật ngữ)|01/07/2026|
+|**TT 67/2023/TT-BTC**|Hướng dẫn thi hành Luật KDBH|—|
+|**NĐ 46/2023/NĐ-CP**|Quy định chi tiết thi hành một số điều Luật KDBH|—|
+|**Bộ luật Dân sự 91/2015/QH13**|Bồi thường thiệt hại ngoài hợp đồng, nguồn nguy hiểm cao độ (Điều 601)|01/01/2017|
+- Văn bản **nội bộ PTI** (QT PTI.XCG.20, Quy tắc QĐ 109/2025, QĐ 110/2025 và các phụ lục) chi tiết hoá pháp luật để áp dụng — khi giải quyết hồ sơ **ưu tiên quy trình và quy tắc PTI**, đối chiếu luật khi có tranh chấp hoặc khi quy trình chưa quy định.
+!! **Bảo hiểm bắt buộc TNDS chủ xe cơ giới** là 1 trong các loại bảo hiểm bắt buộc theo **Điều 8 Luật KDBH** — không được thoả thuận khác so với NĐ 67/2023.`,
+  s: 'Văn bản hợp nhất 31/VBHN-VPQH (Luật KDBH) – Điều 8; NĐ 67/2023/NĐ-CP; NĐ 220/2026/NĐ-CP; BLDS 91/2015/QH13', r: ['pl-lkdbh', 'pl-nd220', 'pl-blds601'] },
+
+{ id: 'pl-lkdbh', g: 'phaply',
+  q: 'Luật Kinh doanh bảo hiểm có những điều nào giám định viên phải nhớ?',
+  k: ['luật kinh doanh bảo hiểm', 'LKDBH', 'luật 08/2022', 'điều 19', 'điều 30', 'điều 31', 'điều 46', 'thời hạn nộp hồ sơ yêu cầu bồi thường', 'nộp hồ sơ yêu cầu bồi thường trong bao lâu', 'nộp hồ sơ bồi thường muộn nhất', 'thời hiệu yêu cầu bồi thường', '01 năm kể từ ngày xảy ra sự kiện bảo hiểm', 'bao lâu phải trả tiền bảo hiểm', 'chậm trả phải trả lãi', 'loại trừ phải giải thích', 'bằng chứng giải thích loại trừ', 'chậm thông báo tổn thất'],
+  a: `4 điều của Luật KDBH mà GĐV hay phải viện dẫn (theo VBHN 31/VBHN-VPQH):
+**Điều 19 – Điều khoản loại trừ trách nhiệm bảo hiểm**
+- DNBH phải quy định rõ trong HĐBH, phải **giải thích rõ ràng, đầy đủ** và **có bằng chứng xác nhận** bên mua đã được giải thích và hiểu rõ khi giao kết.
+- Có **sự kiện bất khả kháng hoặc trở ngại khách quan** dẫn đến bên mua chậm thông báo sự kiện bảo hiểm → DNBH **không được áp dụng** điều khoản loại trừ về việc chậm thông báo.
+**Điều 30 – Thời hạn nộp hồ sơ yêu cầu bồi thường**: **01 năm** kể từ ngày xảy ra sự kiện bảo hiểm; không tính thời gian bất khả kháng/trở ngại khách quan. Nếu NĐBH/người thụ hưởng chứng minh được **không biết** thời điểm xảy ra sự kiện → tính từ ngày biết. Nếu **bên thứ ba yêu cầu bên mua BH bồi thường** → tính từ ngày bên thứ ba yêu cầu.
+**Điều 31 – Thời hạn bồi thường, trả tiền bảo hiểm**: theo thời hạn thoả thuận trong HĐBH; **không có thoả thuận** thì **15 ngày** kể từ ngày nhận đủ hồ sơ hợp lệ. **Chậm trả phải trả lãi** trên số tiền chậm trả tương ứng thời gian chậm, lãi suất theo thoả thuận và quy định Bộ luật Dân sự.
+**Điều 46 – Thông báo khi sự kiện bảo hiểm xảy ra**: bên mua không thực hiện/chậm thực hiện nghĩa vụ thông báo → DNBH có quyền **giảm trừ số tiền bồi thường tương ứng với thiệt hại DNBH phải chịu**, trừ bất khả kháng/trở ngại khách quan. **Không được áp dụng** nếu HĐBH **không có thoả thuận** về trách nhiệm thông báo và chế tài.
+!! Luật KDBH **không quy định "thời hiệu 3 năm"** cho yêu cầu bồi thường — mốc trong Luật là **01 năm nộp hồ sơ (Điều 30)**. Thời hiệu khởi kiện là quy định của Bộ luật Dân sự / Quy tắc bảo hiểm, đừng nhầm hai mốc này.`,
+  s: 'Văn bản hợp nhất 31/VBHN-VPQH (Luật KDBH 08/2022/QH15, sửa đổi bởi Luật 139/2025/QH15) – Điều 19, 30, 31, 46', r: ['pl-vanban', 'qt-thoihan', 'dg-giamtru', 'sb-khieunai'] },
+
+{ id: 'pl-nd220', g: 'phaply',
+  q: 'Nghị định 220/2026/NĐ-CP sửa Nghị định 67/2023 có ảnh hưởng đến bồi thường TNDS xe cơ giới không?',
+  k: ['nghị định 220', 'NĐ 220/2026', '220/2026', 'sửa nghị định 67', 'nghị định 67 còn hiệu lực', 'bên thứ ba', 'người thứ ba đổi tên', 'bên thứ ba hay người thứ ba', 'gọi là bên thứ ba', 'đổi thuật ngữ người thứ ba', 'mức trách nhiệm có thay đổi', 'hiệu lực 01/07/2026'],
+  a: `**NĐ 220/2026/NĐ-CP ngày 22/06/2026**, hiệu lực **01/07/2026**, sửa đổi – bổ sung một số điều của NĐ 67/2023/NĐ-CP.
+**Phần nội dung được sửa (Điều 1–8) chỉ liên quan bảo hiểm bắt buộc công trình trong hoạt động xây dựng**: Điều 32 (đối tượng BH), 33 (số tiền BH tối thiểu), 34 (bổ sung loại trừ mục rữa, kết tạo vảy cứng), 37 (mức phí & mức khấu trừ, giới hạn tăng/giảm phí tối đa 25%), 38 (trách nhiệm mua BH), 45, 58, cùng Phụ lục III và Mẫu số 3 Phụ lục X.
+**Phần ảnh hưởng đến nghiệp vụ xe cơ giới — chỉ là thuật ngữ:** Điều 9 thay cụm từ **"người thứ ba" → "bên thứ ba"** tại nhiều điều của NĐ 67/2023, trong đó có các điều thuộc chương TNDS chủ xe cơ giới: khoản 5 Điều 3, Điều 5, điểm a khoản 1 Điều 7, điểm d khoản 2 Điều 10, khoản 2 và điểm a khoản 6 Điều 12, khoản 5 Điều 13.
+|Nội dung|Sau 01/07/2026|
+|Mức trách nhiệm BH bắt buộc TNDS (150 triệu/người/vụ về người; 100 triệu/vụ về tài sản)|**Không thay đổi**|
+|Phạm vi, loại trừ, tạm ứng, hồ sơ bồi thường TNDS (Điều 7, 12, 13 NĐ 67)|**Không thay đổi nội dung**, chỉ đổi cách gọi bên thứ ba|
+|Thời hạn, thủ tục giải quyết bồi thường TNDS|**Không thay đổi**|
+- HĐBH đã giao kết **trước 01/07/2026** và còn thời hạn → tiếp tục thực hiện theo thoả thuận trong HĐBH, trừ khi các bên thoả thuận sửa đổi, bổ sung.
+!! Văn bản, biểu mẫu nội bộ PTI vẫn dùng "người thứ ba"/"NT3". Khi **trích dẫn NĐ 67/2023 trong công văn, tờ trình từ 01/07/2026** nên dùng đúng thuật ngữ **"bên thứ ba"** của văn bản hiện hành.`,
+  s: 'NĐ 220/2026/NĐ-CP ngày 22/06/2026 – Điều 1–9 và Điều 10 (điều khoản thi hành)', r: ['td-mtn', 'td-nt3', 'pl-vanban'] },
+
+{ id: 'pl-blds601', g: 'phaply',
+  q: 'Nguồn nguy hiểm cao độ là gì? Chủ xe phải bồi thường cả khi không có lỗi đúng không?',
+  k: ['nguồn nguy hiểm cao độ', 'điều 601', 'BLDS', 'bộ luật dân sự', 'bồi thường khi không có lỗi', 'trách nhiệm chủ xe không lỗi', 'phương tiện giao thông vận tải cơ giới', 'lỗi cố ý của người bị thiệt hại', 'bất khả kháng tình thế cấp thiết'],
+  a: `**Điều 601 Bộ luật Dân sự 2015** — cơ sở pháp lý của trách nhiệm dân sự chủ xe cơ giới:
+- **Nguồn nguy hiểm cao độ** bao gồm **phương tiện giao thông vận tải cơ giới**, hệ thống tải điện, nhà máy công nghiệp đang hoạt động, vũ khí, chất nổ, chất cháy, chất độc, chất phóng xạ, thú dữ và các nguồn khác do pháp luật quy định. Chủ sở hữu phải vận hành, sử dụng, bảo quản, trông giữ, vận chuyển đúng quy định.
+- **Chủ sở hữu** phải bồi thường thiệt hại do nguồn nguy hiểm cao độ gây ra; nếu đã **giao cho người khác chiếm hữu, sử dụng** thì **người đó** phải bồi thường, trừ trường hợp có thoả thuận khác.
+- Chủ sở hữu, người chiếm hữu, sử dụng phải bồi thường **cả khi không có lỗi**, trừ hai trường hợp:
+  a) Thiệt hại xảy ra **hoàn toàn do lỗi cố ý của người bị thiệt hại**;
+  b) Thiệt hại xảy ra trong trường hợp **bất khả kháng hoặc tình thế cấp thiết**, trừ khi pháp luật có quy định khác.
+- Nguồn nguy hiểm cao độ bị **chiếm hữu, sử dụng trái pháp luật** → người đang chiếm hữu, sử dụng trái pháp luật phải bồi thường; nếu chủ sở hữu/người chiếm hữu **có lỗi trong việc để bị chiếm hữu, sử dụng trái pháp luật** thì **liên đới** bồi thường.
+!! Đây là lý do một vụ tai nạn vẫn phát sinh trách nhiệm bồi thường TNDS cho bên thứ ba **kể cả khi lái xe không có lỗi** — khác với bảo hiểm vật chất xe (xét theo phạm vi và loại trừ của Quy tắc). Khi phân lỗi, hai chuyện cần tách: **lỗi vi phạm giao thông** và **trách nhiệm bồi thường dân sự**.`,
+  s: 'Bộ luật Dân sự 91/2015/QH13 – Điều 601 (Bồi thường thiệt hại do nguồn nguy hiểm cao độ gây ra)', r: ['nt3-nguyentac', 'td-nt3', 'pl-vanban'] }
+);
+
+/* ─── 13. TÌNH HUỐNG THỰC TẾ (sổ tay thực hành — tham khảo, v: 0) ─── */
+TL_KB.push(
+{ id: 'th-tiepnhan', g: 'tinhhuong',
+  q: 'Khách báo tổn thất chậm, xe đã sửa hoặc đã tháo rã trước giám định thì xử lý thế nào?',
+  k: ['báo chậm', 'báo tổn thất muộn', 'xe đã sửa trước giám định', 'tháo rã trước giám định', 'tai nạn trước ngày hiệu lực', 'hết hạn bảo hiểm', 'chưa giám định đã sửa'],
+  a: `|Tình huống|Kiểm tra|Hướng xử lý|
+|Báo tổn thất chậm|Thời gian báo · lý do chậm · ảnh/video · lịch sử sửa chữa · nhân chứng · khả năng kiểm chứng hiện trường|Vẫn tiếp nhận và giám định. **Không tự động từ chối chỉ vì báo chậm** — đối chiếu nghĩa vụ thông báo trong HĐBH và xét mức giảm trừ|
+|Xe đã sửa trước khi giám định|Ảnh/video trước sửa · phụ tùng tháo ra · hoá đơn, báo giá · hồ sơ và lịch sửa của garage|Chỉ xem xét phần **có đủ căn cứ** về nguyên nhân và mức độ; ghi rõ phần không thể xác minh|
+|Chủ xe tự tháo rã xe|Ai tháo, thời điểm, mục đích · ảnh trước tháo · phụ tùng đã tháo|Ghi nhận hiện trạng sau tháo rã, yêu cầu garage **bảo quản phụ tùng**. Không mặc nhiên chấp nhận toàn bộ báo giá tháo rã|
+|Tai nạn xảy ra **trước ngày hiệu lực**|Thời điểm sự kiện bảo hiểm thực tế so với thời điểm bắt đầu trách nhiệm bảo hiểm|Tổn thất trước khi trách nhiệm phát sinh → **không thuộc trách nhiệm** của hợp đồng đó|
+|Xe đã hết hạn bảo hiểm|Thời điểm tai nạn · thời điểm hết hạn · thời điểm cấp/tái tục|Xác định bằng chứng cứ, **không căn cứ đơn thuần vào thời điểm khách khai báo**|
+!! Nguyên tắc chung: không kết luận chỉ từ lời khai hoặc báo giá — luôn đối chiếu hợp đồng, chứng cứ vật chất, nguyên nhân và quy định áp dụng.`,
+  s: 'Bộ Q&A 300 tình huống giám định – bồi thường XCG (nhóm 01) và tài liệu Nhóm tình huống thực tế GĐBT bảo hiểm xe cơ giới — sổ tay thực hành, không phải văn bản PTI', r: ['ht-xacminh', 'dg-giamtru', 'gd-tailieu'], v: 0 },
+
+{ id: 'th-nguyennhan', g: 'tinhhuong',
+  q: 'Xác định nguyên nhân tai nạn: xe đâm đuôi, mất lái, nổ lốp, cây đổ vào xe?',
+  k: ['nguyên nhân tai nạn', 'đâm đuôi xe trước', 'mất lái', 'nổ lốp', 'cây đổ vào xe', 'tự đâm vào tường', 'dựng lại diễn biến', 'quan hệ nhân quả'],
+  a: `|Tình huống|Phải làm rõ|
+|Xe đâm vào xe phía trước|Khoảng cách · tốc độ · hướng di chuyển · trạng thái dừng/chạy của xe trước · tín hiệu chuyển hướng · camera · dấu vết phanh · vị trí va chạm · lời khai · hồ sơ CQCN. **Không mặc nhiên kết luận xe sau sai hoàn toàn** chỉ dựa vào vị trí va chạm|
+|Xe tự đâm vào tường, vật cố định|Có thuộc rủi ro đâm va/lật/đổ trong HĐBH không; có thuộc loại trừ không; **loại trừ khả năng cố ý** gây thiệt hại|
+|Xe mất lái|Nguyên nhân mất lái: lỗi kỹ thuật · nổ lốp · mặt đường · người điều khiển · tác động của phương tiện khác. **Không kết luận "tai nạn giao thông" chỉ từ lời khai lái xe**|
+|Nổ lốp gây tai nạn|Giám định lốp: tuổi lốp · độ mòn · áp suất · dấu va đập · vết thủng · tình trạng thành lốp. Sau đó mới đánh giá **quan hệ nhân quả** giữa lốp và tai nạn|
+|Cây đổ vào xe đang chạy|Xác định **rủi ro thực tế gây tổn thất** và đối chiếu phạm vi bảo hiểm, không chỉ dựa vào việc xe có đang tham gia giao thông hay không|
+|Một xe có **hai vùng va chạm** trước và sau|Không mặc nhiên coi cả hai thuộc cùng một tai nạn — xác định diễn biến và thời điểm từng va chạm|
+|Tai nạn liên hoàn A → B → C|Dựng lại diễn biến và gán tổn thất của từng xe tương ứng **từng lần tác động**|`,
+  s: 'Bộ Q&A 300 tình huống giám định – bồi thường XCG (nhóm 03) và tài liệu Nhóm tình huống thực tế GĐBT bảo hiểm xe cơ giới — sổ tay thực hành, không phải văn bản PTI', r: ['nt3-nguyentac', 'nt3-damduoi', 'ht-kiemtra'], v: 0 },
+
+{ id: 'th-ngapnuoc', g: 'tinhhuong',
+  q: 'Tình huống xe ngập nước, thuỷ kích cần kiểm tra và kết luận thế nào?',
+  k: ['ngập nước tình huống', 'thủy kích', 'thuỷ kích', 'cố đề máy', 'khởi động lại khi ngập', 'ngập đến nóc', 'cứu hộ kéo ra khỏi vùng ngập', 'dầu động cơ có nước', 'tháo lọc gió'],
+  a: `|Tình huống|Kiểm tra|Kết luận|
+|Xe đi vào vùng ngập rồi chết máy|Mức nước ngập · vị trí xe chết máy · **có tiếp tục đề máy không** · dấu nước khoang máy · tháo lọc gió · dầu động cơ có nước không · hư hỏng có phù hợp diễn biến không|Xác định ngập nước đơn thuần hay **thuỷ kích do khởi động lại**|
+|Chủ xe **cố đề máy nhiều lần** sau khi ngập|Hành vi đề máy có làm **phát sinh hoặc gia tăng** thiệt hại không|Đối chiếu điều khoản về **nghĩa vụ hạn chế tổn thất** và loại trừ liên quan|
+|Xe bị thuỷ kích|Quy tắc/điều khoản cụ thể của hồ sơ · nguyên nhân · diễn biến tổn thất|**Không mặc nhiên từ chối**; PTI có ĐKBS về ngập nước (xem BS06)|
+|Xe ngập đến nóc nhưng động cơ vẫn hoạt động|ECU · giắc điện · mô tơ điện · hộp số · dầu máy · dầu hộp số · hệ thống điện · dấu nước trong cabin|Kiểm tra thực tế, **không chỉ dựa vào lời khai**|
+|Đã cứu hộ kéo ra khỏi vùng ngập rồi mới báo|Quá trình cứu hộ · vị trí ban đầu · mực nước · tình trạng xe trước/sau cứu hộ|Vẫn phải giám định; ghi nhận chứng cứ có được|
+- Tại hiện trường: ghi nhận **mực nước, thời điểm, vị trí đậu xe**; chụp vết nước trên thân xe, nội thất, khoang máy; **nhắc chủ xe không khởi động lại**, kéo xe về gara.
+- Xe có ECU, hộp số, hệ thống điện: đánh giá **khả năng phục hồi** trước khi quyết định thay thế.`,
+  s: 'Bộ Q&A 300 tình huống giám định – bồi thường XCG (nhóm 04) và tài liệu Nhóm tình huống thực tế GĐBT bảo hiểm xe cơ giới — sổ tay thực hành, không phải văn bản PTI', r: ['gd-ngapnuoc', 'qt-bs06'], v: 0 },
+
+{ id: 'th-chayno', g: 'tinhhuong',
+  q: 'Xe cháy khi đang đỗ, cháy sau khi độ điện, cháy toàn bộ thì giám định thế nào?',
+  k: ['cháy khi đang đỗ', 'cháy sau khi độ điện', 'độ thiết bị điện', 'điểm phát cháy', 'PCCC', 'cháy toàn bộ còn VIN', 'nguyên nhân cháy'],
+  a: `|Tình huống|Kiểm tra|Kết luận|
+|Xe cháy khi đang đỗ|Điểm phát cháy · nguyên nhân · hệ thống điện · nhiên liệu · nguồn nhiệt bên ngoài · lịch sử sửa chữa · can thiệp hệ thống điện · camera|Đề nghị biên bản của **công an PCCC** hoặc cơ quan chức năng về nguyên nhân cháy|
+|Xe cháy sau khi **độ thêm thiết bị điện**|Mối **quan hệ nhân quả** giữa thiết bị độ và đám cháy|**Không phải cứ "độ điện" là loại trừ toàn bộ** — phải chứng minh nhân quả|
+|Xe cháy toàn bộ, còn xác định được VIN|VIN · số máy · đăng ký · ảnh trước cháy · hồ sơ bảo hiểm · hiện trường · kết luận nguyên nhân cháy|Đủ căn cứ xác định đối tượng bảo hiểm để xét tổn thất toàn bộ|
+- Phân biệt: cháy do **sự cố điện** · cháy do **va chạm** · cháy do **tự huỷ hoặc cố ý**.
+- Chụp ảnh **vết cháy và điểm khởi phát**; thu thập hồ sơ bảo dưỡng gần nhất và phụ kiện độ thêm có liên quan.`,
+  s: 'Bộ Q&A 300 tình huống giám định – bồi thường XCG (nhóm 05) và tài liệu Nhóm tình huống thực tế GĐBT bảo hiểm xe cơ giới — sổ tay thực hành, không phải văn bản PTI', r: ['gd-chay', 'dg-toanbo'], v: 0 },
+
+{ id: 'th-suachua', g: 'tinhhuong',
+  q: 'Khi nào sửa chữa, khi nào thay mới? Garage đề nghị thay cả cụm thì sao?',
+  k: ['sửa hay thay', 'thay mới phụ tùng', 'móp có phải thay không', 'cản trước xước nhẹ', 'đèn pha nứt', 'túi khí bung', 'cảm biến ADAS', 'thay cả cụm', 'gãy ngàm cản'],
+  a: `Nguyên tắc: **ưu tiên sửa chữa** khi khả thi về kỹ thuật, an toàn và chi phí hợp lý so với thay mới. Chỉ thay mới khi **không thể sửa**, **sửa không bảo đảm kỹ thuật**, **ảnh hưởng an toàn** (khung xương, hệ thống lái, phanh, túi khí), **chi phí sửa gần bằng thay mới**, hoặc hợp đồng/điều khoản quy định khác.
+|Tình huống|Kiểm tra|
+|Chi tiết bị móp|Khả năng nắn, gò, phục hồi đạt yêu cầu kỹ thuật|
+|Cản trước xước nhẹ, garage đề nghị thay cả cản|Đánh giá khả năng sửa chữa thực tế — **không mặc nhiên chấp nhận báo giá garage**|
+|Xước cản nhựa, gãy ngàm cản|Biến dạng · khả năng phục hồi · khả năng sửa ngàm và độ chắc chắn. Thay khi không bảo đảm kỹ thuật|
+|Đèn pha nứt nhưng vẫn sáng|Vị trí và mức độ nứt · khả năng chống nước · kết cấu · chức năng · hướng dẫn của nhà sản xuất · điều khoản bảo hiểm|
+|Túi khí bung|**Không kết luận theo "combo" cố định** — kiểm tra hệ thống SRS, xác định bộ phận thực tế bị kích hoạt/hư hỏng|
+|Va chạm nhẹ, garage báo thay cảm biến ADAS|Vị trí cảm biến · mã lỗi · dữ liệu chẩn đoán · giá trị hiệu chuẩn · hướng dẫn sửa chữa của hãng · khả năng ảnh hưởng sau va chạm|
+|Garage yêu cầu thay cả cụm|Kiểm tra khả năng sửa hoặc thay **từng chi tiết** trong cụm|
+- Ghi rõ **lý do từng hạng mục** trong biên bản giám định để có căn cứ duyệt giá.`,
+  s: 'Bộ Q&A 300 tình huống giám định – bồi thường XCG (nhóm 06) và tài liệu Nhóm tình huống thực tế GĐBT bảo hiểm xe cơ giới — sổ tay thực hành, không phải văn bản PTI', r: ['gd-bienban', 'dg-bangke', 'dg-chaogia'], v: 0 },
+
+{ id: 'th-phutung', g: 'tinhhuong',
+  q: 'Chủ xe đòi phụ tùng chính hãng, xe cũ đòi thay mới toàn bộ thì trả lời thế nào?',
+  k: ['phụ tùng chính hãng', 'OEM', 'aftermarket', 'phụ tùng tương đương', 'xe 8 năm', 'giá phụ tùng mới', 'garage báo giá cao', 'đối chiếu giá thị trường'],
+  a: `|Tình huống|Căn cứ trả lời|
+|Chủ xe yêu cầu **tất cả phụ tùng chính hãng**|Không trả lời "có/không" chung chung — căn cứ HĐBH, quy tắc, thoả thuận về phụ tùng, tình trạng xe, chính sách doanh nghiệp, khả năng cung ứng, nguyên tắc bồi thường. Ở PTI: xem **BS05** (sửa chữa chính hãng) và **BS26** (phụ tùng chính hãng)|
+|Phụ tùng thay thế có được tính **100% giá mới**|Căn cứ phương thức tính bồi thường và điều khoản khấu hao — **không mặc nhiên lấy giá niêm yết phụ tùng mới** làm số tiền bồi thường. Xem **BS02** (thay thế mới)|
+|Xe đã dùng 8 năm, chủ xe đòi thay mới toàn bộ|Kiểm tra điều khoản về **khấu hao/thay mới** và nguyên tắc bồi thường — đây là điểm rất dễ tranh chấp, phải giải thích trước khi sửa|
+|Garage báo giá cao hơn thị trường|Đối chiếu **giá phụ tùng · công sửa chữa · vật tư · thời gian sửa · chính sách hãng · nguồn báo giá · giá tại khu vực**. **Không chỉ lấy một báo giá duy nhất**|
+|Xe còn trong thời gian bảo hành|Thường được thay chính hãng theo điều khoản; xe cũ có thể thoả thuận phụ tùng tương đương|
+- Phụ tùng thay thế phải có **hoá đơn, chứng từ nguồn gốc**.
+- Ghi nhận chênh lệch giá và cách thống nhất với garage, chủ xe **trước khi sửa chữa**.`,
+  s: 'Bộ Q&A 300 tình huống giám định – bồi thường XCG (nhóm 06) và tài liệu Nhóm tình huống thực tế GĐBT bảo hiểm xe cơ giới — sổ tay thực hành, không phải văn bản PTI', r: ['qt-bs02', 'qt-bs05', 'dg-khauhao', 'dg-chaogia'], v: 0 },
+
+{ id: 'th-dongson', g: 'tinhhuong',
+  q: 'Sơn chuyển vùng, sơn cả bên xe, vật tư phụ tính thế nào?',
+  k: ['đồng sơn', 'sơn chuyển vùng', 'sơn cả bên xe', 'màu xe khó pha', 'sơn dặm', 'vật tư phụ', 'nóc xe xước nhẹ', 'đánh bóng', 'tính trùng công sơn'],
+  a: `|Tình huống|Kiểm tra|Kết luận|
+|Một cánh cửa móp nhẹ, garage đề nghị **sơn cả bên xe**|Vùng ảnh hưởng thực tế · kỹ thuật sơn · yêu cầu chuyển màu|Chỉ chấp nhận sơn chuyển vùng khi **có căn cứ kỹ thuật/thẩm mỹ**, không mặc nhiên sơn toàn bên|
+|Garage tính **sơn toàn bộ xe** vì màu khó pha|Yêu cầu kỹ thuật thực tế · khả năng pha màu · phương án chuyển vùng|Chọn phương án kỹ thuật phù hợp, không mặc nhiên chấp nhận|
+|Sơn dặm không đồng màu|Khả năng pha màu và kỹ thuật chuyển vùng|Xác định lại phương án sơn|
+|Nóc xe xước nhẹ|Độ sâu vết xước · khả năng **đánh bóng hoặc sơn cục bộ**|Không thay mới nếu chỉ cần xử lý bề mặt|
+|Thay nắp capo cần sơn|Mã phụ tùng · chi phí sơn hợp lý|**Không tính trùng công sơn** (phụ tùng đã sơn sẵn)|
+|Chi phí **vật tư phụ** tính riêng|Có thuộc phương án sửa chữa và được HĐBH/quy tắc, quy trình cho phép không|Có thể chấp nhận nhưng phải **tránh tính trùng** với đơn giá công sơn/sửa chữa|
+- Kiểm tra **định mức công** (giờ công sửa chữa, sơn theo diện tích và loại sơn), loại bỏ hạng mục trùng lặp hoặc không liên quan đến vụ tổn thất.`,
+  s: 'Bộ Q&A 300 tình huống giám định – bồi thường XCG (nhóm 07) và tài liệu Nhóm tình huống thực tế GĐBT bảo hiểm xe cơ giới — sổ tay thực hành, không phải văn bản PTI', r: ['dg-bangke', 'dg-chaogia'], v: 0 },
+
+{ id: 'th-tonthatcu', g: 'tinhhuong',
+  q: 'Tổn thất cũ nằm cạnh tổn thất mới, tổn thất ẩn sau khi tháo thì xử lý ra sao?',
+  k: ['tổn thất cũ', 'tổn thất ẩn', 'vết xước mới đè vết cũ', 'móp cũ cạnh vết mới', 'phát sinh sau khi tháo cản', 'giám định bổ sung', 'hạng mục phát sinh'],
+  a: `|Tình huống|Cách xử lý|
+|Vết móp cũ ngay cạnh vết tai nạn mới|**Phân tách** tổn thất mới ↔ tổn thất đã tồn tại trước tai nạn; chỉ đưa phần phù hợp với sự kiện bảo hiểm vào phạm vi xem xét|
+|Vết xước mới **đè lên** vết xước cũ|Phân tích: màu · độ sâu · hướng · lớp sơn · biến dạng · dấu ma sát · vị trí tương quan. Nếu cần, dùng phương pháp giám định/chẩn đoán chuyên môn|
+|Phát hiện **tổn thất ẩn** sau khi tháo cản|Có thể giám định bổ sung, nhưng phải chứng minh tổn thất ẩn: **nằm trong vùng va chạm · phù hợp lực va chạm · chưa tồn tại trước đó · có quan hệ nhân quả** với sự kiện bảo hiểm|
+|Garage sửa thêm nhiều hạng mục sau giám định lần đầu|Lập **hồ sơ bổ sung**: hạng mục do tai nạn → có căn cứ bảo hiểm; hạng mục phát sinh khác → **không mặc nhiên** đưa vào hồ sơ|
+|Garage tháo xe **không thông báo** giám định viên|Yêu cầu bảo quản phụ tùng và hình ảnh quá trình tháo rã; ghi rõ phần **không đủ căn cứ** xác định nguyên nhân/mức độ|
+- Garage phải **báo ngay** khi phát sinh; GĐV kiểm tra lại và **chụp ảnh trước khi sửa tiếp**; lập biên bản giám định bổ sung. **Không chấp nhận hạng mục phát sinh đã sửa xong mà chưa được xác nhận.**`,
+  s: 'Bộ Q&A 300 tình huống giám định – bồi thường XCG (nhóm 08) và tài liệu Nhóm tình huống thực tế GĐBT bảo hiểm xe cơ giới — sổ tay thực hành, không phải văn bản PTI', r: ['ct-giamsat', 'gd-bienban'], v: 0 },
+
+{ id: 'th-tndsbb', g: 'tinhhuong',
+  q: 'Tình huống hay gặp khi giải quyết TNDS bắt buộc của chủ xe?',
+  k: ['tình huống TNDS', 'chưa có biên bản công an', 'hồ sơ TNDS thiếu giấy tờ', 'nhiều bên cùng có lỗi', 'hành khách trên xe', 'xe kinh doanh vận tải TNDS', 'quỹ bảo hiểm xe cơ giới'],
+  a: `|Tình huống|Hướng xử lý|
+|**Chưa có biên bản công an**, có giám định được không|Vẫn nên giám định thiệt hại ngay để không bỏ lỡ hiện trường, nhưng **ghi rõ trong biên bản** rằng nguyên nhân và lỗi **chưa được xác định**. Vụ có người chết hoặc bị thương: **bắt buộc** phối hợp và lấy kết luận/biên bản của công an trước khi chốt số tiền|
+|Hồ sơ thiếu giấy tờ|Thông báo **bằng văn bản** danh mục còn thiếu, nêu rõ hạn bổ sung, **lưu bằng chứng ngày gửi**. Thời hạn giải quyết tính từ khi nhận **đủ hồ sơ hợp lệ**. Không từ chối chỉ vì thiếu giấy tờ khi có thể xác minh bằng nguồn khác đáng tin cậy|
+|Tai nạn liên hoàn, **nhiều bên cùng có lỗi**|Xác định tỷ lệ lỗi theo biên bản công an; mỗi DNBH chỉ bồi thường phần thuộc trách nhiệm của xe mình bảo hiểm. Vật chất xe vẫn bồi thường cho xe mình rồi **thế quyền** đòi bên có lỗi. Phối hợp với DNBH khác để **tránh bồi thường trùng**|
+|Xe **kinh doanh vận tải** (taxi, xe công nghệ, chở khách, chở hàng)|Phải đúng **mục đích sử dụng** ghi trên GCNBH — xe cá nhân chạy dịch vụ không khai báo có thể bị từ chối vì **thay đổi rủi ro**. Kiểm tra phù hiệu, hợp đồng vận chuyển, số khách thực tế, tải trọng thực tế|
+|Tạm ứng rồi mới xác định thuộc loại trừ|Khoản đã tạm ứng được **Quỹ bảo hiểm xe cơ giới hoàn trả** cho doanh nghiệp bảo hiểm|
+!! Mức trách nhiệm, phạm vi, loại trừ và hồ sơ TNDS bắt buộc phải lấy theo **NĐ 67/2023/NĐ-CP** (từ 01/07/2026 dùng thuật ngữ "bên thứ ba" theo NĐ 220/2026) — không lấy quy định của bảo hiểm vật chất xe áp sang.`,
+  s: 'Bộ Q&A 300 tình huống giám định – bồi thường XCG (nhóm 09) và tài liệu Nhóm tình huống thực tế GĐBT bảo hiểm xe cơ giới — sổ tay thực hành, không phải văn bản PTI; mức và thủ tục theo NĐ 67/2023', r: ['td-mtn', 'td-hoso', 'td-hoanung', 'pl-nd220'], v: 0 },
+
+{ id: 'th-nguoilai', g: 'tinhhuong',
+  q: 'Nồng độ cồn, ma tuý, không có hoặc hết hạn GPLX thì kết luận thế nào?',
+  k: ['nồng độ cồn tình huống', 'ma túy', 'chất kích thích', 'không có GPLX', 'GPLX hết hạn', 'bằng không phù hợp hạng xe', 'vi phạm người lái'],
+  a: `Đây là nhóm **phải tách rõ bảo hiểm vật chất xe và TNDS bắt buộc** — không trả lời chung cho cả hai.
+|Tình huống|Vật chất xe (tự nguyện)|TNDS bắt buộc|
+|Lái xe có **nồng độ cồn**|Phần lớn quy tắc loại trừ khi nồng độ cồn vượt mức luật định và liên quan đến tai nạn; cần **biên bản công an hoặc kết quả đo** làm căn cứ. Kiểm tra đúng điều khoản loại trừ của **hợp đồng đang giải quyết**|Không tự suy ra loại trừ — phải kiểm tra danh mục loại trừ hiện hành tại NĐ 67/2023|
+|Lái xe **không có GPLX**|Xác định loại xe · GPLX cần thiết · người lái có GPLX không · GPLX có phù hợp hạng xe · còn hiệu lực · tình trạng pháp lý **tại thời điểm tai nạn**|Thuộc nhóm loại trừ của NĐ 67/2023 — đối chiếu điều khoản trước khi từ chối|
+|**GPLX hết hạn**|Kiểm tra riêng điều khoản bảo hiểm và quy định pháp luật **áp dụng tại thời điểm tai nạn**|Như trên|
+- Ở PTI, lái xe **không chịu xét nghiệm** nồng độ cồn/chất kích thích theo yêu cầu thuộc nhóm bị **giảm trừ 50–100%** theo Quy tắc VCX (Điều 12).
+!! Không kết luận loại trừ chỉ từ lời khai hoặc từ việc có nồng độ cồn — phải có **căn cứ đo/biên bản** và phải xét **quan hệ với tai nạn** theo đúng câu chữ điều khoản.`,
+  s: 'Bộ Q&A 300 tình huống giám định – bồi thường XCG (nhóm 10) và tài liệu Nhóm tình huống thực tế GĐBT bảo hiểm xe cơ giới — sổ tay thực hành, không phải văn bản PTI', r: ['qt-con', 'gd-gplx', 'td-loaitru', 'dg-giamtru'], v: 0 },
+
+{ id: 'th-matcap', g: 'tinhhuong',
+  q: 'Xe bị mất trộm, mất cả hai chìa khoá, tổn thất toàn bộ thì xử lý thế nào?',
+  k: ['mất trộm xe', 'mất cắp ô tô', 'mất hai chìa khóa', 'tổn thất toàn bộ khi nào', 'chi phí sửa gần bằng giá trị xe', 'giá trị thu hồi', '75% giá trị xe', 'xác xe'],
+  a: `|Tình huống|Kiểm tra|Kết luận|
+|Xe bị mất trộm|Thời điểm mất · chìa khoá · hệ thống khoá · camera · GPS · trình báo công an · giấy tờ xe · lịch sử sử dụng xe|Chỉ bồi thường khi HĐBH có rủi ro **mất cắp/mất toàn bộ** phù hợp|
+|Chủ xe mất **cả hai chìa khoá**|Nguyên nhân mất xe và khả năng kiểm soát chìa khoá|**Không vì mất chìa khoá mà kết luận gian lận**, nhưng là tình tiết cần xác minh|
+|Khi nào là **tổn thất toàn bộ**|Căn cứ điều khoản HĐBH/quy tắc và phương pháp xác định tổn thất toàn bộ của doanh nghiệp|**Không dùng một tỷ lệ cố định cho mọi hợp đồng** — nhiều nơi dùng mức 75% giá trị xe nhưng phải đối chiếu từng hợp đồng|
+|Chi phí sửa gần bằng giá trị xe|So sánh **chi phí sửa chữa hợp lý** với giá trị bảo hiểm/giá trị thị trường/giới hạn trách nhiệm theo hợp đồng|Áp dụng đúng quy tắc bảo hiểm đang áp dụng cho hồ sơ|
+- Hồ sơ mất cắp/mất cướp: **giấy trình báo, giấy xác nhận tiếp nhận tin báo của công an**, thông báo xe chưa tìm thấy sau thời hạn điều tra; chìa khoá, đăng ký xe bản gốc, giấy tờ chứng minh quyền sở hữu.
+- Bồi thường toàn bộ: chủ xe **chuyển quyền sở hữu** (hoặc quyền đòi lại) cho DNBH; xác xe thuộc DNBH sau khi bồi thường, phải **lập biên bản bàn giao và định giá xác**.
+- Cẩn trọng với vụ mất xe do **người quen, xe cho thuê**, hoặc xảy ra **gần thời điểm mở hợp đồng**.`,
+  s: 'Bộ Q&A 300 tình huống giám định – bồi thường XCG (nhóm 11) và tài liệu Nhóm tình huống thực tế GĐBT bảo hiểm xe cơ giới — sổ tay thực hành, không phải văn bản PTI', r: ['dg-toanbo', 'ct-toanbo', 'sb-thanhly', 'nt3-guixe'], v: 0 },
+
+{ id: 'th-gianlan', g: 'tinhhuong',
+  q: 'Dấu hiệu nghi vấn trục lợi bảo hiểm và cách xử lý khi nghi ngờ?',
+  k: ['dấu hiệu gian lận', 'trục lợi bảo hiểm', 'nghi ngờ gian lận', 'ảnh chỉnh sửa', 'dấu hiệu chỉnh sửa', 'ảnh photoshop', 'metadata ảnh', 'lời khai thay đổi', 'biển số không khớp', 'VIN không rõ', 'tai nạn ngay sau khi mua bảo hiểm'],
+  a: `**Dấu hiệu cần nghi ngờ:**
+- Tai nạn xảy ra **ngay sau khi mở hợp đồng** hoặc ngay trước khi hợp đồng hết hạn.
+- Vết hư hỏng **không khớp lời khai**: góc va chạm, chiều lực, vận tốc, thời điểm, chiều cao va chạm.
+- Vết cũ cộng vết mới; hạng mục cũ được đưa vào đòi bồi thường.
+- **Nhiều vụ liên tiếp** cùng một xe, một garage hoặc một người lái.
+- Chủ xe thiếu hợp tác, không cho chụp ảnh, không cung cấp hồ sơ; báo giá phóng đại với chi tiết không liên quan.
+|Tình huống|Cách xử lý|
+|Khai một vụ nhưng camera/dấu vết cho thấy hai vụ|Đối chiếu camera · GPS · hình ảnh · nhân chứng · hồ sơ công an · lịch sử sửa chữa · dấu vết trên xe. **Tách từng sự kiện**|
+|Hai bên khai giống nhau nhưng hiện trường không phù hợp|Ưu tiên **dấu vết vật chất và chứng cứ độc lập** thay vì lời khai|
+|Ảnh có dấu hiệu chỉnh sửa|Bảo lưu chứng cứ gốc, kiểm tra **metadata**, yêu cầu **file/video gốc** và xác minh nguồn ảnh. Không kết luận chỉ từ ảnh nén|
+|Biển số trong ảnh không khớp / VIN không rõ|Kiểm tra **VIN và vị trí VIN**, đối chiếu hồ sơ xe. **Không xác định đối tượng bảo hiểm chỉ từ biển số**|
+|Lời khai thay đổi nhiều lần|Lập **bảng diễn biến từng phiên bản** lời khai và đối chiếu chứng cứ|
+**Khi nghi ngờ:** không kết luận vội; thu thập thêm chứng cứ (camera, dữ liệu xe, nhân chứng, lịch sử bảo dưỡng); ghi chép **khách quan** trong biên bản; báo cáo cấp quản lý và bộ phận kiểm soát nội bộ theo quy trình; có thể **tạm dừng thanh toán phần nghi vấn** đến khi xác minh xong nhưng vẫn **thông báo khách hàng bằng văn bản**.`,
+  s: 'Bộ Q&A 300 tình huống giám định – bồi thường XCG (nhóm 12) và tài liệu Nhóm tình huống thực tế GĐBT bảo hiểm xe cơ giới — sổ tay thực hành, không phải văn bản PTI', r: ['gd-trucloi', 'sb-saipham', 'th-tonthatcu'], v: 0 },
+
+{ id: 'th-garage', g: 'tinhhuong',
+  q: 'Garage không thống nhất giá, sửa trước khi duyệt, không trả phụ tùng cũ thì sao?',
+  k: ['garage không thống nhất giá', 'garage sửa trước khi duyệt', 'garage không cho giám định bổ sung', 'garage không trả phụ tùng cũ', 'chủ xe muốn sửa tại hãng', 'chỉ định garage', 'xe sửa nhiều nơi'],
+  a: `|Tình huống|Cách xử lý|
+|Garage và giám định **không thống nhất giá**|**Tách từng hạng mục** và nêu căn cứ giá cho mỗi hạng mục — thống nhất bằng căn cứ, không bằng cảm tính|
+|Garage yêu cầu **thay cả cụm**|Kiểm tra khả năng sửa hoặc thay từng chi tiết; chỉ chấp nhận phương án hợp lý|
+|Garage yêu cầu **phụ tùng chính hãng**|Đối chiếu điều khoản HĐBH và tình trạng xe — không mặc nhiên đáp ứng nếu hợp đồng không quy định|
+|Garage **không cho giám định bổ sung**|**Lập biên bản** và bảo lưu quyền xác minh; không kết luận với phần không tiếp cận được|
+|Garage **sửa trước khi duyệt giá**|Xác định ai phê duyệt và phạm vi đã thống nhất; chỉ xem xét phần **có căn cứ**|
+|Garage **không trả phụ tùng cũ**|Yêu cầu bảo quản theo quy trình thu hồi — thiếu phụ tùng làm **giảm khả năng kiểm chứng** và có thể bị trừ giá trị thu hồi|
+|Chủ xe muốn sửa **tại hãng**, PTI chỉ định garage khác|Kiểm tra **quyền lựa chọn cơ sở sửa chữa** theo hợp đồng/quy tắc và thoả thuận dịch vụ (xem BS05)|
+|Xe sửa **nhiều nơi**|Tách hạng mục và thời điểm từng nơi sửa để **tránh thanh toán trùng**|
+- Phụ tùng thay ra còn giá trị (lốp, ắc quy, phiên cùng…) có thể **thu hồi hoặc trừ giá trị** theo quy tắc bảo hiểm.`,
+  s: 'Bộ Q&A 300 tình huống giám định – bồi thường XCG (nhóm 13) và tài liệu Nhóm tình huống thực tế GĐBT bảo hiểm xe cơ giới — sổ tay thực hành, không phải văn bản PTI', r: ['ct-thuhoi', 'ct-giamsat', 'qt-bs05', 'dg-hopdongsc'], v: 0 },
+
+{ id: 'th-xedien', g: 'tinhhuong',
+  q: 'Giám định xe điện, xe hybrid và hệ thống ADAS cần lưu ý gì?',
+  k: ['xe điện tình huống', 'EV', 'hybrid', 'ADAS', 'hệ thống cao áp', 'báo lỗi cao áp', 'lỗi HV', 'HV', 'cách điện cao áp', 'BMS', 'pin pack', 'cổng sạc', 'EVSE', 'inverter', 'hiệu chuẩn cảm biến', 'cháy khi sạc'],
+  a: `**An toàn cao áp (HV) là ưu tiên số một** — không tự thao tác nếu chưa được huấn luyện.
+|Tình huống|Kiểm tra|Kết luận|
+|EV va chạm nhẹ nhưng **báo lỗi HV**|Scan mã lỗi và kiểm tra **cách điện hệ thống cao áp**|**Không đánh giá chỉ bằng ngoại quan**|
+|EV bị **móp pin**|Vỏ pack · module · **BMS**|Cần kỹ thuật viên HV đủ năng lực đánh giá|
+|**EV ngập nước**|**Cô lập cao áp**, không vận hành lại khi chưa kiểm tra|An toàn cao áp trước, giám định sau|
+|EV bị đâm **cổng sạc**|Cổng sạc · khoá · dây · bộ sạc|**Tách tổn thất điện và tổn thất thân vỏ**|
+|**EV cháy khi sạc**|Xác định nguồn cháy: **xe · EVSE (bộ sạc) · hay nguồn điện**|Cần chuyên môn về cháy điện, phối hợp cơ quan chức năng|
+|**Hybrid** va chạm đầu xe|**Inverter** · hệ thống làm mát · cảm biến|Không chỉ kiểm tra động cơ xăng|
+|Hybrid ngập nước|Kiểm tra **cả hệ thống HV và động cơ đốt trong**|Tách các nguồn tổn thất|
+|Cảm biến/camera **ADAS** sau va chạm|Vị trí cảm biến · mã lỗi · dữ liệu chẩn đoán · **giá trị hiệu chuẩn** · hướng dẫn sửa chữa của hãng|Chi phí **hiệu chuẩn (calibration)** phải có căn cứ kỹ thuật, không tính tuỳ tiện|
+!! Tại PTI, **pin gắn trên xe điện** đã được đưa vào bảo hiểm mặc định trong đơn gốc theo Quy tắc VCX QĐ 109/2025 (khoản 15.15) và **không còn khấu trừ 10%** riêng cho tổn thất pin.`,
+  s: 'Bộ Q&A 300 tình huống giám định – bồi thường XCG (nhóm 14) — sổ tay thực hành, không phải văn bản PTI; phần pin xe điện theo Quy tắc VCX QĐ 109/QĐ-PTI ngày 23/09/2025', r: ['gd-xedien', 'qt-thaydoi'], v: 0 },
+
+{ id: 'th-ketluan', g: 'tinhhuong',
+  q: 'Chưa đủ chứng cứ, khách không đồng ý kết luận, đòi tiền mặt thay sửa chữa thì sao?',
+  k: ['chưa đủ chứng cứ', 'khách không đồng ý kết luận', 'đòi tiền mặt thay sửa chữa', 'tự sửa tại nhà', 'bên thứ ba không có chứng từ', 'giám định lại', 'tranh chấp kết luận', 'khởi kiện'],
+  a: `|Tình huống|Cách xử lý|
+|**Chưa đủ chứng cứ** để kết luận|Chuyển trạng thái **cần xác minh bổ sung**, nêu rõ chứng cứ còn thiếu. **Không kết luận có/không bồi thường khi dữ liệu chưa đủ**|
+|Khách hàng **không đồng ý kết luận**|Giải thích **căn cứ từng hạng mục bằng văn bản**, hướng dẫn quy trình khiếu nại/giám định lại theo hợp đồng. Giữ lập trường dựa trên chứng cứ|
+|Garage không đồng ý phương án sửa|Trao đổi **trên từng hạng mục kỹ thuật**, không giải quyết bằng cảm tính|
+|Bên thứ ba đòi chi phí **không có chứng từ**|Yêu cầu chứng cứ phù hợp hoặc áp dụng **phương pháp định giá hợp lý**. Không mặc nhiên chấp nhận|
+|Chủ xe đòi **tiền mặt thay sửa chữa**|Kiểm tra **hình thức bồi thường theo hợp đồng** — GĐV không tự ý đổi hình thức bồi thường|
+|Chủ xe **tự sửa tại nhà**|Xác định chi phí thực tế và khả năng chứng minh; chỉ xem xét theo phương thức bồi thường được quy định|
+**Khi từ chối bồi thường:** thông báo **bằng văn bản**, nêu rõ lý do và **điều khoản áp dụng**; không vượt thời hạn trả lời theo quy định; có ý kiến của bộ phận pháp chế hoặc cấp quản lý với vụ giá trị lớn hoặc đang tranh cãi.
+**Tranh chấp:** thương lượng, hoà giải; không đạt thì bên bị thiệt hại có thể **khởi kiện tại toà án** hoặc dùng trọng tài theo thoả thuận. Với **giám định độc lập**, hai bên thống nhất đơn vị và chi phí **trước khi thực hiện**.`,
+  s: 'Bộ Q&A 300 tình huống giám định – bồi thường XCG (nhóm 15) và tài liệu Nhóm tình huống thực tế GĐBT bảo hiểm xe cơ giới — sổ tay thực hành, không phải văn bản PTI', r: ['dg-tuchoi', 'sb-khieunai', 'gd-thuegd', 'dg-chuaxd'], v: 0 }
 );
 /* @@KB-END@@ */
