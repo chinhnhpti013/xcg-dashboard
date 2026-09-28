@@ -46,6 +46,10 @@ const PHRASINGS = [
   ['khách đòi trả tiền mặt thay vì sửa chữa', 'ct-bangtien'],
   ['garage đề nghị sơn cả bên xe', 'th-dongson'],
   ['xe đã sửa trước khi giám định', 'th-tiepnhan'],
+  ['phí tái tục vật chất xe tính thế nào', 'qt-taituc'],
+  ['xe tái tục ngắt quãng trên 365 ngày áp phí gì', 'qt-taituc'],
+  ['thông tư 67 quy định gì về trả tiền bảo hiểm', 'pl-tt67'],
+  ['pti có được yêu cầu khách cung cấp giấy tờ khách không lấy được không', 'pl-tt67'],
 ];
 
 // ── Mục quy trình PTI phải thắng mục tham khảo (v:0) ────────────────────────

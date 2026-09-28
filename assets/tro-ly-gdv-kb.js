@@ -2,16 +2,24 @@
    BỘ TRI THỨC TRỢ LÝ ẢO GIÁM ĐỊNH VIÊN — PTISOS Quảng Ninh
    Nạp bởi index.html (popup "Trợ lý GĐV"). Chạy offline, không gọi AI/Internet.
 
-   Nguồn chính (ưu tiên quy trình PTI):
+   Nguồn chính (ưu tiên quy trình PTI) — toàn bộ nằm trong docs/Kho tri thức:
    · Quy trình giải quyết YCBT NV XCG ký hiệu PTI.XCG.20 (QĐ ban hành 20/12/2024)
-     và 18 phụ lục PL.PTI.XCG.20.01 → 20.18
+     và 18 phụ lục PL.PTI.XCG.20.01 → 20.18 (PL.20.04 dùng bản "mới" — nhận thế
+     quyền đòi NT3, bộ biểu mẫu NVXE039.01.xx)
    · Quy tắc BH vật chất xe ô tô — QĐ 109/QĐ-PTI ngày 23/09/2025 (hiệu lực 14/10/2025)
    · NĐ 67/2023/NĐ-CP (BH bắt buộc TNDS chủ xe) — trích theo PL.PTI.XCG.20.12
    · Quy tắc QĐ 110/QĐ-PTI ngày 23/09/2025 (trách nhiệm chủ xe/lái xe với phụ xe, người ngồi trên xe)
-   · Công văn nghiệp vụ trong docs/Thi dinh ky: CV 4406 (cam kết CLDV), 2186 (App GĐV),
-     3653 (ảnh cấp đơn), 1933 (thanh toán phí), 5884, 5602, 2479, 756, 2299, 87 —
-     văn bản trước QT PTI.XCG.20 được gắn v: 0 (tham khảo)
-   Bản gốc lưu tại thư mục docs/ (không cần mở khi dùng trợ lý).
+   · Quy trình thu hồi & thanh lý tài sản sau bồi thường (01/07/2025)
+   · Công văn nghiệp vụ PTI: CV 4406 (cam kết CLDV), CV 3653 (ảnh cấp đơn),
+     CV 1959 (thanh toán phí), CV 5884 (GPLX & định giá TS), CV 3770 + CV 25
+     (phí tái tục VCX); sổ tay nội bộ "Tiện ích tra cứu CV"
+   · Pháp luật: Luật KDBH 2022 + Luật 139/2025 (dùng VBHN 31/VBHN-VPQH),
+     NĐ 46/2023, TT 67/2023/TT-BTC, NĐ 67/2023, NĐ 220/2026, BLDS 91/2015
+   · Sổ tay tham khảo (gắn v: 0): Bộ Q&A 300 tình huống, Nhóm tình huống thực tế GĐBT
+   Văn bản ban hành trước QT PTI.XCG.20 được gắn v: 0 (tham khảo).
+   Bản gốc lưu tại docs/Kho tri thức (đã .gitignore — KHÔNG đẩy lên GitHub Pages).
+   ⚠ Chỉ đưa vào đây nội dung có tài liệu gốc trong docs/ — tài liệu bị gỡ khỏi kho
+     thì gỡ luôn mục tương ứng (xem CLAUDE.md, mục Trợ lý ảo GĐV).
 
    CÁCH BỔ SUNG / SỬA NỘI DUNG
    Mỗi mục trong TL_KB:
@@ -34,8 +42,8 @@
    ══════════════════════════════════════════════════════════════════════════ */
 
 window.TL_META = {
-  version: '2026-09-26',
-  basis: 'QT PTI.XCG.20 (12/2024) · QT VCX 109/2025 · QT 110/2025 · NĐ 67/2023 (sửa bởi NĐ 220/2026) · Luật KDBH 2022 (sửa bởi Luật 139/2025)'
+  version: '2026-09-28',
+  basis: 'QT PTI.XCG.20 (12/2024) · QT VCX 109/2025 · QT 110/2025 · NĐ 67/2023 (sửa bởi NĐ 220/2026) · Luật KDBH 2022 (sửa bởi Luật 139/2025) · NĐ 46/2023 & TT 67/2023/TT-BTC'
 };
 
 /* Nhóm chủ đề — thứ tự hiển thị trên màn hình chào */
@@ -394,7 +402,7 @@ Ngoài các trường hợp trên, GĐV báo cáo theo thẩm quyền để quy�
 - **Thanh toán bồi thường:** trong vòng **10 ngày** kể từ khi nhận đủ hồ sơ, chứng từ và hiện vật thu hồi.
 - **Đối soát hồ sơ:** định kỳ **ngày 20 hằng tháng** PTI thông báo danh sách hồ sơ còn thiếu giấy tờ; KH có **10 ngày** kể từ ngày nhận thông báo để bổ sung (không tính thời gian cơ quan chức năng xử lý, trả hồ sơ).
 !! Đây là bản cam kết cũ (2019) dùng để tham khảo mức phục vụ tại địa bàn. Thời hạn **duyệt giá và Bước 4 hiện hành** áp dụng theo QT PTI.XCG.20 và CV 4406 — nếu lệch nhau thì lấy quy trình hiện hành.`,
-  s: 'Quy trình xử lý đền bù (bồi thường) xe ô tô — PTI Quảng Ninh, 04/01/2019 (Ban XCG cung cấp)', r: ['dg-thoihan', 'cl-camket', 'cl-duyetgia'], v: 0 },
+  s: 'Quy trình xử lý đền bù (bồi thường) xe ô tô — PTI Quảng Ninh, 04/01/2019 (Ban XCG cung cấp; bản gốc không lưu trong docs/Kho tri thức)', r: ['dg-thoihan', 'cl-camket', 'cl-duyetgia'], v: 0 },
 
 { id: 'tn-anchi-quytac', g: 'tiepnhan',
   q: 'Kiểm tra ấn chỉ bảo hiểm và xác định Quy tắc áp dụng cho hồ sơ thế nào?',
@@ -1234,7 +1242,27 @@ TL_KB.push(
   a: `- Thiệt hại xe do **hàng hoá chở trên xe/kéo theo** gây ra mà **không** xuất phát từ đâm, va, lật, đổ xe → **loại trừ** (khoản 15.21).
 - Có **BS25**: PTI bồi thường cả trường hợp này; khấu trừ **10% STBT, tối thiểu 2.000.000đ/vụ** (lấy số lớn hơn).
 - Nếu hàng hoá hư hỏng do xe gây tai nạn → xem BH TNDS của chủ xe đối với hàng hoá.`,
-  s: 'QT VCX 109/2025 – khoản 15.21, Điều 30', r: ['qt-loaitru', 'td-hanghoa'] }
+  s: 'QT VCX 109/2025 – khoản 15.21, Điều 30', r: ['qt-loaitru', 'td-hanghoa'] },
+
+{ id: 'qt-taituc', g: 'quytac',
+  q: 'Phí bảo hiểm tái tục vật chất xe ô tô tính theo nguyên tắc nào?',
+  k: ['tái tục', 'phí tái tục', 'tính phí tái tục', 'tái tục vật chất xe', 'tái tục liên tục', 'tái tục ngắt quãng', 'CV 3770', '3770', 'CV 25', 'phí sàn', 'phí bảo hiểm thuần', 'phí tối thiểu 5,5 triệu', 'tỷ lệ bồi thường tái tục', 'TLBT tái tục', 'xe đoàn', 'xe lẻ', 'đổi mục đích sử dụng xe tái tục', 'khách hỏi phí năm sau'],
+  a: `**Định nghĩa** (CV 3770/PTI-BHXCG ngày 11/10/2024, áp dụng từ 14/10/2024):
+- **Tái tục liên tục:** đơn mới bắt đầu hiệu lực **không muộn hơn** thời điểm kết thúc đơn cũ tại PTI.
+- **Tái tục ngắt quãng:** đơn mới bắt đầu sau khi đơn cũ đã hết hiệu lực — chia **đến 365 ngày** và **trên 365 ngày**.
+**Áp phí:**
+|Trường hợp|Biểu phí áp dụng|
+|Tái tục liên tục hoặc ngắt quãng ≤ 365 ngày|Biểu phí **tái tục** hiện hành; xe có **TLBT < 30%** được áp phí tối thiểu **5,5 triệu đồng/xe**|
+|Tái tục ngắt quãng > 365 ngày|Biểu phí **xe tham gia lần đầu** tại PTI|
+**Tỷ lệ bồi thường khi chào phí tái tục** = (số tiền **đã bồi thường** + **ước bồi thường**) / phí bảo hiểm vật chất xe.
+- **Xe lẻ:** TLBT của HĐBH/GCNBH **năm trước liền kề**.
+- **Xe đoàn** (HĐBH từ 02 xe trở lên): TLBT nghiệp vụ VCX (**XO.4**) theo năm nghiệp vụ, **bình quân gia quyền 02 năm liền kề** theo mã khách hàng.
+- Thời điểm tính: tại thời điểm chào phí, **không sớm hơn 30 ngày** trước ngày hết hạn đơn hiện hữu.
+**Sàn phí — đã đổi từ 25/11/2025** (CV 25/PTI-BHXCG): sau khi tính xong phí tái tục, phí **không được thấp hơn phí bảo hiểm thuần của PTI** cài trên Portal (trước đây là "phí bảo hiểm sàn" Mục 1.4 PL01 CV 2896). Phí thuần PTI **luôn thấp hơn** phí sàn cũ → phí tái tục chào cho khách **giảm đi** so với cách tính cũ. Nhập đơn dạng **T – Tái tục** trên Portal, nếu nhập thấp hơn phí thuần hệ thống sẽ cảnh báo và không cho duyệt đơn.
+- **Thêm/bớt điều khoản bổ sung** năm tái tục: phí tăng/giảm tương ứng **phụ phí ĐKBS × STBH năm tái tục**.
+- **Đổi mục đích sử dụng:** kinh doanh → không kinh doanh: áp tỷ lệ phí như **xe tham gia lần đầu**; không kinh doanh → kinh doanh: lấy **số lớn hơn** giữa phí tái tục và tỷ lệ phí xe lần đầu.
+!! Đây là quy định **khai thác/cấp đơn**, GĐV chỉ dùng để trả lời khách hỏi phí năm sau — mọi trường hợp phí sau giảm **không thấp hơn tỷ lệ phí thuần của Bộ Tài chính**. Số liệu ước bồi thường trong hồ sơ đang xử lý **ảnh hưởng trực tiếp** tới TLBT chào phí tái tục của khách.`,
+  s: 'CV 3770/PTI-BHXCG ngày 11/10/2024 – mục 1, 2 (áp dụng 14/10/2024); CV 25/PTI-BHXCG ngày 25/11/2025 – mục 1, 3; CV 2896/PTI-BHXCG ngày 23/09/2025 – PL01', r: ['qt-thaydoi', 'gd-thanhtoanphi', 'dg-thuphi', 'pl-tt67'] }
 );
 
 /* ─── 7. TNDS & TẠM ỨNG (NĐ 67/2023) ─── */
@@ -1751,12 +1779,12 @@ TL_KB.push(
 |**Văn bản hợp nhất 31/VBHN-VPQH**|Bản hợp nhất Luật KDBH 2022 + Luật 139/2025 — **dùng bản này để tra điều luật**|—|
 |**NĐ 67/2023/NĐ-CP**|BH bắt buộc TNDS chủ xe cơ giới, BH cháy nổ bắt buộc, BH bắt buộc trong xây dựng|06/09/2023|
 |**NĐ 220/2026/NĐ-CP**|Sửa đổi NĐ 67/2023 (phần xây dựng + đổi thuật ngữ)|01/07/2026|
-|**TT 67/2023/TT-BTC**|Hướng dẫn thi hành Luật KDBH|—|
-|**NĐ 46/2023/NĐ-CP**|Quy định chi tiết thi hành một số điều Luật KDBH|—|
+|**NĐ 46/2023/NĐ-CP**|Quy định chi tiết thi hành một số điều Luật KDBH (tổ chức, hoạt động DNBH; BH xe cơ giới là nghiệp vụ phi nhân thọ)|01/07/2023|
+|**TT 67/2023/TT-BTC**|Hướng dẫn Luật KDBH và NĐ 46/2023 — trả tiền bảo hiểm, thanh toán phí, cơ sở tính phí XCG|02/11/2023|
 |**Bộ luật Dân sự 91/2015/QH13**|Bồi thường thiệt hại ngoài hợp đồng, nguồn nguy hiểm cao độ (Điều 601)|01/01/2017|
 - Văn bản **nội bộ PTI** (QT PTI.XCG.20, Quy tắc QĐ 109/2025, QĐ 110/2025 và các phụ lục) chi tiết hoá pháp luật để áp dụng — khi giải quyết hồ sơ **ưu tiên quy trình và quy tắc PTI**, đối chiếu luật khi có tranh chấp hoặc khi quy trình chưa quy định.
 !! **Bảo hiểm bắt buộc TNDS chủ xe cơ giới** là 1 trong các loại bảo hiểm bắt buộc theo **Điều 8 Luật KDBH** — không được thoả thuận khác so với NĐ 67/2023.`,
-  s: 'Văn bản hợp nhất 31/VBHN-VPQH (Luật KDBH) – Điều 8; NĐ 67/2023/NĐ-CP; NĐ 220/2026/NĐ-CP; BLDS 91/2015/QH13', r: ['pl-lkdbh', 'pl-nd220', 'pl-blds601'] },
+  s: 'Văn bản hợp nhất 31/VBHN-VPQH (Luật KDBH) – Điều 8; NĐ 67/2023/NĐ-CP; NĐ 220/2026/NĐ-CP; NĐ 46/2023/NĐ-CP; TT 67/2023/TT-BTC; BLDS 91/2015/QH13', r: ['pl-lkdbh', 'pl-nd220', 'pl-tt67', 'pl-blds601'] },
 
 { id: 'pl-lkdbh', g: 'phaply',
   q: 'Luật Kinh doanh bảo hiểm có những điều nào giám định viên phải nhớ?',
@@ -1796,7 +1824,21 @@ TL_KB.push(
   b) Thiệt hại xảy ra trong trường hợp **bất khả kháng hoặc tình thế cấp thiết**, trừ khi pháp luật có quy định khác.
 - Nguồn nguy hiểm cao độ bị **chiếm hữu, sử dụng trái pháp luật** → người đang chiếm hữu, sử dụng trái pháp luật phải bồi thường; nếu chủ sở hữu/người chiếm hữu **có lỗi trong việc để bị chiếm hữu, sử dụng trái pháp luật** thì **liên đới** bồi thường.
 !! Đây là lý do một vụ tai nạn vẫn phát sinh trách nhiệm bồi thường TNDS cho bên thứ ba **kể cả khi lái xe không có lỗi** — khác với bảo hiểm vật chất xe (xét theo phạm vi và loại trừ của Quy tắc). Khi phân lỗi, hai chuyện cần tách: **lỗi vi phạm giao thông** và **trách nhiệm bồi thường dân sự**.`,
-  s: 'Bộ luật Dân sự 91/2015/QH13 – Điều 601 (Bồi thường thiệt hại do nguồn nguy hiểm cao độ gây ra)', r: ['nt3-nguyentac', 'td-nt3', 'pl-vanban'] }
+  s: 'Bộ luật Dân sự 91/2015/QH13 – Điều 601 (Bồi thường thiệt hại do nguồn nguy hiểm cao độ gây ra)', r: ['nt3-nguyentac', 'td-nt3', 'pl-vanban'] },
+
+{ id: 'pl-tt67', g: 'phaply',
+  q: 'Thông tư 67/2023/TT-BTC và Nghị định 46/2023 quy định gì liên quan đến giải quyết bồi thường xe cơ giới?',
+  k: ['thông tư 67', 'TT 67/2023', '67/2023/TT-BTC', 'nghị định 46', 'NĐ 46/2023', '46/2023/NĐ-CP', 'hướng dẫn luật kinh doanh bảo hiểm', 'chi phí thu thập tài liệu', 'yêu cầu khách hàng cung cấp giấy tờ', 'không được yêu cầu bằng chứng', 'từ chối phải nêu lý do bằng văn bản', 'thời điểm hiệu lực hợp đồng phi nhân thọ', 'cơ sở tính phí xe cơ giới', 'căn cứ tăng giảm phí'],
+  a: `**NĐ 46/2023/NĐ-CP ngày 01/07/2023** — quy định chi tiết thi hành một số điều của Luật KDBH (chủ yếu về tổ chức, hoạt động, tài chính của DNBH, đại lý, môi giới, dịch vụ phụ trợ). Điều GĐV cần nhớ: **bảo hiểm xe cơ giới là nghiệp vụ bảo hiểm phi nhân thọ** (khoản 4 Điều 4); Điều 6, 7 lập **Cơ sở dữ liệu về hoạt động kinh doanh bảo hiểm** do Bộ Tài chính quản lý tập trung.
+**TT 67/2023/TT-BTC ngày 02/11/2023** hướng dẫn Luật KDBH và NĐ 46/2023. Các điều chạm trực tiếp tới nghiệp vụ giám định – bồi thường:
+|Điều|Nội dung GĐV cần biết|
+|**Điều 18** – Trả tiền bảo hiểm|Thời hạn nộp hồ sơ & trả tiền theo Điều 30, 31 Luật KDBH. **Từ chối chi trả phải nêu rõ lý do bằng văn bản**. HĐBH phải nêu rõ tài liệu khách phải cung cấp; DNBH **không được yêu cầu bằng chứng mà bên mua không thể tiếp cận/thu thập** theo pháp luật. Tài liệu **thu thập thêm** ngoài danh mục trong HĐBH → **chi phí do DNBH chịu**|
+|**Điều 26** – Thanh toán phí (phi nhân thọ)|Đóng một lần: không quá **30 ngày** kể từ ngày bắt đầu thời hạn BH; đóng theo kỳ: kỳ đầu không quá 30 ngày, các kỳ sau theo HĐBH ban đầu và **không được thoả thuận thay đổi**; **gia hạn** thanh toán phí chỉ khi bên mua có **tài sản bảo đảm hoặc bảo lãnh thanh toán phí** — đây là gốc pháp lý của CV 1959|
+|**Điều 25** – Cơ sở tính phí BH xe cơ giới|Yếu tố tính phí bắt buộc: loại xe, mục đích kinh doanh, mục đích sử dụng, năm sản xuất. **Giảm phí** phải căn cứ quy mô đội xe, mức khấu trừ/miễn thường, **lịch sử bồi thường**, kênh phân phối… và **không thấp hơn phí thuần**|
+|**Điều 16, 17**|HĐBH phi nhân thọ **có hiệu lực từ thời điểm giao kết**; hợp đồng phải ghi rõ mức phí, kỳ đóng, ngày đến hạn, thời gian gia hạn|
+|**Điều 12, 19**|Quy tắc – điều kiện – điều khoản BH là **một bộ phận của HĐBH**; giải quyết tranh chấp theo Điều 32 Luật KDBH|
+!! Khi khách phàn nàn "PTI đòi quá nhiều giấy tờ": đối chiếu **Điều 18 khoản 2, 3 TT 67** — chỉ được yêu cầu tài liệu đã nêu trong HĐBH/quy tắc, tài liệu ngoài danh mục thì PTI tự thu thập và tự chịu chi phí.`,
+  s: 'TT 67/2023/TT-BTC ngày 02/11/2023 – Điều 12, 16, 17, 18, 19, 25, 26; NĐ 46/2023/NĐ-CP ngày 01/07/2023 – Điều 1, 2, 4, 6', r: ['pl-vanban', 'pl-lkdbh', 'gd-thanhtoanphi', 'qt-taituc'] }
 );
 
 /* ─── 13. TÌNH HUỐNG THỰC TẾ (sổ tay thực hành — tham khảo, v: 0) ─── */
