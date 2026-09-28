@@ -349,6 +349,25 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:linear-gradient(150deg,#
   padding:18px 20px;margin-bottom:20px;overflow-x:auto}
 .table-card h3{font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:14px;
   padding-bottom:10px;border-bottom:1px solid var(--surface2)}
+/* Tab CLDV — bảng dữ liệu co gọn, chiều cao khung cân với .chart-card cùng tab
+   (chart-wrap 260px + h3): dòng thấp hơn, phần dư cuộn trong khung, thead dính trên */
+#tab-cldv .table-card{padding:14px 16px;margin-bottom:14px}
+#tab-cldv .table-card>h3{margin-bottom:10px;padding-bottom:8px}
+#tab-cldv .table-card table{font-size:.76rem}
+#tab-cldv .table-card th{padding:6px 10px;font-size:.65rem}
+#tab-cldv .table-card td{padding:5px 10px;line-height:1.35}
+.cldv-tbl-scroll{max-height:255px;overflow-y:auto;overflow-x:auto;
+  scrollbar-width:thin;scrollbar-color:#fb923c var(--surface2)}
+/* separate để viền ô không mất khi thead sticky */
+.cldv-tbl-scroll table{border-collapse:separate;border-spacing:0}
+.cldv-tbl-scroll thead th{position:sticky;top:0;z-index:3;
+  box-shadow:inset 0 -1px 0 var(--border)}
+.cldv-tbl-scroll::-webkit-scrollbar{width:9px;height:9px}
+.cldv-tbl-scroll::-webkit-scrollbar-track{background:var(--surface2);border-radius:8px}
+.cldv-tbl-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#fdba74,#ea580c);
+  border-radius:8px;border:2px solid var(--surface2)}
+.cldv-tbl-scroll::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#f97316,#c2410c)}
+@media(max-width:600px){.cldv-tbl-scroll{max-height:215px}}
 /* Dashboard động — bảng chi tiết cao bằng chart cạnh bên, phần dư cuộn trong khung.
    align-items:start để chart-card giữ chiều cao tự nhiên (JS đọc số đó gán cho bảng). */
 #tab-dashboard .chart-row{align-items:start}
@@ -3176,12 +3195,12 @@ function renderCLDV(s){
         <div class="chart-card"><h3>Phân phối thời gian tồn hồ sơ</h3><div class="chart-wrap"><canvas id="cldv-c1"></canvas></div></div>
         <div class="chart-card"><h3>Cơ cấu đúng hạn / quá hạn</h3><div class="chart-wrap-pie"><canvas id="cldv-c2"></canvas></div></div>
       </div>
-      <div class="table-card" style="margin-bottom:14px">
+      <div class="table-card">
         <h3>Phân loại theo Trạng thái Hồ sơ</h3>
-        <table><thead><tr>
+        <div class="cldv-tbl-scroll"><table><thead><tr>
           <th>Trạng thái</th><th class="center">Số HS</th><th class="center">Tỷ lệ</th>
           <th class="right">Tiền ước BT</th><th class="right">Đã chi trả (gồm VAT)</th>
-        </tr></thead><tbody>${ttRows}</tbody></table>
+        </tr></thead><tbody>${ttRows}</tbody></table></div>
       </div>
       <div style="background:#fff7ed;border-left:4px solid #ea580c;border-radius:0 8px 8px 0;padding:12px 16px">
         <div style="font-size:.72rem;font-weight:700;color:#ea580c;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">💡 Đề xuất — Chất lượng dịch vụ</div>
@@ -3207,13 +3226,13 @@ function renderCLDV(s){
         <div class="chart-card"><h3>Hồ sơ tồn theo từng GĐV</h3><div class="chart-wrap"><canvas id="cldv-c3"></canvas></div></div>
         <div class="chart-card"><h3>Cơ cấu nghiệp vụ — HS đang xử lý</h3><div class="chart-wrap-pie"><canvas id="cldv-c4"></canvas></div></div>
       </div>
-      <div class="table-card" style="margin-bottom:14px">
+      <div class="table-card">
         <h3>Hiệu suất từng Giám định viên</h3>
-        <table><thead><tr>
+        <div class="cldv-tbl-scroll"><table><thead><tr>
           <th>GĐV</th><th class="center">Tổng HS</th><th class="center">Đã GQ</th>
           <th class="center">Đang tồn</th><th class="center">≥90 ngày</th>
           <th class="center">TB tồn</th><th class="center">Mức độ</th>
-        </tr></thead><tbody>${gdvProdRows}</tbody></table>
+        </tr></thead><tbody>${gdvProdRows}</tbody></table></div>
       </div>
       <div style="background:#f0fdf4;border-left:4px solid #34d399;border-radius:0 8px 8px 0;padding:12px 16px">
         <div style="font-size:.72rem;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">💡 Đề xuất — Hiệu quả & Năng suất</div>
